@@ -16,7 +16,10 @@
     "useDefineForClassFields": false,
     "lib": ["ES2022", "dom"],
     "typeRoots": ["node_modules/@types"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "ngx-query-builder": ["projects/ngx-query-builder/src/public-api.ts"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

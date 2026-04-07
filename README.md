@@ -61,10 +61,10 @@ export class AppComponent {
 ### NgModule (backward compatible)
 
 ```ts
-import { NgxQueryBuilderModule } from 'ngx-query-builder';
+import { QueryBuilderModule } from 'ngx-query-builder';
 
 @NgModule({
-  imports: [NgxQueryBuilderModule, ReactiveFormsModule],
+  imports: [QueryBuilderModule, ReactiveFormsModule],
 })
 export class AppModule {}
 ```
@@ -129,7 +129,7 @@ interface QueryBuilderConfig {
 | `number` | `=`, `!=`, `>`, `>=`, `<`, `<=` |
 | `date` | `=`, `!=`, `>`, `>=`, `<`, `<=` |
 | `time` | `=`, `!=`, `>`, `>=`, `<`, `<=` |
-| `category` | `=`, `!=` |
+| `category` | `=`, `!=`, `in`, `not in` |
 | `multiselect` | `in`, `not in` |
 | `boolean` | `=` |
 
@@ -152,9 +152,9 @@ Replace any part of the UI using structural directives as content children.
 
 ```html
 <query-builder [formControl]="queryCtrl" [config]="config">
-  <ng-container *queryField="let field; let rule=rule; let onChange=onChange">
+  <ng-container *queryField="let rule; let fields=fields; let onChange=onChange">
     <mat-select [(ngModel)]="rule.field" (ngModelChange)="onChange($event, rule)">
-      <mat-option *ngFor="let f of field.fields" [value]="f.value">{{f.name}}</mat-option>
+      <mat-option *ngFor="let f of fields" [value]="f.value">{{f.name}}</mat-option>
     </mat-select>
   </ng-container>
 </query-builder>
@@ -227,6 +227,9 @@ npm run build
 # Run tests (Jest)
 npm test
 
+# Run tests with coverage report
+npx jest --coverage
+
 # Build the demo app
 npx ng build demo
 
@@ -238,8 +241,8 @@ npx ng serve demo
 
 1. Replace `angular2-query-builder` with `ngx-query-builder` in `package.json`
 2. Update imports: `from 'angular2-query-builder'` → `from 'ngx-query-builder'`
-3. Replace `QueryBuilderModule` with `NgxQueryBuilderModule` (or use `QueryBuilderComponent` directly)
+3. Keep `QueryBuilderModule` import (or use `QueryBuilderComponent` directly as a standalone component)
 
 ## License
 
-MIT © [Zeb Zhao](https://github.com/zebzhao/)
+MIT © [Argela Inc.](https://argela.com.tr)

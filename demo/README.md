@@ -1,27 +1,38 @@
-# Demo
+# ngx-query-builder — Demo App
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.1.2.
+A standalone Angular 19 application showcasing the `ngx-query-builder` library. The demo provides a live, interactive query builder with JSON output displayed in real time.
 
-## Development server
+## Features Demonstrated
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+- **ReactiveFormsModule** integration — query bound to a `FormControl`
+- **Entity mode** — fields filtered by selected entity
+- **Allow collapse** — rulesets can be collapsed/expanded with animation
+- **Persist value on field change** — values are preserved when switching between compatible field types
+- **Disabled state** — toggling the entire query builder on/off
+- **Custom textarea input** — overriding the default text input with a `<textarea>` via `*queryInput` template
+- **Live JSON output** — rendered below the query builder as pretty-printed JSON
 
-## Code scaffolding
+## Development Server
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+# From the workspace root:
+npm start
+# or
+npx ng serve demo
+```
+
+Navigate to `http://localhost:4200/`. The app auto-reloads on file changes.
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+```bash
+npx ng build demo
+```
 
-## Running unit tests
+Build artifacts are written to `dist/demo/`.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Notes
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+- The demo has **no unit tests** — it exists solely to showcase the library
+- No e2e test suite is configured
+- The demo uses the local `ngx-query-builder` package from `dist/ngx-query-builder` (or via Angular workspace path alias)

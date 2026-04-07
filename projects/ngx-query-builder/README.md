@@ -1,24 +1,79 @@
-# Angular2QueryBuilder
+# ngx-query-builder
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.0.1.
+A flexible, configurable Angular 19 query builder component for constructing complex nested filter expressions. Supports entity-based field filtering, custom templates for every part of the UI, and full `ReactiveFormsModule` integration via `ControlValueAccessor`.
 
-## Code scaffolding
+## Peer Dependencies
 
-Run `ng generate component component-name --project ngx-query-builder` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project ngx-query-builder`.
-> Note: Don't forget to add `--project ngx-query-builder` or else it will be added to the default project in your `angular.json` file. 
+| Package | Version |
+|---------|---------|
+| `@angular/core` | `>=19` |
+| `@angular/forms` | `>=19` |
+| `@angular/common` | `>=19` |
+| `rxjs` | `>=7` |
+
+## Installation
+
+```bash
+npm install ngx-query-builder
+```
+
+## Usage
+
+See the [root README](../../README.md) for full API documentation, examples, and configuration options.
+
+### Standalone (recommended)
+
+```ts
+import { QueryBuilderComponent } from 'ngx-query-builder';
+```
+
+### NgModule (backward compatible)
+
+```ts
+import { QueryBuilderModule } from 'ngx-query-builder';
+```
 
 ## Build
 
-Run `ng build ngx-query-builder` to build the project. The build artifacts will be stored in the `dist/` directory.
+```bash
+ng build ngx-query-builder
+```
+
+Build artifacts are written to `dist/ngx-query-builder/`.
+
+## Testing
+
+```bash
+# Run tests via Angular CLI builder
+ng test ngx-query-builder
+
+# Run tests with detailed coverage report
+npx jest --coverage
+```
+
+The test suite uses Jest (via `jest-preset-angular`) and maintains **100% statement, branch, function and line coverage** for the core component.
 
 ## Publishing
 
-After building your library with `ng build ngx-query-builder`, go to the dist folder `cd dist/ngx-query-builder` and run `npm publish`.
+```bash
+ng build ngx-query-builder
+cd dist/ngx-query-builder
+npm publish
+```
 
-## Running unit tests
+## Exports
 
-Run `ng test ngx-query-builder` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+| Export | Description |
+|--------|-------------|
+| `QueryBuilderComponent` | Core standalone query builder component |
+| `QueryBuilderModule` | NgModule re-exporting the component (backward compat) |
+| `QueryInputDirective` | Custom template for value input |
+| `QueryOperatorDirective` | Custom template for operator selector |
+| `QueryFieldDirective` | Custom template for field selector |
+| `QueryEntityDirective` | Custom template for entity selector |
+| `QueryButtonGroupDirective` | Custom template for add/remove buttons |
+| `QuerySwitchGroupDirective` | Custom template for AND/OR condition switch |
+| `QueryRemoveButtonDirective` | Custom template for remove rule button |
+| `QueryEmptyWarningDirective` | Custom template for empty ruleset warning |
+| `QueryArrowIconDirective` | Custom template for collapse arrow icon |
+| Interfaces | `QueryBuilderConfig`, `Rule`, `RuleSet`, `Field`, `Option`, `Entity` |

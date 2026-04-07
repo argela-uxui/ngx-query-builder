@@ -86,7 +86,12 @@
 
   .q-operator-control, .q-field-control,.q-entity-control, .q-input-control:not([type='checkbox']) {
     min-height: 32px;
-    -webkit-appearance: none;
+    appearance: auto;
+  }
+
+  // Restore native dropdown arrow for <select> elements; the rule above strips it
+  select.q-operator-control, select.q-field-control, select.q-entity-control, select.q-input-control {
+    appearance: auto;
   }
 
   .q-switch-label, .q-button {

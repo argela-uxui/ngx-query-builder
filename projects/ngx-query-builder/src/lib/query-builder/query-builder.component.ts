@@ -502,14 +502,17 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     this.handleDataChange();
   }
 
-  transitionEnd(_e: Event): void {
-    this.treeContainer().nativeElement.style.maxHeight = null;
+  transitionEnd(e: TransitionEvent): void {
+    if (e.propertyName === 'max-height') {
+      this.treeContainer().nativeElement.style.maxHeight = null;
+    }
   }
 
   toggleCollapse(): void {
     this.computedTreeContainerHeight();
     setTimeout(() => {
       this.data.collapsed = !this.data.collapsed;
+      this.changeDetectorRef.markForCheck();
     }, 100);
   }
 

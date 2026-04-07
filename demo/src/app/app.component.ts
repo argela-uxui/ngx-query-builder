@@ -21,44 +21,46 @@ import {
 
       <section>
         <h2>Query Builder</h2>
-        <query-builder [formControl]="queryCtrl" [config]="currentConfig" [allowRuleset]="allowRuleset"
-          [allowCollapse]="allowCollapse" [persistValueOnFieldChange]="persistValueOnFieldChange">
-          <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
-            <textarea class="text-input text-area" [(ngModel)]="rule.value" [disabled]="getDisabledState()"
-              placeholder="Custom Textarea"></textarea>
-          </ng-container>
-        </query-builder>
+        <div data-testid="query-builder">
+          <query-builder [formControl]="queryCtrl" [config]="currentConfig" [allowRuleset]="allowRuleset"
+            [allowCollapse]="allowCollapse" [persistValueOnFieldChange]="persistValueOnFieldChange">
+            <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
+              <textarea class="text-input text-area" [(ngModel)]="rule.value" [disabled]="getDisabledState()"
+                placeholder="Custom Textarea" data-testid="custom-textarea"></textarea>
+            </ng-container>
+          </query-builder>
+        </div>
       </section>
 
       <section class="controls">
         <h2>Controls</h2>
         <div class="controls-grid">
           <label class="control-item">
-            <input type="checkbox" (change)="switchModes($event)">
+            <input type="checkbox" (change)="switchModes($event)" data-testid="toggle-entity-mode">
             <span>Entity Mode</span>
           </label>
           <label class="control-item">
-            <input type="checkbox" (change)="changeDisabled($event)">
+            <input type="checkbox" (change)="changeDisabled($event)" data-testid="toggle-disabled">
             <span>Disabled</span>
           </label>
           <label class="control-item">
-            <input type="checkbox" [(ngModel)]="allowRuleset">
+            <input type="checkbox" [(ngModel)]="allowRuleset" data-testid="toggle-allow-ruleset">
             <span>Allow Ruleset</span>
           </label>
           <label class="control-item">
-            <input type="checkbox" [(ngModel)]="allowCollapse">
+            <input type="checkbox" [(ngModel)]="allowCollapse" data-testid="toggle-allow-collapse">
             <span>Allow Collapse</span>
           </label>
           <label class="control-item">
-            <input type="checkbox" [(ngModel)]="persistValueOnFieldChange">
+            <input type="checkbox" [(ngModel)]="persistValueOnFieldChange" data-testid="toggle-persist-value">
             <span>Persist Value on Field Change</span>
           </label>
         </div>
         <div class="status-row">
-          <span class="badge" [class.valid]="queryCtrl.valid" [class.invalid]="!queryCtrl.valid">
+          <span class="badge" [class.valid]="queryCtrl.valid" [class.invalid]="!queryCtrl.valid" data-testid="badge-valid">
             {{ queryCtrl.valid ? 'Valid' : 'Invalid' }}
           </span>
-          <span class="badge" [class.active]="queryCtrl.touched">
+          <span class="badge" [class.active]="queryCtrl.touched" data-testid="badge-touched">
             {{ queryCtrl.touched ? 'Touched' : 'Untouched' }}
           </span>
         </div>
@@ -66,7 +68,7 @@ import {
 
       <section>
         <h2>Query Output</h2>
-        <pre class="output">{{ query | json }}</pre>
+        <pre class="output" data-testid="query-output">{{ query | json }}</pre>
       </section>
     </div>
   `,
@@ -184,15 +186,19 @@ export class AppComponent {
   public query = {
     condition: 'and',
     rules: [
-      {field: 'age', operator: '<=', entity: 'physical'},
-      {field: 'birthday', operator: '=', value: new Date(), entity: 'nonphysical'},
+      {field: 'age', operator: '<=', value: 30, entity: 'physical'},
+      {field: 'name', operator: '=', value: 'Alice', entity: 'nonphysical'},
+      {field: 'birthday', operator: '=', value: '2000-01-01', entity: 'nonphysical'},
+      {field: 'meetingTime', operator: '=', value: '09:00', entity: 'nonphysical'},
+      {field: 'gender', operator: '=', value: 'm', entity: 'physical'},
+      {field: 'educated', operator: '=', value: true, entity: 'nonphysical'},
+      {field: 'tags', operator: 'in', value: ['angular', 'typescript'], entity: 'nonphysical'},
+      {field: 'school', operator: 'is null', entity: 'nonphysical'},
+      {field: 'notes', operator: '=', value: '', entity: 'nonphysical'},
       {
         condition: 'or',
         rules: [
-          {field: 'gender', operator: '=', entity: 'physical'},
           {field: 'occupation', operator: 'in', entity: 'nonphysical'},
-          {field: 'school', operator: 'is null', entity: 'nonphysical'},
-          {field: 'notes', operator: '=', entity: 'nonphysical'}
         ]
       }
     ]
@@ -220,6 +226,19 @@ export class AppComponent {
       birthday: {
         name: 'Birthday', type: 'date', operators: ['=', '<=', '>'],
         defaultValue: (() => new Date()), entity: 'nonphysical'
+      },
+      meetingTime: {name: 'Meeting Time', type: 'time', entity: 'nonphysical'},
+      tags: {
+        name: 'Tags',
+        type: 'multiselect',
+        operators: ['in', 'not in'],
+        options: [
+          {name: 'Angular', value: 'angular'},
+          {name: 'TypeScript', value: 'typescript'},
+          {name: 'RxJS', value: 'rxjs'},
+          {name: 'Node.js', value: 'nodejs'}
+        ],
+        entity: 'nonphysical'
       },
       school: {name: 'School', type: 'string', nullable: true, entity: 'nonphysical'},
       occupation: {
@@ -254,6 +273,18 @@ export class AppComponent {
         name: 'Birthday', type: 'date', operators: ['=', '<=', '>'],
         defaultValue: (() => new Date())
       },
+      meetingTime: {name: 'Meeting Time', type: 'time'},
+      tags: {
+        name: 'Tags',
+        type: 'multiselect',
+        operators: ['in', 'not in'],
+        options: [
+          {name: 'Angular', value: 'angular'},
+          {name: 'TypeScript', value: 'typescript'},
+          {name: 'RxJS', value: 'rxjs'},
+          {name: 'Node.js', value: 'nodejs'}
+        ]
+      },
       school: {name: 'School', type: 'string', nullable: true},
       occupation: {
         name: 'Occupation',
@@ -286,3 +317,4 @@ export class AppComponent {
     (event.target as HTMLInputElement).checked ? this.queryCtrl.disable() : this.queryCtrl.enable();
   }
 }
+

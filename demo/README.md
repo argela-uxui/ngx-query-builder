@@ -10,6 +10,8 @@ A standalone Angular 19 application showcasing the `ngx-query-builder` library. 
 - **Persist value on field change** — values are preserved when switching between compatible field types
 - **Disabled state** — toggling the entire query builder on/off
 - **Custom textarea input** — overriding the default text input with a `<textarea>` via `*queryInput` template
+- **All input types** — string, number, date, time, category, multiselect, boolean
+- **Nullable fields** — operators `is null` / `is not null` hide the value input
 - **Live JSON output** — rendered below the query builder as pretty-printed JSON
 
 ## Development Server
@@ -31,8 +33,36 @@ npx ng build demo
 
 Build artifacts are written to `dist/demo/`.
 
+## End-to-End Tests (Playwright)
+
+The demo app is covered by a Playwright e2e test suite in `e2e/`.
+
+```bash
+# Run all e2e tests (starts dev server automatically)
+npm run e2e
+
+# Open Playwright interactive UI
+npm run e2e:ui
+
+# View the last HTML test report
+npm run e2e:report
+```
+
+Test files:
+
+| File | Coverage |
+|------|----------|
+| `e2e/page-load.spec.ts` | Page renders, title, output, badges |
+| `e2e/condition.spec.ts` | AND/OR condition toggle (root + nested) |
+| `e2e/rules.spec.ts` | Add/remove rules & rulesets, allowRuleset toggle |
+| `e2e/input-types.spec.ts` | All 8 input types + nullable operator |
+| `e2e/field-operator.spec.ts` | Field changes operators; operator shows/hides input |
+| `e2e/controls.spec.ts` | Entity mode, disabled, collapse, persist value |
+| `e2e/validation.spec.ts` | Valid/invalid/touched badges, empty ruleset warning |
+| `e2e/output.spec.ts` | Live JSON output updates correctly |
+
 ## Notes
 
 - The demo has **no unit tests** — it exists solely to showcase the library
-- No e2e test suite is configured
-- The demo uses the local `ngx-query-builder` package from `dist/ngx-query-builder` (or via Angular workspace path alias)
+- Playwright uses Chromium headless; run `npx playwright install chromium` if browsers aren't installed
+- The `webServer` config in `playwright.config.ts` auto-starts `ng serve demo` before tests run

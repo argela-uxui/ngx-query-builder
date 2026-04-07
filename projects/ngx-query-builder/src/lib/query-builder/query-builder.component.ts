@@ -138,6 +138,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     button: 'q-button',
     buttonGroup: 'q-button-group',
     removeButton: 'q-remove-button',
+    switchRow: 'q-switch-row',
     switchGroup: 'q-switch-group',
     switchLabel: 'q-switch-label',
     switchRadio: 'q-switch-radio',

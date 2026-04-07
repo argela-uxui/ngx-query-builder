@@ -15,6 +15,7 @@ import {
     JsonPipe,
     QueryBuilderModule,
   ],
+  styleUrl: 'app.component.scss',
   template: `
     <div class="demo-container">
       <h1>ngx-query-builder Demo</h1>
@@ -72,111 +73,6 @@ import {
       </section>
     </div>
   `,
-  styles: [`
-    .demo-container {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      font-size: 14px;
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 0 20px;
-      color: #333;
-    }
-
-    h1 {
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: 24px;
-      color: #1a1a1a;
-    }
-
-    h2 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: #444;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    section {
-      margin-bottom: 32px;
-      padding: 16px;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      background: #fafafa;
-    }
-
-    .controls-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .control-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      padding: 6px 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      background: white;
-      user-select: none;
-
-      &:hover {
-        background: #f5f5f5;
-      }
-
-      input[type="checkbox"] {
-        cursor: pointer;
-      }
-    }
-
-    .status-row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .badge {
-      padding: 3px 10px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 500;
-      background: #eee;
-      color: #666;
-
-      &.valid { background: #d4edda; color: #155724; }
-      &.invalid { background: #f8d7da; color: #721c24; }
-      &.active { background: #fff3cd; color: #856404; }
-    }
-
-    .text-input {
-      padding: 4px 8px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      font-family: inherit;
-      font-size: 13px;
-    }
-
-    .text-area {
-      width: 300px;
-      height: 80px;
-      resize: vertical;
-    }
-
-    .output {
-      background: #1e1e1e;
-      color: #d4d4d4;
-      padding: 16px;
-      border-radius: 4px;
-      font-family: 'Consolas', 'Monaco', monospace;
-      font-size: 13px;
-      overflow: auto;
-      max-height: 300px;
-      margin: 0;
-    }
-  `]
 })
 export class AppComponent {
   public queryCtrl: FormControl;

@@ -41,6 +41,17 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 4px;
+
+    // AND/OR switch comes before the action buttons visually,
+    // even though button-group appears first in DOM order.
+    .q-switch-group {
+      order: 1;
+    }
+
+    .q-right-align {
+      order: 2;
+      margin-left: auto;
+    }
   }
 
   .q-arrow-icon-button {
@@ -82,7 +93,9 @@
   }
 
   .q-right-align {
-    margin-left: auto;
+    float: right;
+    // Note: float is ignored for flex items (e.g. inside .q-switch-row),
+    // where margin-left: auto in the nested rule takes effect instead.
   }
 
   .q-button {

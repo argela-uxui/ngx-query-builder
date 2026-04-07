@@ -1,18 +1,8 @@
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Component, inject } from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatSelectModule } from '@angular/material/select';
 import {
   QueryBuilderModule,
-  QueryBuilderClassNames,
   QueryBuilderConfig,
 } from 'ngx-query-builder';
 
@@ -23,232 +13,173 @@ import {
     FormsModule,
     ReactiveFormsModule,
     JsonPipe,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatSelectModule,
-    MatInputModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatRadioModule,
-    MatIconModule,
-    MatCardModule,
     QueryBuilderModule,
   ],
   template: `
-  <h2>Vanilla</h2>
-  <br>
-  <query-builder [formControl]='queryCtrl' [config]='currentConfig' [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse' [persistValueOnFieldChange]='persistValueOnFieldChange'>
-    <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
-      <textarea class="text-input text-area" [(ngModel)]="rule.value" [disabled]=getDisabledState()
-        placeholder="Custom Textarea"></textarea>
-    </ng-container>
-  </query-builder>
-  <br>
-  <div>
-    <div class="row">
-      <p class="col-6">Control Valid (Vanilla): {{ queryCtrl.valid }}</p>
-      <div class="col-6">
-        <label><input type="checkbox" (change)=switchModes($event)>Entity Mode</label>
-      </div>
-    </div>
-    <div class="row">
-      <p class="col-6">Control Touched (Vanilla): {{ queryCtrl.touched }}</p>
-      <div class="col-6">
-        <label><input type="checkbox" (change)=changeDisabled($event)>Disabled</label>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-6">
-        <label><input type="checkbox" [(ngModel)]='allowRuleset'>Allow Ruleset</label>
-      </div>
-      <div class="col-6">
-        <label><input type="checkbox" [(ngModel)]='allowCollapse'>Allow Collapse</label>
-      </div>
-      <div class="col-6">
-        <label><input type="checkbox" [(ngModel)]='persistValueOnFieldChange'>Persist Values on Field Change</label>
-      </div>
-    </div>
+    <div class="demo-container">
+      <h1>ngx-query-builder Demo</h1>
 
-    <textarea class="output">{{query | json}}</textarea>
-  </div>
-  <br>
-  <h2>Custom Material</h2>
-  <br>
-  <mat-card>
-  <query-builder [(ngModel)]='query' [config]='currentConfig' [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse' [persistValueOnFieldChange]='persistValueOnFieldChange'>
-    <ng-container *queryButtonGroup="let ruleset; let addRule=addRule; let addRuleSet=addRuleSet; let removeRuleSet=removeRuleSet">
-      <button type="button" mat-icon-button color="primary" (click)="addRule()">
-        <mat-icon>add</mat-icon></button>
-      <button type="button" mat-icon-button color="primary" *ngIf="addRuleSet" (click)="addRuleSet()">
-        <mat-icon>add_circle_outline</mat-icon></button>
-      <button type="button" mat-icon-button color="accent" *ngIf="removeRuleSet" (click)="removeRuleSet()">
-        <mat-icon>remove_circle_outline</mat-icon></button>
-    </ng-container>
-    <ng-container *queryArrowIcon>
-      <mat-icon ngClass="mat-arrow-icon">chevron_right</mat-icon>
-    </ng-container>
-    <ng-container *queryRemoveButton="let rule; let removeRule=removeRule">
-      <button type="button" mat-icon-button color="accent" (click)="removeRule(rule)">
-        <mat-icon>remove</mat-icon>
-      </button>
-    </ng-container>
-    <ng-container *querySwitchGroup="let ruleset; let onChange=onChange">
-      <mat-radio-group *ngIf="ruleset" [(ngModel)]="ruleset.condition" (ngModelChange)="onChange($event)">
-        <mat-radio-button [style.padding.px]="10" value="and">And</mat-radio-button>
-        <mat-radio-button [style.padding.px]="10" value="or">Or</mat-radio-button>
-      </mat-radio-group>
-    </ng-container>
-    <ng-container *queryEntity="let rule; let entities=entities; let onChange=onChange">
-      <mat-form-field>
-        <mat-select [(ngModel)]="rule.entity" (ngModelChange)="onChange($event, rule)">
-          <mat-option *ngFor="let entity of entities" [value]="entity.value">
-          {{entity.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </ng-container>
-    <ng-container *queryField="let rule; let fields=fields; let onChange=onChange; let getFields = getFields">
-      <mat-form-field>
-        <mat-select [(ngModel)]="rule.field" (ngModelChange)="onChange($event, rule)">
-          <mat-option *ngFor="let field of getFields(rule.entity)" [value]="field.value">
-            {{ field.name }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </ng-container>
-    <ng-container *queryOperator="let rule; let operators=operators; let onChange=onChange">
-      <mat-form-field [style.width.px]="90">
-        <mat-select [(ngModel)]="rule.operator" (ngModelChange)="onChange(rule)">
-          <mat-option *ngFor="let value of operators" [value]="value">
-            {{ value }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </ng-container>
-    <ng-container *queryInput="let rule; type: 'boolean'; let onChange=onChange">
-      <mat-checkbox [(ngModel)]="rule.value" (ngModelChange)="onChange()"></mat-checkbox>
-    </ng-container>
-    <ng-container *queryInput="let rule; let field=field; let options=options; type: 'category'; let onChange=onChange">
-      <mat-form-field>
-        <mat-select [(ngModel)]="rule.value" (ngModelChange)="onChange()">
-          <mat-option *ngFor="let opt of options" [value]="opt.value">
-            {{ opt.name }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </ng-container>
-    <ng-container *queryInput="let rule; type: 'date'; let onChange=onChange">
-      <mat-form-field>
-        <input matInput [matDatepicker]="picker" [(ngModel)]="rule.value" (ngModelChange)="onChange()">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
-    </ng-container>
-    <ng-container *queryInput="let rule; let options=options; type: 'multiselect'; let onChange=onChange">
-      <mat-form-field [style.width.px]="300">
-        <mat-select [(ngModel)]="rule.value" multiple (ngModelChange)="onChange()">
-          <mat-option *ngFor="let opt of options" [value]="opt.value">
-            {{ opt.name }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </ng-container>
-    <ng-container *queryInput="let rule; let field=field; type: 'number'; let onChange=onChange">
-      <mat-form-field [style.width.px]="50">
-        <input matInput [(ngModel)]="rule.value" type="number" (ngModelChange)="onChange()">
-      </mat-form-field>
-    </ng-container>
-    <ng-container *queryInput="let rule; let field=field; type: 'string'; let onChange=onChange">
-      <mat-form-field>
-        <input matInput [(ngModel)]="rule.value" (ngModelChange)="onChange()">
-      </mat-form-field>
-    </ng-container>
-    <ng-container *queryInput="let rule; let field=field; type: 'textarea'; let onChange=onChange">
-      <mat-form-field>
-        <textarea matInput [(ngModel)]="rule.value" (ngModelChange)="onChange()">
-        </textarea>
-      </mat-form-field>
-    </ng-container>
-  </query-builder>
-  </mat-card>
-  <br>
-  <h2>Bootstrap</h2>
-  <br>
-  <query-builder [(ngModel)]='query' [classNames]='bootstrapClassNames' [config]='currentConfig' [allowRuleset]='allowRuleset' [allowCollapse]='allowCollapse' [persistValueOnFieldChange]='persistValueOnFieldChange'>
-    <div class="col-auto" *queryInput="let rule; type: 'textarea'">
-      <textarea class="form-control" [(ngModel)]="rule.value"
-        placeholder="Custom Textarea"></textarea>
+      <section>
+        <h2>Query Builder</h2>
+        <query-builder [formControl]="queryCtrl" [config]="currentConfig" [allowRuleset]="allowRuleset"
+          [allowCollapse]="allowCollapse" [persistValueOnFieldChange]="persistValueOnFieldChange">
+          <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
+            <textarea class="text-input text-area" [(ngModel)]="rule.value" [disabled]="getDisabledState()"
+              placeholder="Custom Textarea"></textarea>
+          </ng-container>
+        </query-builder>
+      </section>
+
+      <section class="controls">
+        <h2>Controls</h2>
+        <div class="controls-grid">
+          <label class="control-item">
+            <input type="checkbox" (change)="switchModes($event)">
+            <span>Entity Mode</span>
+          </label>
+          <label class="control-item">
+            <input type="checkbox" (change)="changeDisabled($event)">
+            <span>Disabled</span>
+          </label>
+          <label class="control-item">
+            <input type="checkbox" [(ngModel)]="allowRuleset">
+            <span>Allow Ruleset</span>
+          </label>
+          <label class="control-item">
+            <input type="checkbox" [(ngModel)]="allowCollapse">
+            <span>Allow Collapse</span>
+          </label>
+          <label class="control-item">
+            <input type="checkbox" [(ngModel)]="persistValueOnFieldChange">
+            <span>Persist Value on Field Change</span>
+          </label>
+        </div>
+        <div class="status-row">
+          <span class="badge" [class.valid]="queryCtrl.valid" [class.invalid]="!queryCtrl.valid">
+            {{ queryCtrl.valid ? 'Valid' : 'Invalid' }}
+          </span>
+          <span class="badge" [class.active]="queryCtrl.touched">
+            {{ queryCtrl.touched ? 'Touched' : 'Untouched' }}
+          </span>
+        </div>
+      </section>
+
+      <section>
+        <h2>Query Output</h2>
+        <pre class="output">{{ query | json }}</pre>
+      </section>
     </div>
-  </query-builder>
   `,
   styles: [`
-  /deep/ html {
-    font: 14px sans-serif;
-    margin: 30px;
-  }
+    .demo-container {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 20px;
+      color: #333;
+    }
 
-  .mat-icon-button {
-    outline: none;
-  }
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      color: #1a1a1a;
+    }
 
-  .mat-arrow-icon {
-    outline: none;
-    line-height: 32px;
-  }
+    h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #444;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
 
-  .mat-form-field {
-    padding-left: 5px;
-    padding-right: 5px;
-  }
+    section {
+      margin-bottom: 32px;
+      padding: 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background: #fafafa;
+    }
 
-  .text-input {
-    padding: 4px 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-  }
+    .controls-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
 
-  .text-area {
-    width: 300px;
-    height: 100px;
-  }
+    .control-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 6px 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+      user-select: none;
 
-  .output {
-    width: 100%;
-    height: 300px;
-  }
+      &:hover {
+        background: #f5f5f5;
+      }
+
+      input[type="checkbox"] {
+        cursor: pointer;
+      }
+    }
+
+    .status-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .badge {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      background: #eee;
+      color: #666;
+
+      &.valid { background: #d4edda; color: #155724; }
+      &.invalid { background: #f8d7da; color: #721c24; }
+      &.active { background: #fff3cd; color: #856404; }
+    }
+
+    .text-input {
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    .text-area {
+      width: 300px;
+      height: 80px;
+      resize: vertical;
+    }
+
+    .output {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 16px;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 13px;
+      overflow: auto;
+      max-height: 300px;
+      margin: 0;
+    }
   `]
 })
 export class AppComponent {
   public queryCtrl: FormControl;
 
   private readonly formBuilder = inject(FormBuilder);
-
-  public bootstrapClassNames: QueryBuilderClassNames = {
-    removeIcon: 'fa fa-minus',
-    addIcon: 'fa fa-plus',
-    arrowIcon: 'fa fa-chevron-right px-2',
-    button: 'btn',
-    buttonGroup: 'btn-group',
-    rightAlign: 'order-12 ml-auto',
-    switchRow: 'd-flex px-2',
-    switchGroup: 'd-flex align-items-center',
-    switchRadio: 'custom-control-input',
-    switchLabel: 'custom-control-label',
-    switchControl: 'custom-control custom-radio custom-control-inline',
-    row: 'row p-2 m-1',
-    rule: 'border',
-    ruleSet: 'border',
-    invalidRuleSet: 'alert alert-danger',
-    emptyWarning: 'text-danger mx-auto',
-    operatorControl: 'form-control',
-    operatorControlSize: 'col-auto pr-0',
-    fieldControl: 'form-control',
-    fieldControlSize: 'col-auto pr-0',
-    entityControl: 'form-control',
-    entityControlSize: 'col-auto pr-0',
-    inputControl: 'form-control',
-    inputControlSize: 'col-auto'
-  };
 
   public query = {
     condition: 'and',
@@ -286,7 +217,8 @@ export class AppComponent {
       name: {name: 'Name', type: 'string', entity: 'nonphysical'},
       notes: {name: 'Notes', type: 'textarea', operators: ['=', '!='], entity: 'nonphysical'},
       educated: {name: 'College Degree?', type: 'boolean', entity: 'nonphysical'},
-      birthday: {name: 'Birthday', type: 'date', operators: ['=', '<=', '>'],
+      birthday: {
+        name: 'Birthday', type: 'date', operators: ['=', '<=', '>'],
         defaultValue: (() => new Date()), entity: 'nonphysical'
       },
       school: {name: 'School', type: 'string', nullable: true, entity: 'nonphysical'},
@@ -318,7 +250,8 @@ export class AppComponent {
       name: {name: 'Name', type: 'string'},
       notes: {name: 'Notes', type: 'textarea', operators: ['=', '!=']},
       educated: {name: 'College Degree?', type: 'boolean'},
-      birthday: {name: 'Birthday', type: 'date', operators: ['=', '<=', '>'],
+      birthday: {
+        name: 'Birthday', type: 'date', operators: ['=', '<=', '>'],
         defaultValue: (() => new Date())
       },
       school: {name: 'School', type: 'string', nullable: true},
@@ -346,10 +279,10 @@ export class AppComponent {
   }
 
   switchModes(event: Event): void {
-    this.currentConfig = (<HTMLInputElement>event.target).checked ? this.entityConfig : this.config;
+    this.currentConfig = (event.target as HTMLInputElement).checked ? this.entityConfig : this.config;
   }
 
   changeDisabled(event: Event): void {
-    (<HTMLInputElement>event.target).checked ? this.queryCtrl.disable() : this.queryCtrl.enable();
+    (event.target as HTMLInputElement).checked ? this.queryCtrl.disable() : this.queryCtrl.enable();
   }
 }

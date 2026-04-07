@@ -61,6 +61,16 @@ cd dist/ngx-query-builder
 npm publish
 ```
 
+## Internal / Private Distribution
+
+To use this library inside your company without publishing to the public npm registry, see the [**Internal / Private Distribution**](../../README.md#internal--private-distribution) section in the root README for full step-by-step instructions covering:
+
+- **npm pack** — build a `.tgz` tarball and install from a file path (zero infrastructure)
+- **Git dependency** — commit built `dist/` to a release branch/tag and install via `git+https://`
+- **GitHub Packages** — publish to your organisation's private GitHub registry
+- **Private registry** — self-hosted Verdaccio, Nexus, or Artifactory
+- **npm link** — symlink for local side-by-side development only
+
 ## Exports
 
 | Export | Description |

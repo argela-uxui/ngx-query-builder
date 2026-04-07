@@ -29,6 +29,162 @@ npm install ngx-query-builder
 
 > **Peer dependencies:** `@angular/core >=19`, `@angular/forms >=19`, `rxjs >=7`
 
+## Internal / Private Distribution
+
+If you want to use this library inside your company without publishing to the public npm registry, choose one of the approaches below.
+
+---
+
+### Option 1 — npm pack (tarball) · _simplest, no infrastructure required_
+
+Build the library, pack it into a `.tgz` file, and distribute it however you like (file share, Git LFS, email, etc.).
+
+```bash
+# In this repository
+ng build ngx-query-builder
+cd dist/ngx-query-builder
+npm pack
+# Produces: ngx-query-builder-X.Y.Z.tgz
+```
+
+In the consuming project:
+
+```bash
+npm install /path/to/ngx-query-builder-X.Y.Z.tgz
+```
+
+Or reference it directly in `package.json`:
+
+```json
+{
+  "dependencies": {
+    "ngx-query-builder": "file:./libs/ngx-query-builder-1.0.0.tgz"
+  }
+}
+```
+
+---
+
+### Option 2 — Git dependency · _no infrastructure, version-controlled_
+
+Commit the built `dist/ngx-query-builder/` output to a dedicated release branch or tag in your internal Git repository (GitHub Enterprise, GitLab, Bitbucket, etc.).
+
+```bash
+# Build and commit dist/ to a release branch
+ng build ngx-query-builder
+git checkout -b release/1.0.0
+git add -f dist/ngx-query-builder
+git commit -m "Release 1.0.0 — built dist"
+git tag v1.0.0
+git push origin release/1.0.0 --tags
+```
+
+In the consuming project:
+
+```bash
+# Install from a specific tag
+npm install git+https://git.company.com/team/ngx-query-builder.git#v1.0.0
+
+# Or from a branch
+npm install git+https://git.company.com/team/ngx-query-builder.git#release/1.0.0
+```
+
+> **Note:** The `dist/` directory is gitignored on `develop`/`main`. The release branch deliberately commits it so npm can resolve the package without a build step in the consuming project.
+
+---
+
+### Option 3 — GitHub Packages · _team-scale, stays on GitHub_
+
+GitHub Packages is a private npm registry built into GitHub. Packages can be scoped to your organisation and are accessible to any team member with the right permissions.
+
+**1. Authenticate** — create a Personal Access Token (PAT) with `write:packages` scope, then add it to `~/.npmrc`:
+
+```ini
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_PAT
+```
+
+**2. Set the package scope** — update `projects/ngx-query-builder/package.json`:
+
+```json
+{
+  "name": "@your-org/ngx-query-builder"
+}
+```
+
+**3. Build and publish:**
+
+```bash
+ng build ngx-query-builder
+cd dist/ngx-query-builder
+npm publish --registry https://npm.pkg.github.com
+```
+
+**4. Install in the consuming project** — add to `.npmrc`:
+
+```ini
+@your-org:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_PAT
+```
+
+Then install as usual:
+
+```bash
+npm install @your-org/ngx-query-builder
+```
+
+---
+
+### Option 4 — Private npm registry (Verdaccio / Nexus / Artifactory) · _enterprise scale_
+
+Any standard private npm registry works. [Verdaccio](https://verdaccio.org/) is free and easy to self-host.
+
+```bash
+# Start Verdaccio locally (or point at your company registry)
+npx verdaccio
+
+# Publish (builds first)
+ng build ngx-query-builder
+cd dist/ngx-query-builder
+npm publish --registry http://your-registry.company.com
+```
+
+In the consuming project, set the registry in `.npmrc`:
+
+```ini
+@your-scope:registry=http://your-registry.company.com
+```
+
+---
+
+### Option 5 — npm link · _local development only_
+
+Use `npm link` when you are developing both this library and a consuming app at the same time on the same machine. Changes to the library are reflected immediately without republishing.
+
+```bash
+# In this repository — build in watch mode and register the link
+npm run build:watch &
+cd dist/ngx-query-builder
+npm link
+
+# In the consuming project — connect to the linked package
+npm link ngx-query-builder
+```
+
+To unlink when done:
+
+```bash
+# In the consuming project
+npm unlink ngx-query-builder
+
+# In this repository
+cd dist/ngx-query-builder
+npm unlink
+```
+
+> **Note:** `npm link` is not suitable for CI or production use. Use one of the options above for shared distribution.
+
+---
+
 ## Quick Start
 
 ### Standalone (Angular 17+)

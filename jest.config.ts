@@ -3,7 +3,7 @@ import type { Config } from 'jest';
 const config: Config = {
   preset: 'jest-preset-angular',
   setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
-  testPathPattern: ['projects/ngx-query-builder/src/.*\\.spec\\.ts$'],
+  testMatch: ['**/projects/ngx-query-builder/src/**/*.spec.ts'],
   transform: {
     '^.+\\.(ts|js|html|svg)$': [
       'jest-preset-angular',
@@ -21,6 +21,7 @@ const config: Config = {
     'projects/ngx-query-builder/src/**/*.ts',
     '!projects/ngx-query-builder/src/public-api.ts',
     '!**/index.ts',
+    '!**/ngx-query-builder.module.ts',  // backward-compat barrel, no logic
   ],
 };
 

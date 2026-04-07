@@ -10,7 +10,7 @@ test.describe('Field and Operator Changes', () => {
   });
 
   test('changing field updates the operator dropdown options', async ({ page }) => {
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
     const lastFieldSelect = demo.fieldSelects().last();
     const lastOperatorSelect = demo.operatorSelects().last();
 
@@ -29,7 +29,7 @@ test.describe('Field and Operator Changes', () => {
   });
 
   test('changing field to category shows category operators', async ({ page }) => {
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
     const lastFieldSelect = demo.fieldSelects().last();
     const lastOperatorSelect = demo.operatorSelects().last();
 
@@ -40,17 +40,18 @@ test.describe('Field and Operator Changes', () => {
   });
 
   test('changing field to boolean shows only "=" operator', async ({ page }) => {
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
     const lastFieldSelect = demo.fieldSelects().last();
     const lastOperatorSelect = demo.operatorSelects().last();
 
     await lastFieldSelect.selectOption({ label: 'College Degree?' });
+    await expect(lastOperatorSelect.locator('option')).toHaveCount(1);
     const options = await lastOperatorSelect.locator('option').allTextContents();
     expect(options).toEqual(['=']);
   });
 
   test('nullable field has "is null" and "is not null" operators', async ({ page }) => {
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
     const lastFieldSelect = demo.fieldSelects().last();
     const lastOperatorSelect = demo.operatorSelects().last();
 
@@ -61,7 +62,7 @@ test.describe('Field and Operator Changes', () => {
   });
 
   test('"is null" operator hides value input', async ({ page }) => {
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
     const lastRow = page.locator('li.q-rule').last();
     const lastFieldSelect = demo.fieldSelects().last();
     const lastOperatorSelect = demo.operatorSelects().last();
@@ -73,7 +74,7 @@ test.describe('Field and Operator Changes', () => {
   });
 
   test('"is not null" operator also hides value input', async ({ page }) => {
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
     const lastRow = page.locator('li.q-rule').last();
     const lastFieldSelect = demo.fieldSelects().last();
     const lastOperatorSelect = demo.operatorSelects().last();
@@ -85,7 +86,7 @@ test.describe('Field and Operator Changes', () => {
   });
 
   test('switching from "is null" to "=" shows input', async ({ page }) => {
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
     const lastRow = page.locator('li.q-rule').last();
     const lastFieldSelect = demo.fieldSelects().last();
     const lastOperatorSelect = demo.operatorSelects().last();
@@ -98,7 +99,7 @@ test.describe('Field and Operator Changes', () => {
   });
 
   test('textarea field shows custom template input', async ({ page }) => {
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
     const lastFieldSelect = demo.fieldSelects().last();
 
     await lastFieldSelect.selectOption({ label: 'Notes' });
@@ -107,9 +108,11 @@ test.describe('Field and Operator Changes', () => {
   });
 
   test('changing field updates output JSON field key', async () => {
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
+    const prevText = await demo.getOutputText();
     const lastFieldSelect = demo.fieldSelects().last();
     await lastFieldSelect.selectOption({ label: 'Name' });
+    await demo.waitForOutputChange(prevText);
 
     const json = await demo.getOutputJson() as any;
     const lastRule = json.rules[json.rules.length - 1];
@@ -117,12 +120,14 @@ test.describe('Field and Operator Changes', () => {
   });
 
   test('changing operator updates output JSON operator key', async ({ page }) => {
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
+    const prevText = await demo.getOutputText();
     const lastFieldSelect = demo.fieldSelects().last();
     const lastOperatorSelect = demo.operatorSelects().last();
 
     await lastFieldSelect.selectOption({ label: 'Age' });
     await lastOperatorSelect.selectOption({ label: '>' });
+    await demo.waitForOutputChange(prevText);
 
     const json = await demo.getOutputJson() as any;
     const ageRules = json.rules.filter((r: any) => r.field === 'age');

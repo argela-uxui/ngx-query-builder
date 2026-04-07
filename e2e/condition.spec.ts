@@ -47,7 +47,9 @@ test.describe('AND/OR Condition Toggle', () => {
   test('nested condition can be toggled independently', async ({ page }) => {
     // Toggle nested condition to AND (index 1 = second AND label = nested component)
     const nestedAndLabel = demo.conditionLabels('AND').nth(1);
+    const prevText = await demo.getOutputText();
     await nestedAndLabel.click();
+    await demo.waitForOutputChange(prevText);
 
     const json = await demo.getOutputJson() as any;
     // Root condition should still be AND
@@ -59,7 +61,9 @@ test.describe('AND/OR Condition Toggle', () => {
   });
 
   test('output JSON reflects condition changes', async () => {
+    const prevText = await demo.getOutputText();
     await demo.conditionLabel('OR', 0).click();
+    await demo.waitForOutputChange(prevText);
     const json = await demo.getOutputJson() as any;
     expect(json.condition).toBe('or');
   });

@@ -11,16 +11,15 @@ test.describe('Add / Remove Rules and Rulesets', () => {
 
   test('clicking "Rule" button adds a new rule row', async () => {
     const before = await demo.fieldSelects().count();
-    await demo.addRuleButtons().first().click();
-    const after = await demo.fieldSelects().count();
-    expect(after).toBe(before + 1);
+    await demo.addRule();
+    await expect(demo.fieldSelects()).toHaveCount(before + 1);
   });
 
   test('added rule appears in query output', async () => {
-    const jsonBefore = await demo.getOutputJson() as any;
-    const countBefore = jsonBefore.rules.length;
+    const prevText = await demo.getOutputText();
+    const countBefore = (JSON.parse(prevText) as any).rules.length;
 
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
 
     const jsonAfter = await demo.getOutputJson() as any;
     expect(jsonAfter.rules.length).toBe(countBefore + 1);
@@ -28,27 +27,25 @@ test.describe('Add / Remove Rules and Rulesets', () => {
 
   test('clicking "Ruleset" button adds a nested ruleset', async ({ page }) => {
     const before = await page.locator('.q-ruleset').count();
-    await demo.addRulesetButtons().first().click();
-    const after = await page.locator('.q-ruleset').count();
-    expect(after).toBeGreaterThan(before);
+    await demo.addRuleset();
+    await expect(page.locator('.q-ruleset')).toHaveCount(before + 1);
   });
 
   test('clicking remove button removes a rule', async () => {
-    // Add a rule first so we have a known removable one
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
     const before = await demo.fieldSelects().count();
 
-    // Remove the last rule
     await demo.removeRuleButtons().last().click();
-    const after = await demo.fieldSelects().count();
-    expect(after).toBe(before - 1);
+    await expect(demo.fieldSelects()).toHaveCount(before - 1);
   });
 
   test('remove button removes the correct rule from output', async () => {
-    await demo.addRuleButtons().first().click();
-    const countBefore = (await demo.getOutputJson() as any).rules.length;
+    await demo.addRule();
+    const prevText = await demo.getOutputText();
+    const countBefore = (JSON.parse(prevText) as any).rules.length;
 
     await demo.removeRuleButtons().last().click();
+    await demo.waitForOutputChange(prevText);
 
     const countAfter = (await demo.getOutputJson() as any).rules.length;
     expect(countAfter).toBe(countBefore - 1);
@@ -72,8 +69,8 @@ test.describe('Add / Remove Rules and Rulesets', () => {
   });
 
   test('remove ruleset button removes nested ruleset', async ({ page }) => {
-    // Add a fresh ruleset
-    await demo.addRulesetButtons().first().click();
+    // Add a fresh ruleset and wait for it to appear
+    await demo.addRuleset();
     const before = await page.locator('.q-ruleset').count();
 
     // The remove-ruleset button is a ".q-remove-button" inside a ".q-ruleset" row
@@ -81,7 +78,6 @@ test.describe('Add / Remove Rules and Rulesets', () => {
     const removeRulesetBtn = page.locator('.q-ruleset .q-remove-button').last();
     await removeRulesetBtn.click();
 
-    const after = await page.locator('.q-ruleset').count();
-    expect(after).toBeLessThan(before);
+    await expect(page.locator('.q-ruleset')).toHaveCount(before - 1);
   });
 });

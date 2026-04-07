@@ -1,14 +1,14 @@
 # ngx-query-builder
 
-A flexible, configurable Angular 19 query builder component for constructing complex nested filter expressions. Supports entity-based field filtering, custom templates for every part of the UI, and full `ReactiveFormsModule` integration via `ControlValueAccessor`.
+A flexible, configurable Angular 21 query builder component for constructing complex nested filter expressions. Supports entity-based field filtering, custom templates for every part of the UI, and full `ReactiveFormsModule` integration via `ControlValueAccessor`.
 
 ## Peer Dependencies
 
 | Package | Version |
 |---------|---------|
-| `@angular/core` | `>=19` |
-| `@angular/forms` | `>=19` |
-| `@angular/common` | `>=19` |
+| `@angular/core` | `>=21` |
+| `@angular/forms` | `>=21` |
+| `@angular/common` | `>=21` |
 | `rxjs` | `>=7` |
 
 ## Installation

@@ -37,24 +37,29 @@ test.describe('Live JSON Output', () => {
   });
 
   test('output updates when a rule is added', async () => {
-    const before = (await demo.getOutputJson() as any).rules.length;
-    await demo.addRuleButtons().first().click();
+    const prevText = await demo.getOutputText();
+    const before = (JSON.parse(prevText) as any).rules.length;
+    await demo.addRule();
     const after = (await demo.getOutputJson() as any).rules.length;
     expect(after).toBe(before + 1);
   });
 
   test('output updates when a rule is removed', async () => {
-    await demo.addRuleButtons().first().click();
-    const before = (await demo.getOutputJson() as any).rules.length;
+    await demo.addRule();
+    const prevText = await demo.getOutputText();
+    const before = (JSON.parse(prevText) as any).rules.length;
     await demo.removeRuleButtons().last().click();
+    await demo.waitForOutputChange(prevText);
     const after = (await demo.getOutputJson() as any).rules.length;
     expect(after).toBe(before - 1);
   });
 
   test('output updates when a field is changed', async ({ page }) => {
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
+    const prevText = await demo.getOutputText();
     const lastField = demo.fieldSelects().last();
     await lastField.selectOption({ label: 'Name' });
+    await demo.waitForOutputChange(prevText);
 
     const json = await demo.getOutputJson() as any;
     const lastRule = json.rules[json.rules.length - 1];
@@ -75,14 +80,30 @@ test.describe('Live JSON Output', () => {
   });
 
   test('output updates when a string value is typed', async ({ page }) => {
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
     const lastRow = page.locator('li.q-rule').last();
     const lastField = demo.fieldSelects().last();
 
+    // Change to string field and wait for output to reflect the field change
+    const prevText = await demo.getOutputText();
     await lastField.selectOption({ label: 'Name' });
+    await demo.waitForOutputChange(prevText);
+
+    // Now type a value and wait for it to appear in the output
     const textInput = lastRow.locator('input.q-input-control[type="text"]');
     await textInput.fill('John');
     await textInput.blur();
+    await page.waitForFunction(
+      (val: string) => {
+        const el = document.querySelector('[data-testid="query-output"]');
+        if (!el) return false;
+        try {
+          const json = JSON.parse(el.textContent || '{}') as any;
+          return (json.rules || []).some((r: any) => r.field === 'name' && r.value === val);
+        } catch { return false; }
+      },
+      'John',
+    );
 
     const json = await demo.getOutputJson() as any;
     const nameRules = json.rules.filter((r: any) => r.field === 'name');
@@ -90,14 +111,16 @@ test.describe('Live JSON Output', () => {
   });
 
   test('output updates when condition is toggled', async () => {
+    const prevText = await demo.getOutputText();
     await demo.conditionLabel('OR', 0).click();
+    await demo.waitForOutputChange(prevText);
     const json = await demo.getOutputJson() as any;
     expect(json.condition).toBe('or');
   });
 
   test('output is always parseable JSON', async () => {
     // Perform several interactions and verify JSON remains parseable after each
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
     expect(() => JSON.parse('')).toThrow(); // sanity check
     const text = await demo.queryOutput().innerText();
     expect(() => JSON.parse(text)).not.toThrow();

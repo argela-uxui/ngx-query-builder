@@ -75,10 +75,11 @@ test.describe('Input Types', () => {
   test('boolean (checkbox) input — toggle updates output', async ({ page }) => {
     const checkboxInput = page.locator('input.q-input-control[type="checkbox"]').first();
 
-    const jsonBefore = await demo.getOutputJson() as any;
-    const before = jsonBefore.rules.find((r: any) => r.field === 'educated')?.value;
+    const prevText = await demo.getOutputText();
+    const before = (JSON.parse(prevText) as any).rules.find((r: any) => r.field === 'educated')?.value;
 
     await checkboxInput.click();
+    await demo.waitForOutputChange(prevText);
 
     const jsonAfter = await demo.getOutputJson() as any;
     const after = jsonAfter.rules.find((r: any) => r.field === 'educated')?.value;

@@ -3,7 +3,7 @@
  * Provides typed helpers for all stable selectors so individual spec
  * files stay concise and independent of CSS/attribute changes.
  */
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 export class DemoPage {
   readonly page: Page;
@@ -14,8 +14,42 @@ export class DemoPage {
 
   async goto(): Promise<void> {
     await this.page.goto('/');
-    // Wait for query builder to render
-    await this.page.waitForSelector('[data-testid="query-builder"] query-builder');
+    // Wait for query builder to render all 10 initial rules (ensures Angular CD has run)
+    await expect(this.page.locator('select.q-field-control')).toHaveCount(10);
+  }
+
+  /** Click "Add Rule" and wait for the new rule row to appear in the DOM. */
+  async addRule(): Promise<void> {
+    const before = await this.fieldSelects().count();
+    await this.addRuleButtons().first().click();
+    await expect(this.fieldSelects()).toHaveCount(before + 1);
+  }
+
+  /** Click "Add Ruleset" and wait for the new ruleset to appear in the DOM. */
+  async addRuleset(): Promise<void> {
+    const before = await this.page.locator('.q-ruleset').count();
+    await this.addRulesetButtons().first().click();
+    await expect(this.page.locator('.q-ruleset')).toHaveCount(before + 1);
+  }
+
+  /**
+   * Capture the current JSON output text, then return the parsed JSON
+   * after it changes from that text. Use this before a mutation to get
+   * the current state; then call waitForOutputChange() after the mutation.
+   */
+  async getOutputText(): Promise<string> {
+    return this.queryOutput().innerText();
+  }
+
+  /** Wait for the query output panel to show different text from prevText. */
+  async waitForOutputChange(prevText: string): Promise<void> {
+    await this.page.waitForFunction(
+      ([selector, prev]: [string, string]) => {
+        const el = document.querySelector(selector);
+        return el != null && el.textContent !== prev;
+      },
+      ['[data-testid="query-output"]', prevText] as [string, string],
+    );
   }
 
   // ---------- Controls ----------

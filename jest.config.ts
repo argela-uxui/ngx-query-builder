@@ -5,11 +5,12 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
   testMatch: ['**/projects/ngx-query-builder/src/**/*.spec.ts'],
   transform: {
-    '^.+\\.(ts|js|html|svg)$': [
+    '^.+\\.(ts|js|mjs|html|svg)$': [
       'jest-preset-angular',
       {
         tsconfig: '<rootDir>/projects/ngx-query-builder/tsconfig.spec.json',
         stringifyContentPathRegex: '\\.(html|svg)$',
+        diagnostics: false,
       },
     ],
   },

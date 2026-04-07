@@ -1,6 +1,6 @@
 # ngx-query-builder
 
-A modernized Angular query builder component — Angular 19, standalone, signals, OnPush.
+A modernized Angular query builder component — Angular 21, standalone, signals, OnPush.
 
 Forked from [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-QueryBuilder) and fully updated to current Angular best practices.
 
@@ -27,7 +27,7 @@ Forked from [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-Qu
 npm install ngx-query-builder
 ```
 
-> **Peer dependencies:** `@angular/core >=19`, `@angular/forms >=19`, `rxjs >=7`
+> **Peer dependencies:** `@angular/core >=21`, `@angular/forms >=21`, `rxjs >=7`
 
 ## Internal / Private Distribution
 

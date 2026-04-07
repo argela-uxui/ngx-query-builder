@@ -143,7 +143,7 @@ test.describe('Controls: Persist Value on Field Change', () => {
   });
 
   test('value is cleared when changing between incompatible types (persist OFF)', async ({ page }) => {
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
     const lastFieldSelect = demo.fieldSelects().last();
     const lastRow = page.locator('li.q-rule').last();
 
@@ -151,10 +151,12 @@ test.describe('Controls: Persist Value on Field Change', () => {
     await lastFieldSelect.selectOption({ label: 'Name' });
     const textInput = lastRow.locator('input.q-input-control[type="text"]');
     await textInput.fill('test value');
+    const prevText = await demo.getOutputText();
     await textInput.blur();
 
     // Change to number field — value should be cleared (incompatible type)
     await lastFieldSelect.selectOption({ label: 'Age' });
+    await demo.waitForOutputChange(prevText);
 
     const json = await demo.getOutputJson() as any;
     const ageRules = json.rules.filter((r: any) => r.field === 'age');
@@ -166,7 +168,7 @@ test.describe('Controls: Persist Value on Field Change', () => {
   test('value is preserved when changing between compatible types (persist ON)', async ({ page }) => {
     await demo.togglePersistValue().check();
 
-    await demo.addRuleButtons().first().click();
+    await demo.addRule();
     const lastFieldSelect = demo.fieldSelects().last();
     const lastRow = page.locator('li.q-rule').last();
 
@@ -174,10 +176,12 @@ test.describe('Controls: Persist Value on Field Change', () => {
     await lastFieldSelect.selectOption({ label: 'Name' });
     const textInput = lastRow.locator('input.q-input-control[type="text"]');
     await textInput.fill('preserved');
+    const prevText = await demo.getOutputText();
     await textInput.blur();
 
     // Change to another string field (school) — same type, value should persist
     await lastFieldSelect.selectOption({ label: 'School' });
+    await demo.waitForOutputChange(prevText);
 
     const json = await demo.getOutputJson() as any;
     const schoolRules = json.rules.filter((r: any) => r.field === 'school');

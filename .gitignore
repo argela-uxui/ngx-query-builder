@@ -60,3 +60,11 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+
+# Node / Angular
+node_modules/
+dist/
+coverage/
+.angular/
+dist/test-out/
+*.js.map

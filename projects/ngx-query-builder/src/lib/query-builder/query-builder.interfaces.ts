@@ -5,16 +5,21 @@ export interface RuleSet {
   isChild?: boolean;
 }
 
+export type QueryValue = unknown;
+export type QueryValueFactory = () => QueryValue;
+export type QueryDefaultValue = QueryValue | QueryValueFactory;
+export type RuleValidationResult = unknown;
+
 export interface Rule {
   field: string;
-  value?: any;
+  value?: QueryValue;
   operator?: string;
   entity?: string;
 }
 
 export interface Option {
   name: string;
-  value: any;
+  value: QueryValue;
 }
 
 export type FieldMap = Record<string, Field>;
@@ -26,10 +31,10 @@ export interface Field {
   nullable?: boolean;
   options?: Option[];
   operators?: string[];
-  defaultValue?: any;
-  defaultOperator?: any;
+  defaultValue?: QueryDefaultValue;
+  defaultOperator?: QueryDefaultValue;
   entity?: string;
-  validator?: (rule: Rule, parent: RuleSet) => any | null;
+  validator?: (rule: Rule, parent: RuleSet) => RuleValidationResult | null;
 }
 
 export interface LocalRuleMeta {
@@ -42,7 +47,7 @@ export type EntityMap = Record<string, Entity>;
 export interface Entity {
   name: string;
   value?: string;
-  defaultField?: any;
+  defaultField?: QueryDefaultValue;
 }
 
 export interface QueryBuilderClassNames {
@@ -91,10 +96,10 @@ export interface QueryBuilderConfig {
   addRule?: (parent: RuleSet) => void;
   removeRuleSet?: (ruleset: RuleSet, parent: RuleSet) => void;
   removeRule?: (rule: Rule, parent: RuleSet) => void;
-  coerceValueForOperator?: (operator: string, value: any, rule: Rule) => any;
+  coerceValueForOperator?: (operator: string, value: QueryValue, rule: Rule) => QueryValue;
   calculateFieldChangeValue?: (currentField: Field,
                                nextField: Field,
-                               currentValue: any) => any;
+                               currentValue: QueryValue) => QueryValue;
 }
 
 export interface SwitchGroupContext {

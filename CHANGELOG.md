@@ -1,67 +1,120 @@
-Angular2-QueryBuilder Changelog
-===============
+ngx-query-builder Changelog
+===========================
+
+All notable changes to this project are documented in this file.
 
 ## [Unreleased]
 
 ### Added
-- Unique `switchGroupId` per component instance — isolates AND/OR radio button groups in nested rulesets, preventing cross-component radio interference. Each instance auto-generates `componentId`, `andOptionId`, `orOptionId`, and `switchGroupId` from a static counter (`qb-0`, `qb-1`, …).
+- Unique `switchGroupId` per component instance to isolate nested AND/OR radio groups.
+- Additional unit test coverage for `QueryBuilderComponent`, including radio-group isolation scenarios.
+- Dedicated TypeScript configuration files to improve IDE support in JetBrains/WebStorm.
 
-Version 0.5.0
------------
-- Upgrade to Angular 8
-- Add option to persist value on rule change (see documentation for details)
+### Changed
+- Refined event handling and lint configuration in line with Angular 21 conventions.
+- Updated TypeScript and deprecation-related compiler settings.
+- Refactored query builder and query value typings for stricter type safety.
+- Updated package metadata and cleaned imports for Angular 21 compatibility.
 
-Version 0.4.0
------------
-- Fix issue switching operators changing select to multiple and causing invalid value error. (#69)
-- Add a `coerceValueForOperator` to handle value changes between operator switches to `config` object.
-- Add `treeContainer`, `collapsed`, `arrowIcon`, `arrowIconButton` fields to `classNames` object.
-- Add `queryArrowIcon` structural directive to override collapse arrow icon.
+### Fixed
+- Improved default accessibility behavior in query builder controls.
+- Removed unused imports in the query builder implementation.
+
+## [21.0.0]
+
+### Added
+- Comprehensive unit test suite and Playwright end-to-end tests for core library behavior.
+
+### Changed
+- Upgraded the project from Angular 19 to Angular 21.
+- Modernized and optimized component/demo styling.
+
+### Fixed
+- Fixed collapse toggle behavior with OnPush change detection.
+- Fixed layout regressions in switch and rule rows.
+- Restored native dropdown arrow behavior on select controls.
+
+## [0.5.0]
+
+### Changed
+- Upgraded to Angular 8.
+- Added an option to persist value on rule change.
+
+## [0.4.0]
+
+### Added
+- Added `coerceValueForOperator` in config to handle value transitions when operators change.
+- Added `treeContainer`, `collapsed`, `arrowIcon`, and `arrowIconButton` to `classNames`.
+- Added `queryArrowIcon` structural directive to override collapse arrow icon.
 - Added `allowCollapse` to enable accordion/collapse mode. (#66)
 
-Version 0.3.3
------------
-- Fix `queryEmptyWarning` directive not being passed to nested rules
+### Fixed
+- Fixed issue where switching operators changed select to multiple and caused invalid value errors. (#69)
 
-Version 0.3.2
------------
-- Add `queryEmptyWarning` directive for customizing empty warning messages
-- Add `[emptyMessage]` to change the default empty message text
+## [0.3.3]
 
-Version 0.3.1
------------
-- Change: add Rule will use `defaultValue` of `Field` as the default
-- Updated Angular Materials to 6.0 in demos
-- Fix touched state not being updated when changing the query condition (AND/OR)
-- Add `[disabled]` feature #61
-- Tweaks to Vanilla CSS styling
+### Fixed
+- Fixed `queryEmptyWarning` directive not being passed to nested rules.
 
-Version 0.3.0
------------
-- Breaking: Renamed `changeField` callback to `onChange` for `queryField` directive.
-- Add `onChange` callback to `queryEntity`, `queryInput`, `queryOperator`, `queryInput` for proper reactive form validation and touched behavior on custom components
-- Add proper touched behavior to reactive form usage (See #49)
-- Add entity mode (See #22)
-- Fix `[value]` unrecognized property binding
-- Fix QueryBuilderClassNames not being exported as interface
-- Fix `in` operator causing multi-select to be displayed for all types (only limited to `category`, `boolean` now)
-- Minor tweaks to CSS styling of default component
+## [0.3.2]
 
-Version 0.2.5
------------
-- Fix root remove ruleset button showing
-- Fix default value bug where only the first character of the operator is shown
-- Fix inability to override multiselect operators (is in, is not in)
+### Added
+- Added `queryEmptyWarning` directive for custom empty warning messages.
+- Added `[emptyMessage]` to override the default empty message text.
 
-Version 0.2.4
------------
-- Fix serious issue with validation causing `ngModel` value to be wrong
-- New `QueryBuilderClassNames` interface
-- Rewrite CSS for more extensible CSS classes
-- New bootstrap 4 example
+## [0.3.1]
 
-Version 0.2.3
------------
-- Fix IE11 not working (target ES5)
-- Fix invalid/valid state
-- New validator function on `Field` config
+### Added
+- Added `[disabled]` support. (#61)
+
+### Changed
+- Updated add-rule behavior to use `Field.defaultValue` as the initial value.
+- Updated Angular Material dependencies in demos to 6.0.
+- Applied vanilla CSS styling improvements.
+
+### Fixed
+- Fixed touched state not updating when changing query condition (AND/OR).
+
+## [0.3.0]
+
+### Added
+- Added `onChange` callback support to `queryEntity`, `queryInput`, and `queryOperator` directives for custom component integration.
+- Added proper touched behavior support for reactive form usage. (See #49)
+- Added entity mode. (See #22)
+
+### Changed
+- **Breaking:** Renamed `changeField` callback to `onChange` for `queryField` directive.
+- Applied minor CSS styling improvements for the default component.
+
+### Fixed
+- Fixed `[value]` unrecognized property binding.
+- Fixed `QueryBuilderClassNames` export as an interface.
+- Fixed `in` operator behavior so multi-select applies only to `category` and `boolean`.
+
+## [0.2.5]
+
+### Fixed
+- Fixed root remove-ruleset button visibility.
+- Fixed default value bug where only the first character of the operator was shown.
+- Fixed inability to override multiselect operators (`is in`, `is not in`).
+
+## [0.2.4]
+
+### Added
+- Added `QueryBuilderClassNames` interface.
+- Added Bootstrap 4 example.
+
+### Changed
+- Rewrote CSS for more extensible class overrides.
+
+### Fixed
+- Fixed a validation issue causing incorrect `ngModel` values.
+
+## [0.2.3]
+
+### Added
+- Added validator function support on `Field` config.
+
+### Fixed
+- Fixed IE11 compatibility (ES5 target).
+- Fixed invalid/valid state handling.

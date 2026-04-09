@@ -42,6 +42,7 @@ import {
   ElementRef,
   Input,
   OnChanges,
+  Provider,
   SimpleChanges,
   TemplateRef,
   contentChild,
@@ -54,13 +55,13 @@ import {
 } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
 
-export const CONTROL_VALUE_ACCESSOR: any = {
+export const CONTROL_VALUE_ACCESSOR: Provider = {
   provide: NG_VALUE_ACCESSOR,
   useExisting: forwardRef(() => QueryBuilderComponent),
   multi: true
 };
 
-export const VALIDATOR: any = {
+export const VALIDATOR: Provider = {
   provide: NG_VALIDATORS,
   useExisting: forwardRef(() => QueryBuilderComponent),
   multi: true
@@ -99,7 +100,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     'A ruleset cannot be empty. Please add a rule or remove it all together.'
   );
   readonly classNames = input<QueryBuilderClassNames | undefined>(undefined);
-  readonly operatorMap = input<{ [key: string]: string[] } | undefined>(undefined);
+  readonly operatorMap = input<Record<string, string[]> | undefined>(undefined);
   readonly parentValue = input<RuleSet | undefined>(undefined);
   readonly config = input<QueryBuilderConfig>({ fields: {} });
   readonly persistValueOnFieldChange = input<boolean>(false);
@@ -163,7 +164,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     inputControlSize: 'q-control-size'
   };
 
-  readonly defaultOperatorMap: { [key: string]: string[] } = {
+  readonly defaultOperatorMap: Record<string, string[]> = {
     string: ['=', '!=', 'contains', 'like'],
     number: ['=', '!=', '>', '>=', '<', '<='],
     time: ['=', '!=', '>', '>=', '<', '<='],
@@ -203,8 +204,9 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   private readonly defaultPersistValueTypes: string[] = [
     'string', 'number', 'time', 'date', 'boolean'
   ];
-  private readonly defaultEmptyList: any[] = [];
-  private operatorsCache: { [key: string]: string[] } = {};
+  private readonly defaultOperatorList: string[] = [];
+  private readonly defaultOptionList: Option[] = [];
+  private operatorsCache: Record<string, string[]> = {};
   private inputContextCache = new Map<Rule, InputContext>();
   private operatorContextCache = new Map<Rule, OperatorContext>();
   private fieldContextCache = new Map<Rule, FieldContext>();
@@ -246,8 +248,9 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   // ---------- Validator Implementation ----------
 
   validate(control: AbstractControl): ValidationErrors | null {
-    const errors: { [key: string]: any } = {};
-    const ruleErrorStore: any[] = [];
+    void control;
+    const errors: ValidationErrors = {};
+    const ruleErrorStore: unknown[] = [];
     let hasErrors = false;
 
     if (!this.config().allowEmptyRulesets && this.checkEmptyRuleInRuleset(this.data)) {
@@ -321,7 +324,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     if (this.operatorsCache[field]) {
       return this.operatorsCache[field];
     }
-    let operators = this.defaultEmptyList;
+    let operators = this.defaultOperatorList;
     const config = this.config();
     const fieldObject = config.fields[field];
 
@@ -335,7 +338,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       operators = fieldObject.operators;
     } else if (type) {
       const opMap = this.operatorMap();
-      operators = (opMap && opMap[type]) || this.defaultOperatorMap[type] || this.defaultEmptyList;
+      operators = (opMap && opMap[type]) || this.defaultOperatorMap[type] || this.defaultOperatorList;
       if (operators.length === 0) {
         console.warn(
           `No operators found for field '${field}' with type ${fieldObject.type}. ` +
@@ -388,7 +391,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     if (config.getOptions) {
       return config.getOptions(field);
     }
-    return config.fields[field].options || this.defaultEmptyList;
+    return config.fields[field].options || this.defaultOptionList;
   }
 
   getClassNames(...args: string[]): string {

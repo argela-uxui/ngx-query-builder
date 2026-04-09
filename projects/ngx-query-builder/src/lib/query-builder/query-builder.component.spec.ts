@@ -1,8 +1,8 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { AbstractControl, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Component, ViewChild } from '@angular/core';
 import { QueryBuilderComponent } from './query-builder.component';
-import { QueryBuilderConfig, RuleSet, Rule } from './query-builder.interfaces';
+import { Entity, QueryBuilderConfig, RuleSet, Rule } from './query-builder.interfaces';
 import { QueryInputDirective } from './query-input.directive';
 import { QueryArrowIconDirective } from './query-arrow-icon.directive';
 import { QueryButtonGroupDirective } from './query-button-group.directive';
@@ -105,7 +105,7 @@ describe('QueryBuilderComponent', () => {
     it('should throw when config is not an object', () => {
       const fixture = TestBed.createComponent(QueryBuilderComponent);
       expect(() => {
-        fixture.componentRef.setInput('config', 'invalid' as any);
+        fixture.componentRef.setInput('config', 'invalid' as unknown as QueryBuilderConfig);
         fixture.detectChanges();
       }).toThrow(/Expected 'config' must be a valid object/);
     });
@@ -124,7 +124,7 @@ describe('QueryBuilderComponent', () => {
 
     it('writeValue(null) falls back to empty ruleset', () => {
       const { component } = createComponent();
-      component.writeValue(null as any);
+      component.writeValue(null as unknown as RuleSet);
       expect(component.data).toEqual({ condition: 'and', rules: [] });
     });
 
@@ -200,19 +200,19 @@ describe('QueryBuilderComponent', () => {
         condition: 'and',
         rules: [{ field: 'name', operator: '=', value: 'Alice' }]
       });
-      const result = component.validate({} as any);
+      const result = component.validate({} as AbstractControl);
       expect(result).toBeNull();
     });
 
     it('returns empty error for empty ruleset when allowEmptyRulesets is false', () => {
       const { component } = createComponent({ ...baseConfig, allowEmptyRulesets: false });
-      const result = component.validate({} as any);
+      const result = component.validate({} as AbstractControl);
       expect(result).toMatchObject({ empty: expect.any(String) });
     });
 
     it('returns null for empty ruleset when allowEmptyRulesets is true', () => {
       const { component } = createComponent({ ...baseConfig, allowEmptyRulesets: true });
-      const result = component.validate({} as any);
+      const result = component.validate({} as AbstractControl);
       expect(result).toBeNull();
     });
 
@@ -221,7 +221,11 @@ describe('QueryBuilderComponent', () => {
         fields: {
           name: {
             name: 'Name', type: 'string',
-            validator: (_rule, _parent) => ({ required: true })
+            validator: (rule, parent) => {
+              void rule;
+              void parent;
+              return { required: true };
+            }
           }
         }
       };
@@ -229,7 +233,7 @@ describe('QueryBuilderComponent', () => {
         condition: 'and',
         rules: [{ field: 'name', operator: '=', value: '' }]
       });
-      const result = component.validate({} as any);
+      const result = component.validate({} as AbstractControl);
       expect(result).toMatchObject({ rules: expect.any(Array) });
     });
 
@@ -243,7 +247,7 @@ describe('QueryBuilderComponent', () => {
         condition: 'and',
         rules: [{ field: 'name', operator: '=', value: 'Alice' }]
       });
-      const result = component.validate({} as any);
+      const result = component.validate({} as AbstractControl);
       expect(result).toBeNull();
     });
 
@@ -255,7 +259,7 @@ describe('QueryBuilderComponent', () => {
           { condition: 'or', rules: [] } // nested empty ruleset
         ]
       });
-      const result = component.validate({} as any);
+      const result = component.validate({} as AbstractControl);
       expect(result).toMatchObject({ empty: expect.any(String) });
     });
   });
@@ -308,7 +312,7 @@ describe('QueryBuilderComponent', () => {
     });
 
     it('warns when no operators found for type', () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
       const { component } = createComponent();
       component.getOperators('unknown'); // type: 'custom_type' — not in defaultOperatorMap
       expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('No operators found'));
@@ -316,8 +320,8 @@ describe('QueryBuilderComponent', () => {
     });
 
     it('warns when field has no type', () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-      const config: QueryBuilderConfig = { fields: { noType: { name: 'NoType' } as any } };
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const config = { fields: { noType: { name: 'NoType' } } } as unknown as QueryBuilderConfig;
       const { component } = createComponent(config);
       component.getOperators('noType');
       expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("No 'type' property found"));
@@ -424,7 +428,7 @@ describe('QueryBuilderComponent', () => {
   describe('getDefaultField()', () => {
     it('returns null for null entity', () => {
       const { component } = createComponent();
-      expect(component.getDefaultField(null as any)).toBeNull();
+      expect(component.getDefaultField(null as unknown as Entity)).toBeNull();
     });
 
     it('returns result of entity.defaultField function', () => {
@@ -452,7 +456,7 @@ describe('QueryBuilderComponent', () => {
     });
 
     it('warns and returns null when no matching fields', () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
       const configWithEntities: QueryBuilderConfig = {
         fields: { name: { name: 'Name', type: 'string' } },
         entities: { org: { name: 'Org' } }
@@ -492,7 +496,7 @@ describe('QueryBuilderComponent', () => {
     });
 
     it('warns and returns null when no operators found', () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
       const config: QueryBuilderConfig = { fields: { x: { name: 'X', type: 'custom_type' } } };
       const { component } = createComponent(config);
       const result = component.getDefaultOperator(component.fields[0]);
@@ -1065,7 +1069,7 @@ describe('QueryBuilderComponent', () => {
     });
 
     it('warns for unknown input type', () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
       const config: QueryBuilderConfig = { fields: { x: { name: 'X', type: 'custom_nonstandard' } } };
       const { component } = createComponent(config);
       const rule: Rule = { field: 'x', operator: '=' };
@@ -1416,7 +1420,7 @@ describe('QueryBuilderComponent — coverage gaps', () => {
     fixture.componentInstance.data = data;
     fixture.detectChanges();
     // Pass null as data to trigger the !rs branch (index = -1, data = null)
-    fixture.componentInstance.changeEntity('person', rule, -1, null as any);
+    fixture.componentInstance.changeEntity('person', rule, -1, null as unknown as RuleSet);
     expect(rule.field).toBe('personName');
   });
 
@@ -1435,7 +1439,7 @@ describe('QueryBuilderComponent — coverage gaps', () => {
     fixture.componentRef.setInput('config', baseConfig);
     fixture.componentInstance.data = { condition: 'and', rules: [] };
     // Create a fake QueryInputDirective to pass as parent template
-    const fakeDirective = { queryInputType: 'string', template: {} } as any;
+    const fakeDirective = { queryInputType: 'string', template: {} } as unknown as QueryInputDirective;
     fixture.componentRef.setInput('parentInputTemplates', [fakeDirective]);
     fixture.detectChanges();
     const result = fixture.componentInstance.findQueryInput('string');
@@ -1454,7 +1458,7 @@ describe('QueryBuilderComponent — coverage gaps', () => {
 
   it('addRule uses null operator when getDefaultOperator returns null', () => {
     // A field with custom_type has no operators, so getDefaultOperator returns null
-    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
     const config: QueryBuilderConfig = { fields: { x: { name: 'X', type: 'custom_type' } } };
     const fixture = TestBed.createComponent(QueryBuilderComponent);
     fixture.componentRef.setInput('config', config);
@@ -1514,7 +1518,7 @@ describe('QueryBuilderComponent — coverage gaps', () => {
   });
 
   it('changeField with no default on nextField when getDefaultOperator returns null', () => {
-    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
     const config: QueryBuilderConfig = {
       fields: {
         name: { name: 'Name', type: 'string' },

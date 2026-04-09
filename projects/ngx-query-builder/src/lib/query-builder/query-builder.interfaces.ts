@@ -1,8 +1,6 @@
-import { ValidationErrors } from '@angular/forms';
-
 export interface RuleSet {
   condition: string;
-  rules: Array<RuleSet | Rule>;
+  rules: (RuleSet | Rule)[];
   collapsed?: boolean;
   isChild?: boolean;
 }
@@ -19,9 +17,7 @@ export interface Option {
   value: any;
 }
 
-export interface FieldMap {
-  [key: string]: Field;
-}
+export type FieldMap = Record<string, Field>;
 
 export interface Field {
   name: string;
@@ -41,9 +37,7 @@ export interface LocalRuleMeta {
   invalid: boolean;
 }
 
-export interface EntityMap {
-  [key: string]: Entity;
-}
+export type EntityMap = Record<string, Entity>;
 
 export interface Entity {
   name: string;

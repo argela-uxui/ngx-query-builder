@@ -28,7 +28,7 @@ Forked from [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-Qu
 npm install ngx-query-builder
 ```
 
-> **Peer dependencies:** `@angular/core >=21`, `@angular/forms >=21`, `rxjs >=7`
+> **Peer dependencies:** `@angular/core >=21`, `@angular/forms >=21`, `@angular/cdk >=21`, `rxjs >=7`
 
 ## Internal / Private Distribution
 
@@ -238,6 +238,7 @@ export class AppModule {}
 | `[allowRuleset]` | `boolean` | `true` | Show "Add Ruleset" button |
 | `[allowCollapse]` | `boolean` | `false` | Enable collapse/expand of rule sets |
 | `[persistValueOnFieldChange]` | `boolean` | `false` | Keep value when field changes to same type |
+| `[dragDropRules]` | `boolean` | `false` | Opt-in pointer drag-drop to reorder/move rules across rulesets (rulesets themselves are not draggable) |
 | `[classNames]` | `QueryBuilderClassNames` | — | CSS class overrides for all elements |
 | `[operatorMap]` | `{ [type: string]: string[] }` | — | Override operators per field type |
 | `[translations]` | `QueryBuilderTranslations` | — | Localize built-in labels, ARIA text, and operator captions |
@@ -348,7 +349,7 @@ Replace any part of the UI using structural directives as content children.
 | Directive | Context variables |
 |---|---|
 | `*queryInput` | `rule`, `field`, `options`, `onChange`, `getDisabledState` |
-| `*queryField` | `rule`, `fields`, `onChange`, `getFields`, `getDisabledState` |
+| `*queryField` | `rule`, `fields`, `onChange`, `getFields`, `getDisabledState`, `dragDropEnabled`, `dragHandleClass`, `dragHandleAriaLabel` |
 | `*queryOperator` | `rule`, `operators`, `labels`, `getLabel(operator)`, `onChange`, `getDisabledState` |
 | `*queryEntity` | `rule`, `entities`, `onChange`, `getDisabledState` |
 | `*queryButtonGroup` | `addRule`, `addRuleSet?`, `removeRuleSet?`, `labels`, `getLabel(key)`, `getDisabledState` |
@@ -358,6 +359,8 @@ Replace any part of the UI using structural directives as content children.
 | `*queryArrowIcon` | `getDisabledState` |
 
 ## Styling
+
+> Drag-drop interactions are pointer-based in this release. Keyboard drag interactions are currently out of scope.
 
 Apply CSS class overrides via `[classNames]` input:
 

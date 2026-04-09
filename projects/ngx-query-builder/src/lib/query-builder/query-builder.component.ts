@@ -44,6 +44,7 @@ import {
   Component,
   ElementRef,
   Input,
+  OnDestroy,
   OnChanges,
   Provider,
   SimpleChanges,
@@ -57,6 +58,23 @@ import {
   viewChild,
 } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDragHandle,
+  CdkDropList,
+} from '@angular/cdk/drag-drop';
+
+interface DragRuleData {
+  rule: Rule;
+  parent: RuleSet;
+  owner: QueryBuilderComponent;
+}
+
+interface DropListData {
+  ruleset: RuleSet;
+  owner: QueryBuilderComponent;
+}
 
 export const CONTROL_VALUE_ACCESSOR: Provider = {
   provide: NG_VALUE_ACCESSOR,
@@ -81,15 +99,21 @@ export const VALIDATOR: Provider = {
     FormsModule,
     NgClass,
     NgTemplateOutlet,
+    CdkDrag,
+    CdkDropList,
+    CdkDragHandle,
   ],
 })
-export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, Validator {
+export class QueryBuilderComponent implements OnChanges, OnDestroy, ControlValueAccessor, Validator {
 
   private static nextComponentId = 0;
+  private static readonly dropListIds = new Set<string>();
+  private static readonly instances = new Set<QueryBuilderComponent>();
   private readonly componentId = `qb-${QueryBuilderComponent.nextComponentId++}`;
   readonly andOptionId = `${this.componentId}-and`;
   readonly orOptionId = `${this.componentId}-or`;
   readonly switchGroupId = `${this.componentId}-switch`;
+  readonly dropListId = `${this.componentId}-drop-list`;
 
   // ---------- Signal Inputs ----------
 
@@ -104,6 +128,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   readonly parentValue = input<RuleSet | undefined>(undefined);
   readonly config = input<QueryBuilderConfig>({ fields: {} });
   readonly persistValueOnFieldChange = input<boolean>(false);
+  readonly dragDropRules = input<boolean>(false);
 
   // Parent template pass-through inputs (for recursive child components)
   readonly parentArrowIconTemplate = input<QueryArrowIconDirective | undefined>(undefined);
@@ -161,7 +186,10 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     operatorControl: 'q-operator-control',
     operatorControlSize: 'q-control-size',
     inputControl: 'q-input-control',
-    inputControlSize: 'q-control-size'
+    inputControlSize: 'q-control-size',
+    dragHandle: 'q-drag-handle',
+    draggableRule: 'q-draggable-rule',
+    dropTargetSpacer: 'q-drop-target-spacer'
   };
 
   readonly defaultOperatorMap: Record<string, string[]> = {
@@ -232,6 +260,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   ];
   private readonly defaultOperatorList: string[] = [];
   private readonly defaultOptionList: Option[] = [];
+  private readonly dragHandleAriaLabel = 'Drag rule';
   private operatorsCache: Record<string, string[]> = {};
   private inputContextCache = new Map<Rule, InputContext>();
   private operatorContextCache = new Map<Rule, OperatorContext>();
@@ -242,6 +271,10 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   private readonly missingTranslationWarnings = new Set<string>();
 
   constructor() {
+    QueryBuilderComponent.dropListIds.add(this.dropListId);
+    QueryBuilderComponent.instances.add(this);
+    QueryBuilderComponent.notifyDropListGraphChanged();
+
     // Recompute fields/entities whenever config signal changes
     effect(() => {
       const config = this.config();
@@ -262,6 +295,12 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         : null;
       this.operatorsCache = {};
     });
+  }
+
+  ngOnDestroy(): void {
+    QueryBuilderComponent.dropListIds.delete(this.dropListId);
+    QueryBuilderComponent.instances.delete(this);
+    QueryBuilderComponent.notifyDropListGraphChanged();
   }
 
   // ---------- OnChanges — kept for `data` and `disabled` which are not signal inputs ----------
@@ -637,6 +676,74 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     this.handleDataChange();
   }
 
+  getDragRuleData(rule: Rule, parent: RuleSet): DragRuleData {
+    return {
+      rule,
+      parent,
+      owner: this
+    };
+  }
+
+  getDropListData(ruleset: RuleSet): DropListData {
+    return {
+      ruleset,
+      owner: this
+    };
+  }
+
+  getConnectedDropListIds(): string[] {
+    return Array.from(QueryBuilderComponent.dropListIds).filter((id) => id !== this.dropListId);
+  }
+
+  canEnterDropList = (drag: CdkDrag<DragRuleData>, drop: CdkDropList<DropListData>): boolean => {
+    if (!this.dragDropRules() || this.disabled) {
+      return false;
+    }
+    return drag.data?.rule != null && drop.data?.ruleset != null;
+  };
+
+  dropRule(event: CdkDragDrop<DropListData, DropListData, DragRuleData>): void {
+    if (!this.dragDropRules() || this.disabled) {
+      return;
+    }
+
+    const sourceListData = event.previousContainer.data;
+    const targetListData = event.container.data;
+    if (!sourceListData || !targetListData) {
+      return;
+    }
+
+    const sourceRuleset = sourceListData.ruleset;
+    const targetRuleset = targetListData.ruleset;
+    const sourceRuleAbsoluteIndices = this.getRuleAbsoluteIndices(sourceRuleset);
+    const sourceAbsoluteIndex = sourceRuleAbsoluteIndices[event.previousIndex];
+    if (sourceAbsoluteIndex === undefined) {
+      return;
+    }
+
+    const [movedRule] = sourceRuleset.rules.splice(sourceAbsoluteIndex, 1);
+    if (!movedRule) {
+      return;
+    }
+
+    const targetRuleAbsoluteIndices = this.getRuleAbsoluteIndices(targetRuleset);
+    const targetAbsoluteIndex = event.currentIndex >= targetRuleAbsoluteIndices.length
+      ? targetRuleset.rules.length
+      : targetRuleAbsoluteIndices[event.currentIndex];
+    if (targetAbsoluteIndex === undefined) {
+      return;
+    }
+
+    targetRuleset.rules.splice(targetAbsoluteIndex, 0, movedRule as Rule);
+
+    sourceListData.owner.resetContextCaches();
+    targetListData.owner.resetContextCaches();
+    sourceListData.owner.changeDetectorRef.markForCheck();
+    targetListData.owner.changeDetectorRef.markForCheck();
+    this.handleTouched();
+    this.handleDataChange();
+  }
+
   changeField(fieldValue: string, rule: Rule): void {
     if (this.disabled) { return; }
 
@@ -740,6 +847,9 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   getQueryItemClassName(local: LocalRuleMeta): string {
     let cls = this.getClassNames('row', 'connector', 'transition');
     cls += ' ' + this.getClassNames(local.ruleset ? 'ruleSet' : 'rule');
+    if (this.dragDropRules() && !local.ruleset) {
+      cls += ' ' + this.getClassNames('draggableRule');
+    }
     if (local.invalid) {
       cls += ' ' + this.getClassNames('invalidRuleSet');
     }
@@ -782,11 +892,18 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         onChange: this.changeField.bind(this),
         getFields: this.getFields.bind(this),
         getDisabledState: this.getDisabledState,
+        dragDropEnabled: this.dragDropRules(),
+        dragHandleClass: this.getClassNames('dragHandle'),
+        dragHandleAriaLabel: this.dragHandleAriaLabel,
         fields: this.fields,
         $implicit: rule
       });
     }
-    return this.fieldContextCache.get(rule)!;
+    const context = this.fieldContextCache.get(rule)!;
+    context.dragDropEnabled = this.dragDropRules();
+    context.dragHandleClass = this.getClassNames('dragHandle');
+    context.dragHandleAriaLabel = this.dragHandleAriaLabel;
+    return context;
   }
 
   getEntityContext(rule: Rule): EntityContext {
@@ -918,6 +1035,28 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
   }
 
+  private getRuleAbsoluteIndices(ruleset: RuleSet): number[] {
+    return ruleset.rules.reduce<number[]>((indices, item, index) => {
+      if (!this.isRuleSet(item)) {
+        indices.push(index);
+      }
+      return indices;
+    }, []);
+  }
+
+  private isRuleSet(item: Rule | RuleSet): item is RuleSet {
+    return (item as RuleSet).rules !== undefined;
+  }
+
+  private resetContextCaches(): void {
+    this.inputContextCache.clear();
+    this.operatorContextCache.clear();
+    this.fieldContextCache.clear();
+    this.entityContextCache.clear();
+    this.removeButtonContextCache.clear();
+    this.buttonGroupContext = null;
+  }
+
   private handleDataChange(): void {
     this.changeDetectorRef.markForCheck();
     this.onChangeCallback?.();
@@ -935,5 +1074,11 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     }
     this.missingTranslationWarnings.add(key);
     console.error(`Missing query-builder translation key: '${key}'.`);
+  }
+
+  private static notifyDropListGraphChanged(): void {
+    for (const instance of QueryBuilderComponent.instances) {
+      instance.changeDetectorRef.markForCheck();
+    }
   }
 }

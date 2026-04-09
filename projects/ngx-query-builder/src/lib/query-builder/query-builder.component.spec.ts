@@ -811,7 +811,68 @@ describe('QueryBuilderComponent', () => {
   });
 
   // -------------------------------------------------------------------------
-  // 18. changeField()
+  // 18. dragDropRules
+  // -------------------------------------------------------------------------
+  describe('dragDropRules', () => {
+    it('getFieldContext exposes drag primitives for queryField templates', () => {
+      const rule: Rule = { field: 'name', operator: '=', value: 'Alice' };
+      const { fixture, component } = createComponent(baseConfig, { condition: 'and', rules: [rule] });
+
+      fixture.componentRef.setInput('dragDropRules', true);
+      fixture.detectChanges();
+
+      const context = component.getFieldContext(rule);
+      expect(context.dragDropEnabled).toBe(true);
+      expect(context.dragHandleClass).toBe('q-drag-handle');
+      expect(context.dragHandleAriaLabel).toBe('Drag rule');
+    });
+
+    it('dropRule reorders rules inside the same ruleset', () => {
+      const ruleA: Rule = { field: 'name', operator: '=', value: 'Alice' };
+      const ruleB: Rule = { field: 'age', operator: '=', value: 30 };
+      const ruleset: RuleSet = { condition: 'and', rules: [ruleA, ruleB] };
+      const { fixture, component } = createComponent(baseConfig, ruleset);
+
+      fixture.componentRef.setInput('dragDropRules', true);
+      fixture.detectChanges();
+
+      component.dropRule({
+        previousIndex: 0,
+        currentIndex: 1,
+        previousContainer: { data: component.getDropListData(ruleset) },
+        container: { data: component.getDropListData(ruleset) },
+      } as Parameters<QueryBuilderComponent['dropRule']>[0]);
+
+      expect((ruleset.rules[0] as Rule).field).toBe('age');
+      expect((ruleset.rules[1] as Rule).field).toBe('name');
+    });
+
+    it('dropRule moves rule between rulesets and leaves source empty', () => {
+      const sourceRule: Rule = { field: 'name', operator: '=', value: 'Alice' };
+      const nestedRule: Rule = { field: 'age', operator: '>=', value: 18 };
+      const sourceRuleset: RuleSet = { condition: 'and', rules: [sourceRule] };
+      const targetRuleset: RuleSet = { condition: 'or', rules: [nestedRule] };
+      const root: RuleSet = { condition: 'and', rules: [sourceRuleset, targetRuleset] };
+
+      const { fixture, component } = createComponent(baseConfig, root);
+      fixture.componentRef.setInput('dragDropRules', true);
+      fixture.detectChanges();
+
+      component.dropRule({
+        previousIndex: 0,
+        currentIndex: 1,
+        previousContainer: { data: component.getDropListData(sourceRuleset) },
+        container: { data: component.getDropListData(targetRuleset) },
+      } as Parameters<QueryBuilderComponent['dropRule']>[0]);
+
+      expect(sourceRuleset.rules).toEqual([]);
+      expect((targetRuleset.rules[0] as Rule).field).toBe('age');
+      expect((targetRuleset.rules[1] as Rule).field).toBe('name');
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // 19. changeField()
   // -------------------------------------------------------------------------
   describe('changeField()', () => {
     it('updates rule.field and assigns default operator', () => {

@@ -26,6 +26,7 @@ import {
         <div data-testid="query-builder">
           <query-builder [formControl]="queryCtrl" [config]="currentConfig" [allowRuleset]="allowRuleset"
             [allowCollapse]="allowCollapse" [persistValueOnFieldChange]="persistValueOnFieldChange"
+            [dragDropRules]="dragDropRules"
             [translations]="queryBuilderTranslations">
             <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
               <textarea class="text-input text-area" [(ngModel)]="rule.value" [disabled]="getDisabledState()"
@@ -57,6 +58,10 @@ import {
           <label class="control-item">
             <input type="checkbox" [(ngModel)]="persistValueOnFieldChange" data-testid="toggle-persist-value">
             <span>Persist Value on Field Change</span>
+          </label>
+          <label class="control-item">
+            <input type="checkbox" [(ngModel)]="dragDropRules" data-testid="toggle-drag-drop-rules">
+            <span>Drag-Drop Rules</span>
           </label>
           <label class="control-item" for="language-select">
             <span>Language</span>
@@ -209,6 +214,7 @@ export class AppComponent {
   public allowRuleset = true;
   public allowCollapse = false;
   public persistValueOnFieldChange = false;
+  public dragDropRules = false;
   public language: 'en' | 'tr' = 'en';
   public queryBuilderTranslations: QueryBuilderTranslations;
 

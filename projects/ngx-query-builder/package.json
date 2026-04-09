@@ -2,6 +2,7 @@
   "name": "ngx-query-builder",
   "version": "21.0.0",
   "peerDependencies": {
+    "@angular/cdk": ">=21.0.0",
     "@angular/common": ">=21.0.0",
     "@angular/core": ">=21.0.0",
     "@angular/forms": ">=21.0.0",

@@ -83,6 +83,9 @@ export interface QueryBuilderClassNames {
   operatorControlSize?: string;
   inputControl?: string;
   inputControlSize?: string;
+  dragHandle?: string;
+  draggableRule?: string;
+  dropTargetSpacer?: string;
 }
 
 export interface QueryBuilderConfig {
@@ -156,6 +159,9 @@ export interface FieldContext {
   onChange: (fieldValue: string, rule: Rule) => void;
   getFields: (entityName: string) => void;
   getDisabledState: () => boolean;
+  dragDropEnabled: boolean;
+  dragHandleClass: string;
+  dragHandleAriaLabel: string;
   fields: Field[];
   $implicit: Rule;
 }

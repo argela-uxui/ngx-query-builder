@@ -83,12 +83,29 @@
 
 <div #treeContainer (transitionend)="transitionEnd($event)" [ngClass]="getClassNames('treeContainer', data.collapsed ? 'collapsed' : '')">
   @if (data && data.rules) {
-    <ul [ngClass]="getClassNames('tree')">
+    <ul
+      [ngClass]="getClassNames('tree')"
+      [class.q-drop-list-enabled]="dragDropRules()"
+      cdkDropList
+      [id]="dropListId"
+      [cdkDropListData]="getDropListData(data)"
+      [cdkDropListConnectedTo]="getConnectedDropListIds()"
+      [cdkDropListDisabled]="disabled || !dragDropRules()"
+      [cdkDropListEnterPredicate]="canEnterDropList"
+      (cdkDropListDropped)="dropRule($event)">
+      @if (dragDropRules() && data.rules.length === 0) {
+        <li [ngClass]="getClassNames('dropTargetSpacer')" aria-hidden="true"></li>
+      }
       @for (rule of data.rules; track rule; let i = $index) {
         @let local = { ruleset: !!$any(rule).rules, invalid: !config().allowEmptyRulesets && !!$any(rule).rules && $any(rule).rules.length === 0 };
-        <li [ngClass]="getQueryItemClassName(local)">
-          @if (!local.ruleset) {
-            @let asRule = $any(rule);
+        @if (!local.ruleset) {
+          @let asRule = $any(rule);
+          <li
+            [ngClass]="getQueryItemClassName(local)"
+            cdkDrag
+            [cdkDragData]="getDragRuleData(asRule, data)"
+            [cdkDragDisabled]="disabled || !dragDropRules()"
+            cdkDragPreviewContainer="parent">
 
             @let removeButtonTpl = getRemoveButtonTemplate();
             @if (removeButtonTpl) {
@@ -131,6 +148,16 @@
               <ng-container [ngTemplateOutlet]="fieldTpl" [ngTemplateOutletContext]="getFieldContext(asRule)"></ng-container>
             } @else {
               <div [ngClass]="getClassNames('fieldControlSize')">
+                @if (dragDropRules()) {
+                  <button
+                    type="button"
+                    cdkDragHandle
+                    [ngClass]="getClassNames('dragHandle')"
+                    [attr.aria-label]="getFieldContext(asRule).dragHandleAriaLabel"
+                    [disabled]="disabled">
+                    <span aria-hidden="true">::</span>
+                  </button>
+                }
                 <select [ngClass]="getClassNames('fieldControl')" [(ngModel)]="asRule.field" (ngModelChange)="changeField($event, asRule)"
                   [disabled]="disabled">
                   @for (field of getFields(asRule.entity); track field.value) {
@@ -199,10 +226,11 @@
                 }
               </div>
             }
+          </li>
+        }
 
-          }
-
-          @if (local.ruleset) {
+        @if (local.ruleset) {
+          <li [ngClass]="getQueryItemClassName(local)">
             <query-builder
               [data]="$any(rule)"
               [disabled]="disabled"
@@ -222,21 +250,22 @@
               [config]="config()"
               [allowRuleset]="allowRuleset()"
               [allowCollapse]="allowCollapse()"
+              [dragDropRules]="dragDropRules()"
               [emptyMessage]="emptyMessage()"
               [translations]="translations()"
               [operatorMap]="operatorMap()">
             </query-builder>
-          }
-
-          @let emptyWarningTpl = getEmptyWarningTemplate();
-          @if (local.invalid) {
-            @if (emptyWarningTpl) {
-              <ng-container [ngTemplateOutlet]="emptyWarningTpl" [ngTemplateOutletContext]="getEmptyWarningContext()"></ng-container>
-            } @else {
-              <p [ngClass]="getClassNames('emptyWarning')">{{getUiLabel('emptyRuleset')}}</p>
+            @let emptyWarningTpl = getEmptyWarningTemplate();
+            @if (local.invalid) {
+              @if (emptyWarningTpl) {
+                <ng-container [ngTemplateOutlet]="emptyWarningTpl" [ngTemplateOutletContext]="getEmptyWarningContext()"></ng-container>
+              } @else {
+                <p [ngClass]="getClassNames('emptyWarning')">{{getUiLabel('emptyRuleset')}}</p>
+              }
             }
-          }
-        </li>
+          </li>
+        }
+
       }
     </ul>
   }

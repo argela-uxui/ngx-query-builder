@@ -117,6 +117,32 @@
     padding-right: 10px;
   }
 
+  .q-draggable-rule {
+    cursor: grab;
+  }
+
+  .q-drag-handle {
+    margin-right: 6px;
+    min-height: var(--qb-control-height);
+    border: 1px solid var(--qb-border-color);
+    border-radius: var(--qb-border-radius);
+    background-color: var(--qb-bg-color);
+    color: var(--qb-text-color);
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  .cdk-drag-preview {
+    opacity: 0.85;
+  }
+
+  .cdk-drag-placeholder {
+    opacity: 0.25;
+  }
+
   .q-input-control,
   .q-operator-control,
   .q-field-control,
@@ -241,6 +267,24 @@
   .q-tree {
     list-style: none;
     margin: 4px 0 2px;
+
+    &.q-drop-list-enabled {
+      min-height: 44px;
+    }
+  }
+
+  .q-drop-list-enabled.cdk-drop-list-receiving {
+    outline: 1px dashed var(--qb-switch-active-border);
+    outline-offset: 2px;
+  }
+
+  .q-drop-target-spacer {
+    min-height: 36px;
+    margin: 4px 0;
+    border: 1px dashed var(--qb-border-color);
+    border-radius: var(--qb-border-radius);
+    background: var(--qb-hover-bg);
+    pointer-events: none;
   }
 
   .q-row {

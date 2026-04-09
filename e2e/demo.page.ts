@@ -74,6 +74,10 @@ export class DemoPage {
     return this.page.locator('[data-testid="toggle-persist-value"]');
   }
 
+  toggleDragDropRules(): Locator {
+    return this.page.locator('[data-testid="toggle-drag-drop-rules"]');
+  }
+
   languageSelect(): Locator {
     return this.page.locator('[data-testid="language-select"]');
   }
@@ -118,6 +122,101 @@ export class DemoPage {
   /** All input controls (text, number, date, time, checkbox, category select) */
   inputControls(): Locator {
     return this.page.locator('.q-input-control');
+  }
+
+  /** Draggable rule rows (visible when dragDropRules is enabled). */
+  draggableRuleRows(): Locator {
+    return this.page.locator('li.q-draggable-rule');
+  }
+
+  /** Default drag handles rendered next to field selectors. */
+  dragHandles(): Locator {
+    return this.page.locator('button.q-drag-handle');
+  }
+
+  queryBuilderInstances(): Locator {
+    return this.page.locator('query-builder');
+  }
+
+  builderAt(index: number): Locator {
+    return this.queryBuilderInstances().nth(index);
+  }
+
+  dropListAtBuilder(index: number): Locator {
+    return this.builderAt(index).locator('ul.q-tree').first();
+  }
+
+  dragHandleAtBuilder(index: number, ruleIndex = 0): Locator {
+    return this.builderAt(index).locator('button.q-drag-handle').nth(ruleIndex);
+  }
+
+  async addRulesetAtBuilder(index: number): Promise<void> {
+    const before = await this.queryBuilderInstances().count();
+    await this.builderAt(index)
+      .locator('.q-button-group > button.q-button:not(.q-remove-button):has(.q-add-icon):nth-child(2)')
+      .first()
+      .click();
+    await expect(this.queryBuilderInstances()).toHaveCount(before + 1);
+  }
+
+  async dragHandleToBuilder(sourceBuilderIndex: number, targetBuilderIndex: number, sourceRuleIndex = 0): Promise<void> {
+    const source = this.dragHandleAtBuilder(sourceBuilderIndex, sourceRuleIndex);
+    const target = this.dropListAtBuilder(targetBuilderIndex);
+    const sourceBox = await source.boundingBox();
+    const targetBox = await target.boundingBox();
+
+    expect(sourceBox).toBeTruthy();
+    expect(targetBox).toBeTruthy();
+
+    const startX = sourceBox!.x + sourceBox!.width / 2;
+    const startY = sourceBox!.y + sourceBox!.height / 2;
+    const targetX = targetBox!.x + targetBox!.width / 2;
+    const targetY = targetBox!.y + Math.min(24, targetBox!.height / 2);
+
+    await this.page.mouse.move(startX, startY);
+    await this.page.mouse.down();
+    await this.page.mouse.move(startX + 6, startY + 6, { steps: 4 });
+    await this.page.mouse.move(targetX, targetY, { steps: 14 });
+    await this.page.mouse.up();
+  }
+
+  async dragHandleToBuilderUntilOutputChanges(
+    sourceBuilderIndex: number,
+    targetBuilderIndex: number,
+    prevOutputText: string,
+    sourceRuleIndex = 0,
+  ): Promise<boolean> {
+    const source = this.dragHandleAtBuilder(sourceBuilderIndex, sourceRuleIndex);
+    const target = this.dropListAtBuilder(targetBuilderIndex);
+
+    const sourceBox = await source.boundingBox();
+    const targetBox = await target.boundingBox();
+    expect(sourceBox).toBeTruthy();
+    expect(targetBox).toBeTruthy();
+
+    const startX = sourceBox!.x + sourceBox!.width / 2;
+    const startY = sourceBox!.y + sourceBox!.height / 2;
+    const targetPoints = [
+      { x: targetBox!.x + 16, y: targetBox!.y + 14 },
+      { x: targetBox!.x + targetBox!.width / 2, y: targetBox!.y + targetBox!.height / 2 },
+      { x: targetBox!.x + 18, y: targetBox!.y + Math.max(16, targetBox!.height - 12) },
+    ];
+
+    for (const point of targetPoints) {
+      await this.page.mouse.move(startX, startY);
+      await this.page.mouse.down();
+      await this.page.mouse.move(startX + 8, startY + 8, { steps: 5 });
+      await this.page.mouse.move(point.x, point.y, { steps: 16 });
+      await this.page.mouse.up();
+
+      await this.page.waitForTimeout(120);
+      const after = await this.getOutputText();
+      if (after !== prevOutputText) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /** Arrow icon buttons (collapse toggle) */

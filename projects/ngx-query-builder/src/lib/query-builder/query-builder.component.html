@@ -4,14 +4,18 @@
   </ng-template>
 
   @if (allowCollapse()) {
-    <a (click)="toggleCollapse()" [ngClass]="getClassNames('arrowIconButton', data.collapsed ? 'collapsed' : '')">
+    <button
+      type="button"
+      (click)="toggleCollapse()"
+      [ngClass]="getClassNames('arrowIconButton', data.collapsed ? 'collapsed' : '')"
+      [attr.aria-label]="data.collapsed ? 'Expand ruleset' : 'Collapse ruleset'">
       @let arrowTpl = getArrowIconTemplate();
       @if (arrowTpl) {
         <ng-container [ngTemplateOutlet]="arrowTpl" [ngTemplateOutletContext]="getArrowIconContext()"></ng-container>
       } @else {
         <ng-container [ngTemplateOutlet]="defaultArrowIcon"></ng-container>
       }
-    </a>
+    </button>
   }
 
   @let buttonGroupTpl = getButtonGroupTemplate();
@@ -44,14 +48,26 @@
     @if (data) {
       <div [ngClass]="getClassNames('switchGroup', 'transition')">
         <div [ngClass]="getClassNames('switchControl')">
-          <input type="radio" [ngClass]="getClassNames('switchRadio')" [(ngModel)]="data.condition" [disabled]="disabled"
-            value="and" #andOption />
-          <label (click)="changeCondition(andOption.value)" [ngClass]="getClassNames('switchLabel')">AND</label>
+          <input
+            type="radio"
+            [id]="andOptionId"
+            [ngClass]="getClassNames('switchRadio')"
+            [(ngModel)]="data.condition"
+            (ngModelChange)="changeCondition($event)"
+            [disabled]="disabled"
+            value="and" />
+          <label [attr.for]="andOptionId" [ngClass]="getClassNames('switchLabel')">AND</label>
         </div>
         <div [ngClass]="getClassNames('switchControl')">
-          <input type="radio" [ngClass]="getClassNames('switchRadio')" [(ngModel)]="data.condition" [disabled]="disabled"
-            value="or" #orOption />
-          <label (click)="changeCondition(orOption.value)" [ngClass]="getClassNames('switchLabel')">OR</label>
+          <input
+            type="radio"
+            [id]="orOptionId"
+            [ngClass]="getClassNames('switchRadio')"
+            [(ngModel)]="data.condition"
+            (ngModelChange)="changeCondition($event)"
+            [disabled]="disabled"
+            value="or" />
+          <label [attr.for]="orOptionId" [ngClass]="getClassNames('switchLabel')">OR</label>
         </div>
       </div>
     }

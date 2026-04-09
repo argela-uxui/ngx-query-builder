@@ -61,6 +61,9 @@
     transform: rotate(90deg);
     transition: var(--qb-collapse-transition);
     cursor: pointer;
+    background: transparent;
+    border: 0;
+    padding: 0;
 
     &.q-collapsed {
       transform: rotate(0);
@@ -89,7 +92,7 @@
   .q-switch-group,
   .q-button-group {
     display: inline-flex;
-    font-family: var(--qb-font-family);
+    font-family: var(--qb-font-family), serif;
   }
 
   .q-right-align {

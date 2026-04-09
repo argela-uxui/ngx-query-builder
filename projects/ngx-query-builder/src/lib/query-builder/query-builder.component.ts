@@ -92,6 +92,11 @@ export const VALIDATOR: Provider = {
 })
 export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, Validator {
 
+  private static nextComponentId = 0;
+  private readonly componentId = `qb-${QueryBuilderComponent.nextComponentId++}`;
+  readonly andOptionId = `${this.componentId}-and`;
+  readonly orOptionId = `${this.componentId}-or`;
+
   // ---------- Signal Inputs ----------
 
   readonly allowRuleset = input<boolean>(true);

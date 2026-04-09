@@ -86,6 +86,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   private readonly componentId = `qb-${QueryBuilderComponent.nextComponentId++}`;
   readonly andOptionId = `${this.componentId}-and`;
   readonly orOptionId = `${this.componentId}-or`;
+  readonly switchGroupId = `${this.componentId}-switch`;
 
   // ---------- Signal Inputs ----------
 

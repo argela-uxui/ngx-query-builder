@@ -10,6 +10,7 @@ Angular 21 library (`ngx-query-builder`) — a standalone, signal-based query bu
 - **Public API:** `projects/ngx-query-builder/src/public-api.ts` — re-exports everything. `QueryBuilderModule` exists only for NgModule backward-compat; the component is standalone.
 - **Demo app:** `demo/src/app/app.component.ts` — standalone component importing `QueryBuilderModule`, wired with `FormControl`. Used as the target for e2e tests.
 - **Recursive rendering:** `QueryBuilderComponent` renders nested `<query-builder>` for child rulesets, passing parent templates and callbacks via `parentXxxTemplate` signal inputs. Context objects are cached per `Rule` instance in `Map` caches and invalidated on field/rule changes.
+- **Radio group isolation:** Each component instance auto-generates a unique `componentId` from a `private static nextComponentId` counter (`qb-0`, `qb-1`, …). From this, `switchGroupId` (`qb-N-switch`), `andOptionId` (`qb-N-and`), and `orOptionId` (`qb-N-or`) are derived and used as `name`, `id`, and `for` attributes on the AND/OR radio buttons and labels. This ensures nested `<query-builder>` instances don't interfere with each other's radio selection.
 - **Data model:** `RuleSet` (recursive tree of `condition` + `rules: (Rule | RuleSet)[]`) defined in `query-builder.interfaces.ts`. The component mutates this tree in-place and notifies via CVA callbacks.
 
 ## Commands

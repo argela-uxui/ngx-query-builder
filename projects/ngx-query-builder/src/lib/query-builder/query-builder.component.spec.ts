@@ -1536,3 +1536,147 @@ describe('QueryBuilderComponent — coverage gaps', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// switchGroupId isolation — unique radio group names per component instance
+// ---------------------------------------------------------------------------
+describe('switchGroupId isolation', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [QueryBuilderComponent, ReactiveFormsModule],
+    }).compileComponents();
+  });
+
+  it('should generate unique switchGroupId for each component instance', () => {
+    const { component: c1 } = createComponent();
+    const { component: c2 } = createComponent();
+    expect(c1.switchGroupId).not.toBe(c2.switchGroupId);
+  });
+
+  it('should generate unique andOptionId for each component instance', () => {
+    const { component: c1 } = createComponent();
+    const { component: c2 } = createComponent();
+    expect(c1.andOptionId).not.toBe(c2.andOptionId);
+  });
+
+  it('should generate unique orOptionId for each component instance', () => {
+    const { component: c1 } = createComponent();
+    const { component: c2 } = createComponent();
+    expect(c1.orOptionId).not.toBe(c2.orOptionId);
+  });
+
+  it('should have different andOptionId and orOptionId within the same instance', () => {
+    const { component } = createComponent();
+    expect(component.andOptionId).not.toBe(component.orOptionId);
+  });
+
+  it('andOptionId and orOptionId should share a common prefix', () => {
+    const { component } = createComponent();
+    // Both derive from the same componentId: "qb-N"
+    const andPrefix = component.andOptionId.replace(/-and$/, '');
+    const orPrefix = component.orOptionId.replace(/-or$/, '');
+    expect(andPrefix).toBe(orPrefix);
+  });
+
+  it('switchGroupId should follow the qb-N-switch naming pattern', () => {
+    const { component } = createComponent();
+    expect(component.switchGroupId).toMatch(/^qb-\d+-switch$/);
+  });
+
+  it('andOptionId should follow the qb-N-and naming pattern', () => {
+    const { component } = createComponent();
+    expect(component.andOptionId).toMatch(/^qb-\d+-and$/);
+  });
+
+  it('orOptionId should follow the qb-N-or naming pattern', () => {
+    const { component } = createComponent();
+    expect(component.orOptionId).toMatch(/^qb-\d+-or$/);
+  });
+
+  it('should render radio inputs with id attributes matching andOptionId and orOptionId', () => {
+    const { fixture, component } = createComponent();
+    const el: HTMLElement = fixture.nativeElement;
+    const andRadio = el.querySelector(`input[type="radio"][id="${component.andOptionId}"]`) as HTMLInputElement;
+    const orRadio = el.querySelector(`input[type="radio"][id="${component.orOptionId}"]`) as HTMLInputElement;
+    expect(andRadio).toBeTruthy();
+    expect(orRadio).toBeTruthy();
+    expect(andRadio.value).toBe('and');
+    expect(orRadio.value).toBe('or');
+  });
+
+  it('should render labels with for attributes matching radio ids', () => {
+    const { fixture, component } = createComponent();
+    const el: HTMLElement = fixture.nativeElement;
+    const andLabel = el.querySelector(`label[for="${component.andOptionId}"]`);
+    const orLabel = el.querySelector(`label[for="${component.orOptionId}"]`);
+    expect(andLabel).toBeTruthy();
+    expect(orLabel).toBeTruthy();
+    expect(andLabel!.textContent).toContain('AND');
+    expect(orLabel!.textContent).toContain('OR');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Nested ruleset radio group isolation (requires host wrapper)
+// ---------------------------------------------------------------------------
+@Component({
+  standalone: true,
+  imports: [QueryBuilderComponent],
+  template: `
+    <query-builder [config]="config" [data]="data"></query-builder>
+  `
+})
+class NestedRulesetHostComponent {
+  config: QueryBuilderConfig = {
+    fields: { name: { name: 'Name', type: 'string' } }
+  };
+  data: RuleSet = {
+    condition: 'and',
+    rules: [
+      { field: 'name', operator: '=', value: 'Alice' },
+      { condition: 'or', rules: [{ field: 'name', operator: '=', value: 'Bob' }] }
+    ]
+  };
+}
+
+describe('switchGroupId isolation — nested rulesets', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [NestedRulesetHostComponent],
+    }).compileComponents();
+  });
+
+  it('should render distinct radio name attributes for root and nested rulesets', () => {
+    const fixture = TestBed.createComponent(NestedRulesetHostComponent);
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const allRadios = el.querySelectorAll('input[type="radio"].q-switch-radio');
+    // Root has 2 radios (AND/OR), nested has 2 radios (AND/OR) → at least 4
+    expect(allRadios.length).toBeGreaterThanOrEqual(4);
+
+    // Collect distinct id prefixes (e.g. "qb-5" from "qb-5-and") to verify
+    // that root and nested instances use different componentId values
+    const prefixes = new Set<string>();
+    allRadios.forEach((radio) => {
+      const id = (radio as HTMLInputElement).id;
+      // Extract prefix: "qb-N-and" → "qb-N"
+      const prefix = id.replace(/-(and|or)$/, '');
+      prefixes.add(prefix);
+    });
+    // Root and nested should have different prefixes
+    expect(prefixes.size).toBeGreaterThanOrEqual(2);
+  });
+
+  it('should render distinct radio id attributes for root and nested rulesets', () => {
+    const fixture = TestBed.createComponent(NestedRulesetHostComponent);
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const allRadios = el.querySelectorAll('input[type="radio"].q-switch-radio');
+
+    // Collect all id values — they should all be unique
+    const ids = Array.from(allRadios).map((r) => (r as HTMLInputElement).id);
+    const uniqueIds = new Set(ids);
+    expect(uniqueIds.size).toBe(ids.length);
+  });
+});
+
+

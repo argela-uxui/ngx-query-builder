@@ -31,6 +31,7 @@ projects/ngx-query-builder/src/
 ```
 
 - **Recursive rendering:** `QueryBuilderComponent` renders nested `<query-builder>` for child rulesets, passing parent templates and callbacks via `parentXxxTemplate` signal inputs.
+- **Radio group isolation:** Each component instance auto-generates a unique `componentId` from a `private static nextComponentId` counter (`qb-0`, `qb-1`, …). From this, `switchGroupId` (`qb-N-switch`), `andOptionId` (`qb-N-and`), and `orOptionId` (`qb-N-or`) are derived and used as `name`, `id`, and `for` attributes on the AND/OR radio buttons and labels. This ensures nested `<query-builder>` instances don't interfere with each other's radio selection.
 - **Data model:** `RuleSet` is a recursive tree of `condition` + `rules: (Rule | RuleSet)[]`. The component mutates this tree in-place and notifies via CVA callbacks.
 - **Context caching:** Template context objects are cached per `Rule` instance in `Map` caches and invalidated on field/rule changes.
 - **Demo app:** `demo/src/app/app.component.ts` — standalone component importing `QueryBuilderModule`, used as the E2E test target.

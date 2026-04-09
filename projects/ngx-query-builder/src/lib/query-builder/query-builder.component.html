@@ -51,6 +51,7 @@
           <input
             type="radio"
             [id]="andOptionId"
+            [name]="switchGroupId"
             [ngClass]="getClassNames('switchRadio')"
             [(ngModel)]="data.condition"
             (ngModelChange)="changeCondition($event)"
@@ -62,6 +63,7 @@
           <input
             type="radio"
             [id]="orOptionId"
+            [name]="switchGroupId"
             [ngClass]="getClassNames('switchRadio')"
             [(ngModel)]="data.condition"
             (ngModelChange)="changeCondition($event)"

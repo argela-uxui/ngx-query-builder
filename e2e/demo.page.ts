@@ -143,6 +143,11 @@ export class DemoPage {
     return this.conditionLabels(value).nth(index);
   }
 
+  /** All AND/OR radio inputs across all query-builder instances */
+  switchRadios(): Locator {
+    return this.page.locator('.q-switch-radio');
+  }
+
   /** The custom textarea from *queryInput template */
   customTextarea(): Locator {
     return this.page.locator('[data-testid="custom-textarea"]');

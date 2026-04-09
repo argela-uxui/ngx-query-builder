@@ -19,6 +19,7 @@ Forked from [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-Qu
 - ✅ **ControlValueAccessor** — works with Angular reactive forms and template-driven forms
 - ✅ **Fully customizable** — replace any template (fields, operators, inputs, buttons, etc.)
 - ✅ **Recursive rule sets** — nested AND/OR grouping
+- ✅ **Radio group isolation** — each component instance generates unique IDs for AND/OR radios, safe for nested rulesets
 - ✅ **Jest** — fast unit tests
 
 ## Installation

@@ -1,6 +1,11 @@
 Angular2-QueryBuilder Changelog
 ===============
 
+## [Unreleased]
+
+### Added
+- Unique `switchGroupId` per component instance — isolates AND/OR radio button groups in nested rulesets, preventing cross-component radio interference. Each instance auto-generates `componentId`, `andOptionId`, `orOptionId`, and `switchGroupId` from a static counter (`qb-0`, `qb-1`, …).
+
 Version 0.5.0
 -----------
 - Upgrade to Angular 8

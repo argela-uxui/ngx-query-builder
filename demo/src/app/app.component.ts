@@ -210,7 +210,11 @@ export class AppComponent {
   }
 
   changeDisabled(event: Event): void {
-    (event.target as HTMLInputElement).checked ? this.queryCtrl.disable() : this.queryCtrl.enable();
+    if ((event.target as HTMLInputElement).checked) {
+      this.queryCtrl.disable();
+    } else {
+      this.queryCtrl.enable();
+    }
   }
 }
 

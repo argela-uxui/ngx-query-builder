@@ -78,16 +78,6 @@ export const VALIDATOR: Provider = {
     FormsModule,
     NgClass,
     NgTemplateOutlet,
-    // QueryBuilderComponent,
-    // QueryInputDirective,
-    // QueryOperatorDirective,
-    // QueryFieldDirective,
-    // QueryEntityDirective,
-    // QueryButtonGroupDirective,
-    // QuerySwitchGroupDirective,
-    // QueryRemoveButtonDirective,
-    // QueryEmptyWarningDirective,
-    // QueryArrowIconDirective,
   ],
 })
 export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, Validator {

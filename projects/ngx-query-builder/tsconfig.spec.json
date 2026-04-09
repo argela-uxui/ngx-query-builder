@@ -4,10 +4,10 @@
     "outDir": "../../out-tsc/spec",
     "types": ["jest", "node"],
     "module": "preserve",
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "composite": true
   },
   "include": [
-    "**/*.spec.ts",
-    "**/*.d.ts"
+    "src/**/*.ts"
   ]
 }

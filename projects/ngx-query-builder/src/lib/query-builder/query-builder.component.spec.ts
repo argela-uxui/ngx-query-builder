@@ -1680,3 +1680,409 @@ describe('switchGroupId isolation — nested rulesets', () => {
 });
 
 
+// ---------------------------------------------------------------------------
+// Branch coverage — remaining uncovered branches
+// ---------------------------------------------------------------------------
+describe('QueryBuilderComponent — branch coverage', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [QueryBuilderComponent, ReactiveFormsModule],
+    }).compileComponents();
+  });
+
+  it('computedTreeContainerHeight does nothing when treeContainer has no firstElementChild', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', baseConfig);
+    fixture.componentInstance.data = { condition: 'and', rules: [] };
+    fixture.detectChanges();
+
+    const nativeEl = fixture.componentInstance.treeContainer().nativeElement;
+    // Remove all children so firstElementChild is null
+    while (nativeEl.firstChild) {
+      nativeEl.removeChild(nativeEl.firstChild);
+    }
+    // Should not throw and should not set maxHeight
+    fixture.componentInstance.computedTreeContainerHeight();
+    expect(nativeEl.style.maxHeight).toBe('');
+  });
+
+  it('validate handles rule item with no field and no rules (silent skip in validateRulesInRuleset)', () => {
+    const config: QueryBuilderConfig = {
+      fields: { name: { name: 'Name', type: 'string' } },
+      allowEmptyRulesets: true,
+    };
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', config);
+    fixture.componentInstance.data = { condition: 'and', rules: [] };
+    fixture.detectChanges();
+    // Set data with a malformed item AFTER initial render to avoid template errors
+    // Item has neither .rules (not a RuleSet) nor a truthy .field (not a valid Rule)
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [
+        { field: 'name', operator: '=', value: 'ok' },
+        { field: '', operator: '=' } as Rule, // falsy field — triggers else-if false branch at line 813
+      ],
+    };
+    // Call validate directly without re-rendering
+    const result = fixture.componentInstance.validate({} as AbstractControl);
+    // No error expected — the empty-field item is silently skipped
+    expect(result).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// HTML template rendering tests — cover all @switch input-type cases and
+// template branches (entities, collapse, empty warning, custom templates)
+// ---------------------------------------------------------------------------
+describe('QueryBuilderComponent — template rendering', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [QueryBuilderComponent, ReactiveFormsModule],
+    }).compileComponents();
+  });
+
+  it('should render a text input for string field type', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 'name', operator: '=', value: 'Alice' }],
+    };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const input = el.querySelector('input[type="text"].q-input-control') as HTMLInputElement;
+    expect(input).toBeTruthy();
+  });
+
+  it('should render a number input for number field type', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { age: { name: 'Age', type: 'number' } },
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 'age', operator: '=', value: 25 }],
+    };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const input = el.querySelector('input[type="number"].q-input-control') as HTMLInputElement;
+    expect(input).toBeTruthy();
+  });
+
+  it('should render a date input for date field type', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { dob: { name: 'DOB', type: 'date' } },
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 'dob', operator: '=', value: '2020-01-01' }],
+    };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const input = el.querySelector('input[type="date"].q-input-control') as HTMLInputElement;
+    expect(input).toBeTruthy();
+  });
+
+  it('should render a time input for time field type', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { t: { name: 'Time', type: 'time' } },
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 't', operator: '=', value: '12:00' }],
+    };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const input = el.querySelector('input[type="time"].q-input-control') as HTMLInputElement;
+    expect(input).toBeTruthy();
+  });
+
+  it('should render a select for category field type', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: {
+        cat: {
+          name: 'Category',
+          type: 'category',
+          options: [
+            { name: 'A', value: 'a' },
+            { name: 'B', value: 'b' },
+          ],
+        },
+      },
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 'cat', operator: '=', value: 'a' }],
+    };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const select = el.querySelector('select.q-input-control') as HTMLSelectElement;
+    expect(select).toBeTruthy();
+    expect(select.multiple).toBe(false);
+    expect(select.options.length).toBe(2);
+  });
+
+  it('should render a multiselect for category field with in operator', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: {
+        cat: {
+          name: 'Category',
+          type: 'category',
+          options: [
+            { name: 'A', value: 'a' },
+            { name: 'B', value: 'b' },
+          ],
+        },
+      },
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 'cat', operator: 'in', value: ['a'] }],
+    };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const select = el.querySelector('select[multiple].q-input-control') as HTMLSelectElement;
+    expect(select).toBeTruthy();
+    expect(select.multiple).toBe(true);
+  });
+
+  it('should render a checkbox for boolean field type', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { active: { name: 'Active', type: 'boolean' } },
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 'active', operator: '=', value: true }],
+    };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const input = el.querySelector('input[type="checkbox"].q-input-control') as HTMLInputElement;
+    expect(input).toBeTruthy();
+  });
+
+  it('should render no input for is null operator', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string', nullable: true } },
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 'name', operator: 'is null' }],
+    };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const inputControls = el.querySelectorAll('.q-input-control');
+    expect(inputControls.length).toBe(0);
+  });
+
+  it('should render entity select when entities are configured', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: {
+        personName: { name: 'Person Name', type: 'string', entity: 'person' },
+        orgName: { name: 'Org Name', type: 'string', entity: 'org' },
+      },
+      entities: { person: { name: 'Person' }, org: { name: 'Org' } },
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 'personName', operator: '=', value: 'Alice', entity: 'person' }],
+    };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const entitySelect = el.querySelector('select.q-entity-control') as HTMLSelectElement;
+    expect(entitySelect).toBeTruthy();
+    expect(entitySelect.options.length).toBe(2);
+  });
+
+  it('should render collapse button when allowCollapse is true', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+    });
+    fixture.componentRef.setInput('allowCollapse', true);
+    fixture.componentInstance.data = { condition: 'and', rules: [] };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const collapseBtn = el.querySelector('button.q-arrow-icon-button');
+    expect(collapseBtn).toBeTruthy();
+  });
+
+  it('should not render collapse button when allowCollapse is false', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+    });
+    fixture.componentRef.setInput('allowCollapse', false);
+    fixture.componentInstance.data = { condition: 'and', rules: [] };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const collapseBtn = el.querySelector('button.q-arrow-icon-button');
+    expect(collapseBtn).toBeNull();
+  });
+
+  it('should render empty warning for empty nested ruleset when allowEmptyRulesets is false', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+      allowEmptyRulesets: false,
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ condition: 'or', rules: [] }],
+    };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const warning = el.querySelector('p.q-empty-warning');
+    expect(warning).toBeTruthy();
+    expect(warning!.textContent).toContain('ruleset cannot be empty');
+  });
+
+  it('should render remove button for rules', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 'name', operator: '=', value: 'test' }],
+    };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const removeBtn = el.querySelector('button.q-remove-button');
+    expect(removeBtn).toBeTruthy();
+  });
+
+  it('should render add rule and add ruleset buttons', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+    });
+    fixture.componentRef.setInput('allowRuleset', true);
+    fixture.componentInstance.data = { condition: 'and', rules: [] };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const buttons = el.querySelectorAll('button.q-button');
+    // At least 2 buttons: Add Rule + Add Ruleset
+    expect(buttons.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('should not render add ruleset button when allowRuleset is false', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+    });
+    fixture.componentRef.setInput('allowRuleset', false);
+    fixture.componentInstance.data = { condition: 'and', rules: [] };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const buttons = el.querySelectorAll('button.q-button');
+    // Only 1 button: Add Rule (no Add Ruleset, no Remove Ruleset)
+    expect(buttons.length).toBe(1);
+    expect(buttons[0].textContent).toContain('Rule');
+  });
+
+  it('should render field select with correct options', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: {
+        name: { name: 'Name', type: 'string' },
+        age: { name: 'Age', type: 'number' },
+      },
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 'name', operator: '=', value: 'test' }],
+    };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const fieldSelect = el.querySelector('select.q-field-control') as HTMLSelectElement;
+    expect(fieldSelect).toBeTruthy();
+    expect(fieldSelect.options.length).toBe(2);
+  });
+
+  it('should render operator select with correct options', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 'name', operator: '=', value: 'test' }],
+    };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const opSelect = el.querySelector('select.q-operator-control') as HTMLSelectElement;
+    expect(opSelect).toBeTruthy();
+    // string operators: =, !=, contains, like
+    expect(opSelect.options.length).toBe(4);
+  });
+
+  it('should disable all controls when component is disabled', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+    });
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 'name', operator: '=', value: 'test' }],
+    };
+    fixture.componentInstance.disabled = true;
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const disabledInputs = el.querySelectorAll('input:disabled, select:disabled, button:disabled');
+    expect(disabledInputs.length).toBeGreaterThan(0);
+  });
+
+  it('should render remove ruleset button when parentValue is set', () => {
+    const parent: RuleSet = { condition: 'and', rules: [] };
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+    });
+    fixture.componentRef.setInput('allowRuleset', true);
+    fixture.componentRef.setInput('parentValue', parent);
+    fixture.componentInstance.data = { condition: 'and', rules: [] };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    // Should have 3 buttons: Add Rule, Add Ruleset, Remove Ruleset
+    const buttons = el.querySelectorAll('button.q-button');
+    expect(buttons.length).toBe(3);
+  });
+
+  it('should render the collapsed class on treeContainer when collapsed', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+    });
+    fixture.componentInstance.data = { condition: 'and', rules: [], collapsed: true };
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const treeContainer = el.querySelector('.q-tree-container');
+    expect(treeContainer).toBeTruthy();
+    expect(treeContainer!.classList.contains('q-collapsed')).toBe(true);
+  });
+
+  it('should render AND/OR radio buttons reflecting current condition', async () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+    });
+    fixture.componentInstance.data = { condition: 'or', rules: [] };
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    const orRadio = el.querySelector(`input[type="radio"][value="or"]`) as HTMLInputElement;
+    expect(orRadio).toBeTruthy();
+    expect(orRadio.checked).toBe(true);
+  });
+});

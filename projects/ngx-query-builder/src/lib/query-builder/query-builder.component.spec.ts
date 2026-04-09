@@ -2,7 +2,7 @@ import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { AbstractControl, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Component, ViewChild } from '@angular/core';
 import { QueryBuilderComponent } from './query-builder.component';
-import { Entity, QueryBuilderConfig, RuleSet, Rule } from './query-builder.interfaces';
+import { Entity, QueryBuilderConfig, QueryBuilderTranslations, RuleSet, Rule } from './query-builder.interfaces';
 import { QueryInputDirective } from './query-input.directive';
 import { QueryArrowIconDirective } from './query-arrow-icon.directive';
 import { QueryButtonGroupDirective } from './query-button-group.directive';
@@ -33,6 +33,58 @@ const baseConfig: QueryBuilderConfig = {
 };
 
 const emptyRuleset: RuleSet = { condition: 'and', rules: [] };
+
+const englishTranslations: QueryBuilderTranslations = {
+  addRule: 'Rule',
+  addRuleset: 'Ruleset',
+  removeRule: 'Remove rule',
+  removeRuleset: 'Remove ruleset',
+  and: 'AND',
+  or: 'OR',
+  collapseRuleset: 'Collapse ruleset',
+  expandRuleset: 'Expand ruleset',
+  emptyRuleset: 'A ruleset cannot be empty. Please add a rule or remove it all together.',
+  operatorLabels: {
+    '=': '=',
+    '!=': '!=',
+    '>': '>',
+    '>=': '>=',
+    '<': '<',
+    '<=': '<=',
+    contains: 'contains',
+    like: 'like',
+    in: 'in',
+    'not in': 'not in',
+    'is null': 'is null',
+    'is not null': 'is not null',
+  },
+};
+
+const turkishTranslations: QueryBuilderTranslations = {
+  addRule: 'Kural',
+  addRuleset: 'Kural Grubu',
+  removeRule: 'Kurali kaldir',
+  removeRuleset: 'Kural grubunu kaldir',
+  and: 'VE',
+  or: 'VEYA',
+  collapseRuleset: 'Kural grubunu daralt',
+  expandRuleset: 'Kural grubunu genislet',
+  emptyRuleset: 'Kural grubu bos olamaz.',
+  operatorLabels: {
+    '=': '=',
+    '!=': '!=',
+    '>': '>',
+    '>=': '>=',
+    '<': '<',
+    '<=': '<=',
+    contains: 'icerir',
+    like: 'benzer',
+    in: 'icinde',
+    'not in': 'icinde degil',
+    'is null': 'null',
+    'is not null': 'null degil',
+  },
+};
 
 function createComponent(config = baseConfig, data: RuleSet = { ...emptyRuleset }) {
   const fixture = TestBed.createComponent(QueryBuilderComponent);
@@ -1035,6 +1087,16 @@ describe('QueryBuilderComponent', () => {
       const ctx = component.getSwitchGroupContext();
       expect(ctx.$implicit).toBe(component.data);
       expect(typeof ctx.onChange).toBe('function');
+      expect(ctx.labels.and).toBe('AND');
+    });
+
+    it('getOperatorContext() exposes translated operator labels', () => {
+      const { fixture, component } = createComponent();
+      fixture.componentRef.setInput('translations', turkishTranslations as QueryBuilderTranslations);
+      fixture.detectChanges();
+      const ctx = component.getOperatorContext({ field: 'name', operator: '=' });
+      expect(ctx.getLabel('contains')).toBe('icerir');
+      expect(ctx.labels['contains']).toBe('icerir');
     });
 
     it('getArrowIconContext() returns context with data', () => {
@@ -2084,5 +2146,50 @@ describe('QueryBuilderComponent — template rendering', () => {
     const orRadio = el.querySelector(`input[type="radio"][value="or"]`) as HTMLInputElement;
     expect(orRadio).toBeTruthy();
     expect(orRadio.checked).toBe(true);
+  });
+
+  it('should render translated labels and update them at runtime', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+    });
+    fixture.componentRef.setInput('translations', englishTranslations as QueryBuilderTranslations);
+    fixture.componentInstance.data = { condition: 'and', rules: [{ field: 'name', operator: 'contains', value: 'x' }] };
+    fixture.detectChanges();
+
+    let el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('button.q-button')?.textContent).toContain('Rule');
+    expect(el.querySelector('label.q-switch-label')?.textContent).toContain('AND');
+    expect((el.querySelector('select.q-operator-control option') as HTMLOptionElement)?.textContent).toContain('=');
+
+    fixture.componentRef.setInput('translations', turkishTranslations as QueryBuilderTranslations);
+    fixture.detectChanges();
+
+    el = fixture.nativeElement;
+    expect(el.querySelector('button.q-button')?.textContent).toContain('Kural');
+    expect(el.querySelector('label.q-switch-label')?.textContent).toContain('VE');
+    const options = Array.from(el.querySelectorAll('select.q-operator-control option')).map((option) => option.textContent?.trim());
+    expect(options).toContain('icerir');
+  });
+
+  it('should render missing translation keys and log console errors', () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: { name: { name: 'Name', type: 'string' } },
+    });
+    fixture.componentRef.setInput('translations', {
+      and: 'VE',
+      operatorLabels: {},
+    } as unknown as QueryBuilderTranslations);
+    fixture.componentInstance.data = { condition: 'and', rules: [{ field: 'name', operator: '=', value: 'x' }] };
+    fixture.detectChanges();
+
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('button.q-button')?.textContent).toContain('addRule');
+    const opOptionTexts = Array.from(el.querySelectorAll('select.q-operator-control option')).map((option) => option.textContent?.trim());
+    expect(opOptionTexts).toContain('contains');
+    expect(consoleSpy).toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
 });

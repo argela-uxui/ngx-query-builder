@@ -112,7 +112,7 @@ test.describe('Live JSON Output', () => {
 
   test('output updates when condition is toggled', async () => {
     const prevText = await demo.getOutputText();
-    await demo.conditionLabel('OR', 0).click();
+    await demo.conditionLabelByValue('or', 0).click();
     await demo.waitForOutputChange(prevText);
     const json = await demo.getOutputJson() as any;
     expect(json.condition).toBe('or');

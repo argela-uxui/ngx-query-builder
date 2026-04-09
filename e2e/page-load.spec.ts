@@ -40,6 +40,7 @@ test.describe('Page Load', () => {
     await expect(demo.toggleAllowRuleset()).toBeVisible();
     await expect(demo.toggleAllowCollapse()).toBeVisible();
     await expect(demo.togglePersistValue()).toBeVisible();
+    await expect(demo.languageSelect()).toBeVisible();
   });
 
   test('valid badge is visible on load', async () => {

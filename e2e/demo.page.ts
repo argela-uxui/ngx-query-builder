@@ -74,6 +74,10 @@ export class DemoPage {
     return this.page.locator('[data-testid="toggle-persist-value"]');
   }
 
+  languageSelect(): Locator {
+    return this.page.locator('[data-testid="language-select"]');
+  }
+
   badgeValid(): Locator {
     return this.page.locator('[data-testid="badge-valid"]');
   }
@@ -90,13 +94,11 @@ export class DemoPage {
 
   /** All "Rule" add-buttons — excludes "Ruleset" buttons */
   addRuleButtons(): Locator {
-    return this.page.locator('.q-button:not(.q-remove-button)')
-      .filter({ hasText: /Rule/ })
-      .filter({ hasNotText: /Ruleset/ });
+    return this.page.locator('.q-button-group > button.q-button:not(.q-remove-button):first-child');
   }
 
   addRulesetButtons(): Locator {
-    return this.page.locator('.q-button:not(.q-remove-button)').filter({ hasText: 'Ruleset' });
+    return this.page.locator('.q-button-group > button.q-button:not(.q-remove-button):has(.q-add-icon):nth-child(2)');
   }
 
   removeRuleButtons(): Locator {
@@ -133,14 +135,13 @@ export class DemoPage {
     return this.page.locator('select.q-entity-control');
   }
 
-  /** AND/OR condition labels — returns ALL matching labels so callers can use .nth() or .last() */
-  conditionLabels(value: 'AND' | 'OR'): Locator {
-    return this.page.locator('.q-switch-label').filter({ hasText: value });
+  /** Condition labels by underlying radio value (localization-safe). */
+  conditionLabelsByValue(value: 'and' | 'or'): Locator {
+    return this.page.locator(`input.q-switch-radio[value="${value}"] + label.q-switch-label`);
   }
 
-  /** @deprecated use conditionLabels(value).nth(index) */
-  conditionLabel(value: 'AND' | 'OR', index = 0): Locator {
-    return this.conditionLabels(value).nth(index);
+  conditionLabelByValue(value: 'and' | 'or', index = 0): Locator {
+    return this.conditionLabelsByValue(value).nth(index);
   }
 
   /** All AND/OR radio inputs across all query-builder instances */

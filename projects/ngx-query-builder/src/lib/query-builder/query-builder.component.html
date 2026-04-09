@@ -8,7 +8,7 @@
       type="button"
       (click)="toggleCollapse()"
       [ngClass]="getClassNames('arrowIconButton', data.collapsed ? 'collapsed' : '')"
-      [attr.aria-label]="data.collapsed ? 'Expand ruleset' : 'Collapse ruleset'">
+      [attr.aria-label]="data.collapsed ? getUiLabel('expandRuleset') : getUiLabel('collapseRuleset')">
       @let arrowTpl = getArrowIconTemplate();
       @if (arrowTpl) {
         <ng-container [ngTemplateOutlet]="arrowTpl" [ngTemplateOutletContext]="getArrowIconContext()"></ng-container>
@@ -26,15 +26,20 @@
   } @else {
     <div [ngClass]="getClassNames('buttonGroup', 'rightAlign')">
       <button type="button" (click)="addRule()" [ngClass]="getClassNames('button')" [disabled]="disabled">
-        <i [ngClass]="getClassNames('addIcon')"></i> Rule
+        <i [ngClass]="getClassNames('addIcon')"></i> {{ getUiLabel('addRule') }}
       </button>
       @if (allowRuleset()) {
         <button type="button" (click)="addRuleSet()" [ngClass]="getClassNames('button')" [disabled]="disabled">
-          <i [ngClass]="getClassNames('addIcon')"></i> Ruleset
+          <i [ngClass]="getClassNames('addIcon')"></i> {{ getUiLabel('addRuleset') }}
         </button>
       }
       @if (!!parentValue() && allowRuleset()) {
-        <button type="button" (click)="removeRuleSet()" [ngClass]="getClassNames('button', 'removeButton')" [disabled]="disabled">
+        <button
+          type="button"
+          (click)="removeRuleSet()"
+          [ngClass]="getClassNames('button', 'removeButton')"
+          [disabled]="disabled"
+          [attr.aria-label]="getUiLabel('removeRuleset')">
           <i [ngClass]="getClassNames('removeIcon')"></i>
         </button>
       }
@@ -57,7 +62,7 @@
             (ngModelChange)="changeCondition($event)"
             [disabled]="disabled"
             value="and" />
-          <label [attr.for]="andOptionId" [ngClass]="getClassNames('switchLabel')">AND</label>
+          <label [attr.for]="andOptionId" [ngClass]="getClassNames('switchLabel')">{{ getUiLabel('and') }}</label>
         </div>
         <div [ngClass]="getClassNames('switchControl')">
           <input
@@ -69,7 +74,7 @@
             (ngModelChange)="changeCondition($event)"
             [disabled]="disabled"
             value="or" />
-          <label [attr.for]="orOptionId" [ngClass]="getClassNames('switchLabel')">OR</label>
+          <label [attr.for]="orOptionId" [ngClass]="getClassNames('switchLabel')">{{ getUiLabel('or') }}</label>
         </div>
       </div>
     }
@@ -92,7 +97,12 @@
               </div>
             } @else {
               <div [ngClass]="getClassNames('removeButtonSize', 'rightAlign')">
-                <button type="button" [ngClass]="getClassNames('button', 'removeButton')" (click)="removeRule(asRule, data)" [disabled]="disabled">
+                <button
+                  type="button"
+                  [ngClass]="getClassNames('button', 'removeButton')"
+                  (click)="removeRule(asRule, data)"
+                  [disabled]="disabled"
+                  [attr.aria-label]="getUiLabel('removeRule')">
                   <i [ngClass]="getClassNames('removeIcon')"></i>
                 </button>
               </div>
@@ -138,7 +148,7 @@
                 <select [ngClass]="getClassNames('operatorControl')" [(ngModel)]="asRule.operator" (ngModelChange)="changeOperator(asRule)"
                   [disabled]="disabled">
                   @for (operator of getOperators(asRule.field); track operator) {
-                    <option [ngValue]="operator">{{operator}}</option>
+                    <option [ngValue]="operator">{{ getOperatorLabel(operator) }}</option>
                   }
                 </select>
               </div>
@@ -213,6 +223,7 @@
               [allowRuleset]="allowRuleset()"
               [allowCollapse]="allowCollapse()"
               [emptyMessage]="emptyMessage()"
+              [translations]="translations()"
               [operatorMap]="operatorMap()">
             </query-builder>
           }
@@ -222,7 +233,7 @@
             @if (emptyWarningTpl) {
               <ng-container [ngTemplateOutlet]="emptyWarningTpl" [ngTemplateOutletContext]="getEmptyWarningContext()"></ng-container>
             } @else {
-              <p [ngClass]="getClassNames('emptyWarning')">{{emptyMessage()}}</p>
+              <p [ngClass]="getClassNames('emptyWarning')">{{getUiLabel('emptyRuleset')}}</p>
             }
           }
         </li>

@@ -4,6 +4,7 @@ import { JsonPipe } from '@angular/common';
 import {
   QueryBuilderModule,
   QueryBuilderConfig,
+  QueryBuilderTranslations,
 } from 'ngx-query-builder';
 
 @Component({
@@ -24,7 +25,8 @@ import {
         <h2>Query Builder</h2>
         <div data-testid="query-builder">
           <query-builder [formControl]="queryCtrl" [config]="currentConfig" [allowRuleset]="allowRuleset"
-            [allowCollapse]="allowCollapse" [persistValueOnFieldChange]="persistValueOnFieldChange">
+            [allowCollapse]="allowCollapse" [persistValueOnFieldChange]="persistValueOnFieldChange"
+            [translations]="queryBuilderTranslations">
             <ng-container *queryInput="let rule; type: 'textarea'; let getDisabledState=getDisabledState">
               <textarea class="text-input text-area" [(ngModel)]="rule.value" [disabled]="getDisabledState()"
                 placeholder="Custom Textarea" data-testid="custom-textarea"></textarea>
@@ -55,6 +57,14 @@ import {
           <label class="control-item">
             <input type="checkbox" [(ngModel)]="persistValueOnFieldChange" data-testid="toggle-persist-value">
             <span>Persist Value on Field Change</span>
+          </label>
+          <label class="control-item" for="language-select">
+            <span>Language</span>
+            <select id="language-select" data-testid="language-select" [ngModel]="language"
+              (ngModelChange)="changeLanguage($event)">
+              <option value="en">English</option>
+              <option value="tr">Turkce</option>
+            </select>
           </label>
         </div>
         <div class="status-row">
@@ -199,10 +209,69 @@ export class AppComponent {
   public allowRuleset = true;
   public allowCollapse = false;
   public persistValueOnFieldChange = false;
+  public language: 'en' | 'tr' = 'en';
+  public queryBuilderTranslations: QueryBuilderTranslations;
+
+  private readonly englishTranslations: QueryBuilderTranslations = {
+    addRule: 'Rule',
+    addRuleset: 'Ruleset',
+    removeRule: 'Remove rule',
+    removeRuleset: 'Remove ruleset',
+    and: 'AND',
+    or: 'OR',
+    collapseRuleset: 'Collapse ruleset',
+    expandRuleset: 'Expand ruleset',
+    emptyRuleset: 'A ruleset cannot be empty. Please add a rule or remove it all together.',
+    operatorLabels: {
+      '=': '=',
+      '!=': '!=',
+      '>': '>',
+      '>=': '>=',
+      '<': '<',
+      '<=': '<=',
+      contains: 'contains',
+      like: 'like',
+      in: 'in',
+      'not in': 'not in',
+      'is null': 'is null',
+      'is not null': 'is not null',
+      eq: 'eq',
+      neq: 'neq'
+    }
+  };
+
+  private readonly turkishTranslations: QueryBuilderTranslations = {
+    addRule: 'Kural',
+    addRuleset: 'Kural Grubu',
+    removeRule: 'Kurali kaldir',
+    removeRuleset: 'Kural grubunu kaldir',
+    and: 'VE',
+    or: 'VEYA',
+    collapseRuleset: 'Kural grubunu daralt',
+    expandRuleset: 'Kural grubunu genislet',
+    emptyRuleset: 'Kural grubu bos olamaz. Lutfen bir kural ekleyin veya tamamen kaldirin.',
+    operatorLabels: {
+      '=': '=',
+      '!=': '!=',
+      '>': '>',
+      '>=': '>=',
+      '<': '<',
+      '<=': '<=',
+      contains: 'icerir',
+      like: 'benzer',
+      in: 'icinde',
+      'not in': 'icinde degil',
+      'is null': 'null',
+      'is not null': 'null degil',
+      eq: 'esit',
+      neq: 'esit degil'
+    }
+  };
 
   constructor() {
     this.queryCtrl = this.formBuilder.control(this.query);
     this.currentConfig = this.config;
+    this.queryBuilderTranslations = this.englishTranslations;
   }
 
   switchModes(event: Event): void {
@@ -215,6 +284,13 @@ export class AppComponent {
     } else {
       this.queryCtrl.enable();
     }
+  }
+
+  changeLanguage(language: 'en' | 'tr'): void {
+    this.language = language;
+    this.queryBuilderTranslations = language === 'tr'
+      ? this.turkishTranslations
+      : this.englishTranslations;
   }
 }
 

@@ -27,8 +27,11 @@ import {
   LocalRuleMeta,
   OperatorContext,
   Option,
+  QueryBuilderButtonLabels,
   QueryBuilderClassNames,
   QueryBuilderConfig,
+  QueryBuilderSwitchLabels,
+  QueryBuilderTranslations,
   RemoveButtonContext,
   ArrowIconContext,
   Rule,
@@ -95,6 +98,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   readonly emptyMessage = input<string>(
     'A ruleset cannot be empty. Please add a rule or remove it all together.'
   );
+  readonly translations = input<QueryBuilderTranslations | undefined>(undefined);
   readonly classNames = input<QueryBuilderClassNames | undefined>(undefined);
   readonly operatorMap = input<Record<string, string[]> | undefined>(undefined);
   readonly parentValue = input<RuleSet | undefined>(undefined);
@@ -169,6 +173,32 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     boolean: ['=']
   };
 
+  readonly defaultTranslations: QueryBuilderTranslations = {
+    addRule: 'Rule',
+    addRuleset: 'Ruleset',
+    removeRule: 'Remove rule',
+    removeRuleset: 'Remove ruleset',
+    and: 'AND',
+    or: 'OR',
+    collapseRuleset: 'Collapse ruleset',
+    expandRuleset: 'Expand ruleset',
+    emptyRuleset: 'A ruleset cannot be empty. Please add a rule or remove it all together.',
+    operatorLabels: {
+      '=': '=',
+      '!=': '!=',
+      '>': '>',
+      '>=': '>=',
+      '<': '<',
+      '<=': '<=',
+      contains: 'contains',
+      like: 'like',
+      in: 'in',
+      'not in': 'not in',
+      'is null': 'is null',
+      'is not null': 'is not null'
+    }
+  };
+
   // ---------- ControlValueAccessor callbacks ----------
 
   onChangeCallback: (() => void) | undefined = undefined;
@@ -209,6 +239,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   private entityContextCache = new Map<Rule, EntityContext>();
   private removeButtonContextCache = new Map<Rule, RemoveButtonContext>();
   private buttonGroupContext: ButtonGroupContext | null = null;
+  private readonly missingTranslationWarnings = new Set<string>();
 
   constructor() {
     // Recompute fields/entities whenever config signal changes
@@ -396,6 +427,54 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
       .map((id) => (clsLookup as Record<string, string | undefined>)[id] || (this.defaultClassNames as Record<string, string | undefined>)[id])
       .filter((c): c is string => !!c);
     return classNames.length ? classNames.join(' ') : '';
+  }
+
+  getUiLabel(key: keyof Omit<QueryBuilderTranslations, 'operatorLabels'>): string {
+    const customTranslations = this.translations();
+    if (!customTranslations) {
+      if (key === 'emptyRuleset') {
+        return this.emptyMessage();
+      }
+      return this.defaultTranslations[key];
+    }
+
+    const translatedValue = customTranslations[key];
+    if (typeof translatedValue === 'string') {
+      return translatedValue;
+    }
+
+    this.warnMissingTranslationKey(key);
+    return key;
+  }
+
+  getOperatorLabel(operator: string): string {
+    const customTranslations = this.translations();
+    if (!customTranslations) {
+      return this.defaultTranslations.operatorLabels[operator] ?? operator;
+    }
+
+    const translatedValue = customTranslations.operatorLabels?.[operator];
+    if (typeof translatedValue === 'string') {
+      return translatedValue;
+    }
+
+    this.warnMissingTranslationKey(`operatorLabels.${operator}`);
+    return operator;
+  }
+
+  getButtonLabels(): QueryBuilderButtonLabels {
+    return {
+      addRule: this.getUiLabel('addRule'),
+      addRuleset: this.getUiLabel('addRuleset'),
+      removeRuleset: this.getUiLabel('removeRuleset')
+    };
+  }
+
+  getSwitchLabels(): QueryBuilderSwitchLabels {
+    return {
+      and: this.getUiLabel('and'),
+      or: this.getUiLabel('or')
+    };
   }
 
   getDefaultField(entity: Entity): Field | null {
@@ -673,10 +752,16 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
         addRule: this.addRule.bind(this),
         addRuleSet: this.allowRuleset() ? this.addRuleSet.bind(this) : undefined,
         removeRuleSet: this.allowRuleset() && this.parentValue() ? this.removeRuleSet.bind(this) : undefined,
+        labels: this.getButtonLabels(),
+        getLabel: (key: keyof QueryBuilderButtonLabels) => this.getButtonLabels()[key],
         getDisabledState: this.getDisabledState,
         $implicit: this.data
       };
     }
+
+    this.buttonGroupContext.addRuleSet = this.allowRuleset() ? this.addRuleSet.bind(this) : undefined;
+    this.buttonGroupContext.removeRuleSet = this.allowRuleset() && this.parentValue() ? this.removeRuleSet.bind(this) : undefined;
+    this.buttonGroupContext.labels = this.getButtonLabels();
     return this.buttonGroupContext!;
   }
 
@@ -719,6 +804,8 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   getSwitchGroupContext(): SwitchGroupContext {
     return {
       onChange: this.changeCondition.bind(this),
+      labels: this.getSwitchLabels(),
+      getLabel: (key: keyof QueryBuilderSwitchLabels) => this.getSwitchLabels()[key],
       getDisabledState: this.getDisabledState,
       $implicit: this.data
     };
@@ -734,7 +821,7 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   getEmptyWarningContext(): EmptyWarningContext {
     return {
       getDisabledState: this.getDisabledState,
-      message: this.emptyMessage(),
+      message: this.getUiLabel('emptyRuleset'),
       $implicit: this.data
     };
   }
@@ -743,12 +830,20 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
     if (!this.operatorContextCache.has(rule)) {
       this.operatorContextCache.set(rule, {
         onChange: () => this.changeOperator(rule),
+        labels: {},
+        getLabel: (operator: string) => this.getOperatorLabel(operator),
         getDisabledState: this.getDisabledState,
         operators: this.getOperators(rule.field),
         $implicit: rule
       });
     }
-    return this.operatorContextCache.get(rule)!;
+    const context = this.operatorContextCache.get(rule)!;
+    context.operators = this.getOperators(rule.field);
+    context.labels = context.operators.reduce<Record<string, string>>((acc, operator) => {
+      acc[operator] = this.getOperatorLabel(operator);
+      return acc;
+    }, {});
+    return context;
   }
 
   getInputContext(rule: Rule): InputContext {
@@ -832,5 +927,13 @@ export class QueryBuilderComponent implements OnChanges, ControlValueAccessor, V
   private handleTouched(): void {
     this.onTouchedCallback?.();
     this.parentTouchedCallback()?.();
+  }
+
+  private warnMissingTranslationKey(key: string): void {
+    if (this.missingTranslationWarnings.has(key)) {
+      return;
+    }
+    this.missingTranslationWarnings.add(key);
+    console.error(`Missing query-builder translation key: '${key}'.`);
   }
 }

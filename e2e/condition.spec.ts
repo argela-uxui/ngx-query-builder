@@ -16,7 +16,7 @@ test.describe('AND/OR Condition Toggle', () => {
   });
 
   test('clicking OR label switches root condition to OR', async ({ page }) => {
-    const orLabel = demo.conditionLabel('OR', 0);
+    const orLabel = demo.conditionLabelByValue('or', 0);
     await orLabel.click();
 
     const json = await demo.getOutputJson();
@@ -25,9 +25,9 @@ test.describe('AND/OR Condition Toggle', () => {
 
   test('clicking AND label switches root condition back to AND', async ({ page }) => {
     // Switch to OR first
-    await demo.conditionLabel('OR', 0).click();
+    await demo.conditionLabelByValue('or', 0).click();
     // Switch back to AND
-    await demo.conditionLabel('AND', 0).click();
+    await demo.conditionLabelByValue('and', 0).click();
 
     const json = await demo.getOutputJson();
     expect((json as any).condition).toBe('and');
@@ -46,7 +46,7 @@ test.describe('AND/OR Condition Toggle', () => {
 
   test('nested condition can be toggled independently', async ({ page }) => {
     // Toggle nested condition to AND (index 1 = second AND label = nested component)
-    const nestedAndLabel = demo.conditionLabels('AND').nth(1);
+    const nestedAndLabel = demo.conditionLabelsByValue('and').nth(1);
     const prevText = await demo.getOutputText();
     await nestedAndLabel.click();
     await demo.waitForOutputChange(prevText);
@@ -62,7 +62,7 @@ test.describe('AND/OR Condition Toggle', () => {
 
   test('output JSON reflects condition changes', async () => {
     const prevText = await demo.getOutputText();
-    await demo.conditionLabel('OR', 0).click();
+    await demo.conditionLabelByValue('or', 0).click();
     await demo.waitForOutputChange(prevText);
     const json = await demo.getOutputJson() as any;
     expect(json.condition).toBe('or');

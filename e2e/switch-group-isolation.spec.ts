@@ -95,7 +95,7 @@ test.describe('Switch Group Isolation (unique radio id per instance)', () => {
     await expect(rootAndRadio).toBeChecked();
 
     // Toggle nested condition to AND (index 1 = second AND label = nested component)
-    const nestedAndLabel = demo.conditionLabels('AND').nth(1);
+    const nestedAndLabel = demo.conditionLabelsByValue('and').nth(1);
     const prevText = await demo.getOutputText();
     await nestedAndLabel.click();
     await demo.waitForOutputChange(prevText);

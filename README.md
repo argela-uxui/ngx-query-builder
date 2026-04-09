@@ -240,7 +240,8 @@ export class AppModule {}
 | `[persistValueOnFieldChange]` | `boolean` | `false` | Keep value when field changes to same type |
 | `[classNames]` | `QueryBuilderClassNames` | — | CSS class overrides for all elements |
 | `[operatorMap]` | `{ [type: string]: string[] }` | — | Override operators per field type |
-| `[emptyMessage]` | `string` | `'A ruleset cannot be empty…'` | Message shown for empty rule sets |
+| `[translations]` | `QueryBuilderTranslations` | — | Localize built-in labels, ARIA text, and operator captions |
+| `[emptyMessage]` | `string` | `'A ruleset cannot be empty…'` | Legacy empty warning message when `translations` is not set |
 
 ## Configuration
 
@@ -275,6 +276,19 @@ interface QueryBuilderConfig {
   removeRuleSet?: (ruleset: RuleSet, parent: RuleSet) => void;
   coerceValueForOperator?: (operator: string, value: any, rule: Rule) => any;
   calculateFieldChangeValue?: (currentField: Field, nextField: Field, currentValue: any) => any;
+}
+
+interface QueryBuilderTranslations {
+  addRule: string;
+  addRuleset: string;
+  removeRule: string;
+  removeRuleset: string;
+  and: string;
+  or: string;
+  collapseRuleset: string;
+  expandRuleset: string;
+  emptyRuleset: string;
+  operatorLabels: Record<string, string>;
 }
 ```
 
@@ -335,11 +349,11 @@ Replace any part of the UI using structural directives as content children.
 |---|---|
 | `*queryInput` | `rule`, `field`, `options`, `onChange`, `getDisabledState` |
 | `*queryField` | `rule`, `fields`, `onChange`, `getFields`, `getDisabledState` |
-| `*queryOperator` | `rule`, `operators`, `onChange`, `getDisabledState` |
+| `*queryOperator` | `rule`, `operators`, `labels`, `getLabel(operator)`, `onChange`, `getDisabledState` |
 | `*queryEntity` | `rule`, `entities`, `onChange`, `getDisabledState` |
-| `*queryButtonGroup` | `addRule`, `addRuleSet?`, `removeRuleSet?`, `getDisabledState` |
+| `*queryButtonGroup` | `addRule`, `addRuleSet?`, `removeRuleSet?`, `labels`, `getLabel(key)`, `getDisabledState` |
 | `*queryRemoveButton` | `rule`, `removeRule`, `getDisabledState` |
-| `*querySwitchGroup` | `onChange`, `getDisabledState` |
+| `*querySwitchGroup` | `onChange`, `labels`, `getLabel(key)`, `getDisabledState` |
 | `*queryEmptyWarning` | `message`, `getDisabledState` |
 | `*queryArrowIcon` | `getDisabledState` |
 

@@ -102,8 +102,34 @@ export interface QueryBuilderConfig {
                                currentValue: QueryValue) => QueryValue;
 }
 
+export interface QueryBuilderButtonLabels {
+  addRule: string;
+  addRuleset: string;
+  removeRuleset: string;
+}
+
+export interface QueryBuilderSwitchLabels {
+  and: string;
+  or: string;
+}
+
+export interface QueryBuilderTranslations {
+  addRule: string;
+  addRuleset: string;
+  removeRule: string;
+  removeRuleset: string;
+  and: string;
+  or: string;
+  collapseRuleset: string;
+  expandRuleset: string;
+  emptyRuleset: string;
+  operatorLabels: Record<string, string>;
+}
+
 export interface SwitchGroupContext {
   onChange: (conditionValue: string) => void;
+  labels: QueryBuilderSwitchLabels;
+  getLabel: (key: keyof QueryBuilderSwitchLabels) => string;
   getDisabledState: () => boolean;
   $implicit: RuleSet;
 }
@@ -136,6 +162,8 @@ export interface FieldContext {
 
 export interface OperatorContext {
   onChange: () => void;
+  labels: Record<string, string>;
+  getLabel: (operator: string) => string;
   getDisabledState: () => boolean;
   operators: string[];
   $implicit: Rule;
@@ -153,6 +181,8 @@ export interface ButtonGroupContext {
   addRule: () => void;
   addRuleSet?: () => void;
   removeRuleSet?: () => void;
+  labels: QueryBuilderButtonLabels;
+  getLabel: (key: keyof QueryBuilderButtonLabels) => string;
   getDisabledState: () => boolean;
   $implicit: RuleSet;
 }

@@ -70,3 +70,4 @@ dist/test-out/
 *.js.map
 test-results/
 e2e/playwright-report/
+!/test-results/

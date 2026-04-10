@@ -45,13 +45,15 @@ Build the library, pack it into a `.tgz` file, and distribute it however you lik
 ng build ngx-query-builder
 cd dist/ngx-query-builder
 npm pack
-# Produces: ngx-query-builder-X.Y.Z.tgz
+# Writes to: publish/ngx-query-builder-X.Y.Z.tgz
 ```
+
+`npm` writes the tarball to the configured `pack-destination` (`publish/` in this repo), not the current folder.
 
 In the consuming project:
 
 ```bash
-npm install /path/to/ngx-query-builder-X.Y.Z.tgz
+npm install /path/to/publish/ngx-query-builder-X.Y.Z.tgz
 ```
 
 Or reference it directly in `package.json`:

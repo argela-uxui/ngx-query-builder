@@ -64,6 +64,8 @@ Temporary Items
 # Node / Angular
 node_modules/
 dist/
+publish/*
+!publish/.gitkeep
 coverage/
 .angular/
 dist/test-out/

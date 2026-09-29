@@ -54,5 +54,6 @@ Angular 21 library (`ngx-query-builder`) — a standalone, signal-based query bu
 | Playground | `demo/src/app/playground/playground.component.ts` |
 | Demo shared components | `demo/src/app/shared/` |
 | Demo examples | `demo/src/app/examples/` |
+| Operational documentation | `docs/README.md`, `docs/npm-publishing.md`, `docs/demo-deployment.md` |
 | Library package.json | `projects/ngx-query-builder/package.json` |
 | TSConfig paths | `tsconfig.json` (`"ngx-query-builder"` → `public-api.ts`) |

@@ -12,6 +12,7 @@ Angular 21 library workspace for `@argela-uxui/ngx-query-builder`, a standalone 
 | `projects/ngx-query-builder/src/public-api.ts` | Public exports for the npm package. |
 | `projects/ngx-query-builder/README.md` | Consumer-facing documentation, included in the built package. |
 | `demo/` | Angular application exercising the library; see the [demo README](demo/README.md). |
+| `docs/` | Operational guides for package publishing and demo deployment; see [docs README](docs/README.md). |
 | `e2e/` | Playwright browser tests for the demo. |
 | `dist/ngx-query-builder/` | Generated, publishable library package (gitignored). |
 
@@ -83,6 +84,12 @@ The publishable package is configured in `projects/ngx-query-builder/package.jso
 4. From the repository root, publish with `npm run publish`. That script rebuilds with the production configuration and runs `npm publish` from `dist/ngx-query-builder/`. Verify the released package and version on npm after publishing.
 
 Do not run `npm publish` from the root; its `private: true` setting prevents publishing the workspace instead of the library. To create a local archive without publishing, run `npm run build` followed by `npm pack ./dist/ngx-query-builder --pack-destination publish` from the repository root. The tarball is written to the gitignored `publish/` directory; packing does not require npm authentication.
+
+For the comprehensive guide on packaging and publishing, see the [NPM Package Publishing Guide](docs/npm-publishing.md).
+
+## Demo deployment
+
+The demo site at [https://argela-uxui.github.io/qbdemo/](https://argela-uxui.github.io/qbdemo/) is automatically deployed from GitHub Actions on every push to `main` affecting library or demo files. For complete deployment details, build parameters, SPA routing configuration, and secrets management, see the [Demo Site Deployment Guide](docs/demo-deployment.md).
 
 ## License
 

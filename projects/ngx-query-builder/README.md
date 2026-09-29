@@ -10,6 +10,10 @@ Forked from [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-Qu
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
+## Online Demo
+
+Visit : https://argela-uxui.github.io/qbdemo/ 
+
 ## Features
 
 - ✅ **Standalone component** — no NgModule required (NgModule export provided for backward compat)

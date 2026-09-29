@@ -1,6 +1,6 @@
 {
   "name": "@argela-uxui/ngx-query-builder",
-  "version": "21.0.0",
+  "version": "21.0.1",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"

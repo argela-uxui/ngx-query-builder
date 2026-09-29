@@ -49,6 +49,6 @@ jobs:
           repository-name: argela-uxui/argela-uxui.github.io
           branch: main
           folder: demo/dist/demo/browser
-          target-folder: ngx-query-builder
+          target-folder: qbdemo
           clean: true
           commit-message: Deploy ngx-query-builder demo

@@ -2,12 +2,12 @@
 
 ## General Overview
 
-`@argela-uxui/ngx-query-builder` is a configurable Angular query-builder component for composing nested filter expressions. It provides a standalone, signal-based UI, supports reactive and template-driven forms through `ControlValueAccessor`, and allows custom templates for its controls.
+`@argela-uxui/ngx-query-builder` is a configurable Angular 21 query-builder component for composing, validating, and editing nested filter expressions. It exposes a standalone component, integrates with Angular forms through `ControlValueAccessor` and `Validator`, and lets applications replace individual controls with custom templates.
 
 Forked from [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-QueryBuilder) and fully updated to current Angular best practices.
 
-[![Angular](https://img.shields.io/badge/Angular-19-red)](https://angular.io)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org)
+[![Angular](https://img.shields.io/badge/Angular-21-red)](https://angular.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 ## Features
@@ -22,6 +22,8 @@ Forked from [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-Qu
 - ✅ **Fully customizable** — replace any template (fields, operators, inputs, buttons, etc.)
 - ✅ **Recursive rule sets** — nested AND/OR grouping
 - ✅ **Radio group isolation** — each component instance generates unique IDs for AND/OR radios, safe for nested rulesets
+- ✅ **Configurable validation** — field validators and empty-ruleset validation integrate with Angular forms
+- ✅ **Optional drag and drop** — move or reorder rules across rule sets with pointer interactions
 - ✅ **Jest** — fast unit tests
 
 ## Peer Dependencies
@@ -40,40 +42,68 @@ Forked from [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-Qu
 npm install @argela-uxui/ngx-query-builder
 ```
 
+The published package targets Angular 21 or later. Install the Angular CDK, Common, Core, and Forms packages, plus RxJS, as peer dependencies if they are not already part of your application.
+
 ---
 
 ## Quick Start
 
-### Standalone (Angular 17+)
+### Standalone (Angular 21+)
 
 ```ts
-import { QueryBuilderComponent, QueryBuilderConfig } from '@argela-uxui/ngx-query-builder';
+import { Component } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import {
+  QueryBuilderComponent,
+  QueryBuilderConfig,
+  RuleSet,
+} from '@argela-uxui/ngx-query-builder';
 
 @Component({
+  selector: 'app-query',
   standalone: true,
   imports: [QueryBuilderComponent, ReactiveFormsModule],
-  template: `<query-builder [formControl]="queryCtrl" [config]="config"></query-builder>`
+  template: `<query-builder [formControl]="queryCtrl" [config]="config" />`,
 })
 export class AppComponent {
-  queryCtrl = new FormControl({ condition: 'and', rules: [] });
+  readonly queryCtrl = new FormControl<RuleSet>(
+    { condition: 'and', rules: [] },
+    { nonNullable: true },
+  );
 
-  config: QueryBuilderConfig = {
+  readonly config: QueryBuilderConfig = {
     fields: {
-      age:      { name: 'Age',      type: 'number' },
-      gender:   { name: 'Gender',   type: 'category', options: [
-                    { name: 'Male',   value: 'm' },
-                    { name: 'Female', value: 'f' },
-                  ]},
+      age: { name: 'Age', type: 'number', defaultValue: 18 },
+      gender: {
+        name: 'Gender',
+        type: 'category',
+        options: [
+          { name: 'Male', value: 'm' },
+          { name: 'Female', value: 'f' },
+        ],
+      },
       birthday: { name: 'Birthday', type: 'date' },
-      name:     { name: 'Name',     type: 'string' },
-    }
+      name: { name: 'Name', type: 'string' },
+      status: {
+        name: 'Status',
+        type: 'category',
+        options: [
+          { name: 'Active', value: 'active' },
+          { name: 'Inactive', value: 'inactive' },
+        ],
+      },
+    },
   };
 }
 ```
 
+The form control is the source of truth: read the current query from `queryCtrl.value`, subscribe to `queryCtrl.valueChanges` to react to edits, or call `queryCtrl.setValue(savedQuery)` to load a saved query. The query value is a `RuleSet` tree. A newly added rule uses the first configured field, its `defaultOperator` (or the first available operator), and its `defaultValue`.
+
 ### NgModule (backward compatible)
 
 ```ts
+import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { QueryBuilderModule } from '@argela-uxui/ngx-query-builder';
 
 @NgModule({
@@ -82,46 +112,50 @@ import { QueryBuilderModule } from '@argela-uxui/ngx-query-builder';
 export class AppModule {}
 ```
 
-## Inputs
+`QueryBuilderComponent` is standalone and is the recommended import for new applications. `QueryBuilderModule` remains available for NgModule-based applications.
+
+## Component Inputs
 
 | Input | Type | Default | Description |
 |---|---|---|---|
-| `[formControl]` | `FormControl<RuleSet>` | — | Reactive forms binding |
-| `[(ngModel)]` | `RuleSet` | — | Template-driven binding |
-| `[config]` | `QueryBuilderConfig` | `{ fields: {} }` | Field/operator configuration |
-| `[data]` | `RuleSet` | `{ condition:'and', rules:[] }` | Query value (use with CVA or direct binding) |
-| `[disabled]` | `boolean` | `false` | Disable the entire query builder |
-| `[allowRuleset]` | `boolean` | `true` | Show "Add Ruleset" button |
-| `[allowCollapse]` | `boolean` | `false` | Enable collapse/expand of rule sets |
-| `[persistValueOnFieldChange]` | `boolean` | `false` | Keep value when field changes to same type |
-| `[dragDropRules]` | `boolean` | `false` | Opt-in pointer drag-drop to reorder/move rules across rulesets (rulesets themselves are not draggable) |
-| `[classNames]` | `QueryBuilderClassNames` | — | CSS class overrides for all elements |
-| `[operatorMap]` | `{ [type: string]: string[] }` | — | Override operators per field type |
-| `[translations]` | `QueryBuilderTranslations` | — | Localize built-in labels, ARIA text, and operator captions |
-| `[emptyMessage]` | `string` | `'A ruleset cannot be empty…'` | Legacy empty warning message when `translations` is not set |
+| `[formControl]`, `formControlName` | Angular form control | — | Recommended way to read and update the query. |
+| `[(ngModel)]` | `RuleSet` | — | Template-driven forms binding; import `FormsModule`. |
+| `[config]` | `QueryBuilderConfig` | `{ fields: {} }` | Field, entity, operator, and callback configuration. |
+| `[data]` | `RuleSet` | `{ condition: 'and', rules: [] }` | Direct value input when not using a forms directive. The component edits this tree in place; use forms binding for managed value updates. |
+| `[disabled]` | `boolean` | `false` | Disables the builder and its controls. A form control can also set this state. |
+| `[allowRuleset]` | `boolean` | `true` | Shows controls for adding nested rulesets and, on child groups, removing them. |
+| `[allowCollapse]` | `boolean` | `false` | Enables collapse/expand controls on rulesets. |
+| `[persistValueOnFieldChange]` | `boolean` | `false` | Preserves a value when switching between supported fields of the same type. |
+| `[dragDropRules]` | `boolean` | `false` | Enables pointer drag-and-drop to reorder or move rules across rulesets. Rulesets themselves are not draggable. |
+| `[classNames]` | `QueryBuilderClassNames` | Built-in `q-*` classes | CSS class overrides for the component. |
+| `[operatorMap]` | `Record<string, string[]>` | Built-in operator map | Overrides operators by field type; a field's own `operators` or `getOperators` callback takes precedence. |
+| `[translations]` | `QueryBuilderTranslations` | Built-in English labels | Localizes UI labels, accessible labels, and operator captions. When supplied, provide the complete interface. |
+| `[emptyMessage]` | `string` | `A ruleset cannot be empty. Please add a rule or remove it all together.` | Legacy empty warning text used when `translations` is not supplied. |
 
 ## Configuration
 
 ### `QueryBuilderConfig`
+
+Define at least one field to allow the default add-rule action to create a rule. Field keys are identifiers in the configuration; `value` optionally overrides the identifier stored in `Rule.field`.
 
 ```ts
 interface QueryBuilderConfig {
   fields: {
     [fieldKey: string]: {
       name: string;           // Display label
-      type: string;           // 'string' | 'number' | 'date' | 'time' | 'boolean' | 'category' | 'multiselect'
+      type: string;           // Built-in types: string, number, date, time, boolean, category
       value?: string;         // Key used in the rule (defaults to fieldKey)
-      options?: Option[];     // For category/multiselect
+      options?: Option[];     // Select options for category and multiselect inputs
       operators?: string[];   // Override operators for this field
-      defaultValue?: any;     // Default value when field is selected
-      defaultOperator?: any;  // Default operator when field is selected
+      defaultValue?: QueryDefaultValue;
+      defaultOperator?: QueryDefaultValue;
       entity?: string;        // Associate field with an entity
-      nullable?: boolean;
-      validator?: (rule: Rule, parent: RuleSet) => any | null;
+      nullable?: boolean;     // Adds "is null" and "is not null" operators
+      validator?: (rule: Rule, parent: RuleSet) => RuleValidationResult | null;
     }
   };
   entities?: {
-    [entityKey: string]: { name: string; value?: string; defaultField?: any }
+    [entityKey: string]: Entity;
   };
   allowEmptyRulesets?: boolean;
   getOperators?: (fieldName: string, field: Field) => string[];
@@ -131,8 +165,12 @@ interface QueryBuilderConfig {
   addRuleSet?: (parent: RuleSet) => void;
   removeRule?: (rule: Rule, parent: RuleSet) => void;
   removeRuleSet?: (ruleset: RuleSet, parent: RuleSet) => void;
-  coerceValueForOperator?: (operator: string, value: any, rule: Rule) => any;
-  calculateFieldChangeValue?: (currentField: Field, nextField: Field, currentValue: any) => any;
+  coerceValueForOperator?: (operator: string, value: QueryValue, rule: Rule) => QueryValue;
+  calculateFieldChangeValue?: (
+    currentField: Field,
+    nextField: Field,
+    currentValue: QueryValue
+  ) => QueryValue;
 }
 
 interface QueryBuilderTranslations {
@@ -151,6 +189,8 @@ interface QueryBuilderTranslations {
 
 ### Default Operator Map
 
+The built-in operator map is selected by `Field.type`. A field-level `operators` array takes precedence; `getOperators` can supply the list dynamically. Nullable fields also receive `is null` and `is not null`.
+
 | Type | Default Operators |
 |---|---|
 | `string` | `=`, `!=`, `contains`, `like` |
@@ -158,61 +198,70 @@ interface QueryBuilderTranslations {
 | `date` | `=`, `!=`, `>`, `>=`, `<`, `<=` |
 | `time` | `=`, `!=`, `>`, `>=`, `<`, `<=` |
 | `category` | `=`, `!=`, `in`, `not in` |
-| `multiselect` | `in`, `not in` |
 | `boolean` | `=` |
+
+`multiselect` is an input type rather than a field type with a built-in operator list. For category and boolean fields, selecting `in` or `not in` changes the input to a multi-select. String and number fields use their regular input type for those operators unless `getInputType` overrides the behavior.
 
 ## Custom Templates
 
-Replace any part of the UI using structural directives as content children.
+Replace individual controls by adding the corresponding exported structural directive to content inside `<query-builder>`. Import each directive in a standalone component (or use `QueryBuilderModule`, which exports them). Template callback values should be used to notify the builder after updating a rule.
 
 ### Custom Input
 
 ```html
 <query-builder [formControl]="queryCtrl" [config]="config">
   <!-- Custom input for fields of type 'textarea' -->
-  <ng-container *queryInput="let rule; type: 'textarea'">
-    <textarea [(ngModel)]="rule.value"></textarea>
+  <ng-container *queryInput="let rule; type: 'textarea'; let onChange=onChange; let getDisabledState=getDisabledState">
+    <textarea
+      [(ngModel)]="rule.value"
+      [ngModelOptions]="{ standalone: true }"
+      (ngModelChange)="onChange()"
+      [disabled]="getDisabledState()"></textarea>
   </ng-container>
 </query-builder>
 ```
+
+Import `FormsModule` when using `ngModel` in custom controls. Mark inner controls standalone so they do not register as additional controls with the outer form. Call the context's `onChange()` after custom value/operator changes so the outer query form receives the update.
 
 ### Custom Field Selector
 
 ```html
 <query-builder [formControl]="queryCtrl" [config]="config">
-  <ng-container *queryField="let rule; let fields=fields; let onChange=onChange">
-    <mat-select [(ngModel)]="rule.field" (ngModelChange)="onChange($event, rule)">
-      <mat-option *ngFor="let f of fields" [value]="f.value">{{f.name}}</mat-option>
+  <ng-container *queryField="let rule; let fields=fields; let onChange=onChange; let getDisabledState=getDisabledState">
+    <mat-select
+      [(ngModel)]="rule.field"
+      [ngModelOptions]="{ standalone: true }"
+      (ngModelChange)="onChange($event, rule)"
+      [disabled]="getDisabledState()">
+      <mat-option *ngFor="let field of fields" [value]="field.value">{{ field.name }}</mat-option>
     </mat-select>
   </ng-container>
 </query-builder>
 ```
 
+This example uses Angular Material; import `MatSelectModule` in the host component. Use the provided `onChange(fieldValue, rule)` callback rather than only assigning `rule.field`: the callback updates dependent operator/value state and notifies the form. `getFields(entityName)` returns the fields available for a selected entity.
+
 ### Custom Button Group
 
 ```html
 <query-builder [formControl]="queryCtrl" [config]="config">
-  <ng-container *queryButtonGroup="let ruleset; let addRule=addRule; let addRuleSet=addRuleSet; let removeRuleSet=removeRuleSet">
-    <button (click)="addRule()">+ Rule</button>
-    <button *ngIf="addRuleSet" (click)="addRuleSet()">+ Ruleset</button>
-    <button *ngIf="removeRuleSet" (click)="removeRuleSet()">- Ruleset</button>
+  <ng-container *queryButtonGroup="let addRule=addRule; let addRuleSet=addRuleSet; let removeRuleSet=removeRuleSet; let labels=labels; let getDisabledState=getDisabledState">
+    <button type="button" (click)="addRule()" [disabled]="getDisabledState()">{{ labels.addRule }}</button>
+    @if (addRuleSet) {
+      <button type="button" (click)="addRuleSet()" [disabled]="getDisabledState()">{{ labels.addRuleset }}</button>
+    }
+    @if (removeRuleSet) {
+      <button type="button" (click)="removeRuleSet()" [disabled]="getDisabledState()">{{ labels.removeRuleset }}</button>
+    }
   </ng-container>
 </query-builder>
 ```
 
+`addRuleSet` and `removeRuleSet` are optional in the template context: they are only present when rulesets are enabled and, for removal, when the group is nested.
+
 ### Available Directives
 
-| Directive | Context variables |
-|---|---|
-| `*queryInput` | `rule`, `field`, `options`, `onChange`, `getDisabledState` |
-| `*queryField` | `rule`, `fields`, `onChange`, `getFields`, `getDisabledState`, `dragDropEnabled`, `dragHandleClass`, `dragHandleAriaLabel` |
-| `*queryOperator` | `rule`, `operators`, `labels`, `getLabel(operator)`, `onChange`, `getDisabledState` |
-| `*queryEntity` | `rule`, `entities`, `onChange`, `getDisabledState` |
-| `*queryButtonGroup` | `addRule`, `addRuleSet?`, `removeRuleSet?`, `labels`, `getLabel(key)`, `getDisabledState` |
-| `*queryRemoveButton` | `rule`, `removeRule`, `getDisabledState` |
-| `*querySwitchGroup` | `onChange`, `labels`, `getLabel(key)`, `getDisabledState` |
-| `*queryEmptyWarning` | `message`, `getDisabledState` |
-| `*queryArrowIcon` | `getDisabledState` |
+The complete directive list, including each `$implicit` type and context property, is documented in [Template directives](#template-directives).
 
 ## Styling
 
@@ -248,65 +297,23 @@ classNames: QueryBuilderClassNames = {
 
 ## Detailed Usage Documentation
 
-### Standalone component
+### Forms, values, and validation
 
-Import `QueryBuilderComponent` and the forms module used by your form binding:
+The quick-start example uses reactive forms, which is the recommended integration when the host application needs a value stream, disabled state, touched state, or validation. Subscribe to `valueChanges` to process edits, and use `setValue` or `patchValue` on the control to load a saved `RuleSet`.
 
-```ts
-import { Component } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import {
-  QueryBuilderComponent,
-  QueryBuilderConfig,
-  RuleSet,
-} from '@argela-uxui/ngx-query-builder';
+For template-driven forms, import `FormsModule` and bind a `RuleSet` with `[(ngModel)]`. For integrations that do not use Angular forms, bind `[data]` directly. Direct binding is mutable: the component edits the supplied rule tree in place and does not expose a separate change output, so use a forms directive when the host needs notifications.
 
-@Component({
-  selector: 'app-query',
-  standalone: true,
-  imports: [QueryBuilderComponent, ReactiveFormsModule],
-  template: `<query-builder [formControl]="query" [config]="config" />`,
-})
-export class QueryComponent {
-  readonly query = new FormControl<RuleSet>({
-    condition: 'and',
-    rules: [],
-  });
-
-  readonly config: QueryBuilderConfig = {
-    fields: {
-      name: { name: 'Name', type: 'string' },
-      age: { name: 'Age', type: 'number' },
-      birthday: { name: 'Birthday', type: 'date' },
-      status: {
-        name: 'Status',
-        type: 'category',
-        options: [
-          { name: 'Active', value: 'active' },
-          { name: 'Inactive', value: 'inactive' },
-        ],
-      },
-    },
-  };
-}
+```html
+<query-builder [(ngModel)]="query" [config]="config" />
 ```
 
-The component implements both `ControlValueAccessor` and Angular's `Validator`. Use it with `[formControl]`, `formControlName`, or `[(ngModel)]`. For direct binding instead, provide `[data]` with a `RuleSet`.
+The component implements both `ControlValueAccessor` and Angular's `Validator`. Its validator reports empty rulesets unless `config.allowEmptyRulesets` is enabled, and runs each configured field validator for its matching rule. A field validator should return `null` for a valid rule or a non-null error value for an invalid one; Angular includes empty-ruleset errors under `empty` and field validation results under `rules` in the form control's validation errors. Use the form's normal `markAsTouched()` or `markAllAsTouched()` flow to surface validation feedback.
 
-For NgModule applications, import `QueryBuilderModule` in place of the standalone component:
-
-```ts
-import { QueryBuilderModule } from '@argela-uxui/ngx-query-builder';
-
-@NgModule({
-  imports: [QueryBuilderModule, ReactiveFormsModule],
-})
-export class AppModule {}
-```
+NgModule-based applications can use `QueryBuilderModule` as shown in the quick start; it re-exports the standalone component and all template directives. New standalone applications can import only the component and the specific directives they use.
 
 ### Query data model
 
-A query is a recursive tree. Each ruleset combines its child rules with `and` or `or`; a child may be either another ruleset or a leaf rule.
+A query is a recursive tree. Each ruleset combines its direct child rules with its own `condition` (`and` or `or`); nested rulesets let different branches use different conditions. A leaf rule contains a configured field identifier, an operator, and an optional value/entity. `value` is `unknown`, so applications can use strings, numbers, booleans, arrays, or domain-specific values.
 
 ```ts
 const query: RuleSet = {
@@ -324,9 +331,11 @@ const query: RuleSet = {
 };
 ```
 
+Keep rule field identifiers aligned with each configured field's `value` (or its configuration key when `value` is omitted). Persist the complete `RuleSet` if the query must be restored later; `collapsed` is presentation state and can be omitted from application query serialization if it is not relevant.
+
 ### Field and builder configuration
 
-`QueryBuilderConfig.fields` is a map from field key to its definition. `name` and `type` are required. The field key is used in rules unless `value` overrides it.
+`QueryBuilderConfig.fields` is a map from field key to its definition. `name` and `type` are required. The field key is used in rules unless `value` overrides it. `defaultValue` and `defaultOperator` accept either a value or a zero-argument factory; factories are useful when a new rule needs a fresh array/object value rather than sharing one instance.
 
 ```ts
 const config: QueryBuilderConfig = {
@@ -353,87 +362,73 @@ const config: QueryBuilderConfig = {
 };
 ```
 
-Supported default operator maps:
+When an entity is selected, the builder filters the field selector to fields whose `entity` matches that entity's `value`. If `defaultField` is omitted, the first field belonging to that entity is selected. `defaultField` is a `Field` object or a factory that returns one, not a field key string. This example shows how entity values, configuration keys, and rule field values relate:
 
-| Field type | Default operators |
-|---|---|
-| `string` | `=`, `!=`, `contains`, `like` |
-| `number`, `date`, `time` | `=`, `!=`, `>`, `>=`, `<`, `<=` |
-| `category` | `=`, `!=`, `in`, `not in` |
-| `boolean` | `=` |
+```ts
+import { Field, QueryBuilderConfig } from '@argela-uxui/ngx-query-builder';
 
-Set a field's `operators` to override its operators, or use the component's `operatorMap` input to override operators by type. `multiselect` is an input type used for multiple values (including `in` and `not in` on category and boolean fields).
+const customerName: Field = {
+  name: 'Name',
+  type: 'string',
+  entity: 'customer',
+  value: 'customer_name',
+};
+const orderTotal: Field = {
+  name: 'Total',
+  type: 'number',
+  entity: 'order',
+  value: 'order_total',
+};
+
+const config: QueryBuilderConfig = {
+  entities: {
+    customer: { name: 'Customer', defaultField: customerName },
+    order: { name: 'Order', defaultField: orderTotal },
+  },
+  fields: {
+    customerName,
+    orderTotal,
+  },
+};
+```
+
+The field's `value` determines the identifier written into `Rule.field`. If you provide a default field, ensure its `entity` matches the selected entity.
+
+For the complete list of built-in operators by field type, see [Default Operator Map](#default-operator-map).
+
+Set a field's `operators` to override its operators, use the component's `operatorMap` input to override them by type, or provide `getOperators` for dynamic field-specific logic. `getOperators` takes precedence over both. `multiselect` is an input type, not an operator-map field type; category and boolean fields use it for `in` and `not in` by default.
+
+With nullable fields, the built-in `is null` and `is not null` operators have no value control. `coerceValueForOperator` runs when the operator changes; by default, values are converted to an array when an operator selects a multiselect input. Use `getInputType` and `getOptions` when the built-in type/options behavior does not fit the application. For a value-less operator in a custom `getInputType`, return an empty string so no value control is rendered.
 
 ### Entities and callbacks
 
-Entities can group fields. Set `entities` on the config and associate fields using their `entity` key. An entity may specify a `defaultField`.
+Entities group fields behind an entity selector. Declare them under `config.entities` and match each field's `entity` to the entity value, as shown in [Field and builder configuration](#field-and-builder-configuration). `defaultField` can set the initial field for the entity; otherwise, the first matching field is selected.
 
 The config also provides hooks for custom data handling:
 
 | Config property | Purpose |
 |---|---|
-| `getOperators(fieldName, field)` | Return operators available for a field. |
-| `getInputType(field, operator)` | Select the value input type for a field/operator pair. |
-| `getOptions(field)` | Return options for a field input. |
-| `addRule(parent)` / `addRuleSet(parent)` | Customize adding rules or rulesets. |
-| `removeRule(rule, parent)` / `removeRuleSet(ruleset, parent)` | Customize removing rules or rulesets. |
-| `coerceValueForOperator(operator, value, rule)` | Convert a value when an operator changes. |
-| `calculateFieldChangeValue(currentField, nextField, currentValue)` | Choose a value when the selected field changes. |
+| `getOperators(fieldName, field)` | Return operators available for a field; takes precedence over field-level and type-level operator lists. |
+| `getInputType(field, operator)` | Select the value input type for a field/operator pair. Return a type supported by a built-in control or by a matching `queryInput` template. |
+| `getOptions(field)` | Return options for a field input; takes precedence over `Field.options`. |
+| `addRule(parent)` / `addRuleSet(parent)` | Replace the default add behavior. Mutate `parent.rules` to add the desired item. |
+| `removeRule(rule, parent)` / `removeRuleSet(ruleset, parent)` | Replace the default remove behavior for the supplied parent ruleset. |
+| `coerceValueForOperator(operator, value, rule)` | Convert a value when an operator changes, for example scalar-to-array when switching to `in`. |
+| `calculateFieldChangeValue(currentField, nextField, currentValue)` | Choose the value after a field change; overrides default-value and value-persistence behavior. |
 
-### Component inputs
+### Component input behavior
 
-| Input | Type | Default | Description |
-|---|---|---|---|
-| `config` | `QueryBuilderConfig` | `{ fields: {} }` | Fields, entities, and behavior callbacks. |
-| `data` | `RuleSet` | Empty `and` ruleset | Query data for direct binding; forms can write the value through `ControlValueAccessor`. |
-| `disabled` | `boolean` | `false` | Disables the builder. |
-| `allowRuleset` | `boolean` | `true` | Shows controls for adding/removing nested rulesets. |
-| `allowCollapse` | `boolean` | `false` | Enables collapse/expand controls on rulesets. |
-| `allowEmptyRulesets` | `boolean` in config | `false` | Allows empty rulesets without marking them invalid. |
-| `persistValueOnFieldChange` | `boolean` | `false` | Preserves compatible values when changing fields. |
-| `dragDropRules` | `boolean` | `false` | Enables pointer drag-and-drop to reorder/move rules between rulesets. Rulesets themselves cannot be dragged. |
-| `operatorMap` | `Record<string, string[]>` | Built-in map | Overrides operators by field type. |
-| `translations` | `QueryBuilderTranslations` | Built-in English labels | Sets UI and operator labels, including accessible labels. |
-| `emptyMessage` | `string` | Built-in empty-ruleset message | Legacy empty warning text when `translations` is not supplied. |
-| `classNames` | `QueryBuilderClassNames` | Built-in `q-*` classes | Overrides CSS classes used by the component. |
+All supported bindings, inputs, defaults, and their behavior are listed once in [Component Inputs](#component-inputs). The examples above show how to choose between reactive forms, template-driven forms, and direct mutable `[data]` binding.
 
-### Localization and styling
+### Localization
 
-Provide `translations` to customize labels for buttons, AND/OR conditions, collapse controls, empty rulesets, and operator captions. It has `addRule`, `addRuleset`, `removeRule`, `removeRuleset`, `and`, `or`, `collapseRuleset`, `expandRuleset`, `emptyRuleset`, and `operatorLabels` properties.
+Provide `translations` to customize labels for buttons, AND/OR conditions, collapse controls, empty rulesets, and operator captions. It is a complete `QueryBuilderTranslations` object with `addRule`, `addRuleset`, `removeRule`, `removeRuleset`, `and`, `or`, `collapseRuleset`, `expandRuleset`, `emptyRuleset`, and `operatorLabels`. Include captions in `operatorLabels` for custom operators; otherwise, the operator text is used as its label.
 
-Use `classNames` to override component CSS classes. Available keys include `row`, `rule`, `ruleSet`, `switchGroup`, `fieldControl`, `entityControl`, `operatorControl`, `inputControl`, button and icon keys, warning/collapse keys, and drag/drop keys. Unspecified keys keep the built-in `q-*` class names.
+`emptyMessage` is retained for compatibility when no `translations` object is supplied. If `translations` is present, use its `emptyRuleset` property for the warning instead. CSS class overrides are documented in [Styling](#styling).
 
 ### Custom templates
 
-Import the directive you use in the host component. The `queryInput` directive selects a custom input by type:
-
-```ts
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import {
-  QueryBuilderComponent,
-  QueryInputDirective,
-} from '@argela-uxui/ngx-query-builder';
-
-@Component({
-  standalone: true,
-  imports: [
-    QueryBuilderComponent,
-    QueryInputDirective,
-    FormsModule,
-    ReactiveFormsModule,
-  ],
-  template: `
-    <query-builder [formControl]="query" [config]="config">
-      <ng-container *queryInput="let rule; type: 'textarea'">
-        <textarea [(ngModel)]="rule.value"></textarea>
-      </ng-container>
-    </query-builder>
-  `,
-})
-export class QueryComponent {}
-```
-
-The field, operator, entity, button group, remove button, switch group, empty warning, and arrow icon can also be replaced with their corresponding directives. Directive contexts expose the current rule/ruleset, relevant lists and labels, callbacks, and `getDisabledState()`; see the directive context reference below.
+See [Custom Templates](#custom-templates) for working custom input, field-selector, and button-group examples. The same approach applies to operator, entity, remove-button, switch-group, empty-warning, and arrow-icon templates. Import the directive used by a standalone host component; `QueryBuilderModule` exports all directives for NgModule applications. Directive contexts expose the current rule/ruleset, relevant lists and labels, callbacks, and `getDisabledState()`.
 
 ## Exports and API Documentation
 
@@ -446,26 +441,28 @@ The field, operator, entity, button group, remove button, switch group, empty wa
 
 ### Template directives
 
-Each directive accepts a template and exposes the listed context values. `$implicit` is available as `let value`; named values can be assigned with `let name=name`.
+Each directive accepts a template and exposes the listed context values. `$implicit` is available as `let value`; named values can be assigned with `let name=name`. For example, `*queryField="let rule; let fields=fields; let onChange=onChange"` exposes the current rule as `rule`, the available fields as `fields`, and the field-change callback as `onChange`. Call the provided callback after custom control changes so Angular forms receive the updated query and touched state.
 
 | Directive | Template context |
 |---|---|
-| `QueryInputDirective` (`*queryInput`) | `$implicit: Rule`, `field: Field`, `options: Option[]`, `onChange()`, `getDisabledState()`; optional `type` selects the input type. |
-| `QueryFieldDirective` (`*queryField`) | `$implicit: Rule`, `fields: Field[]`, `onChange(fieldValue, rule)`, `getFields(entityName)`, `getDisabledState()`, drag-handle state and label. |
-| `QueryOperatorDirective` (`*queryOperator`) | `$implicit: Rule`, `operators: string[]`, `labels`, `getLabel(operator)`, `onChange()`, `getDisabledState()`. |
+| `QueryInputDirective` (`*queryInput`) | `$implicit: Rule`, `field: Field`, `options: Option[]`, `onChange()`, `getDisabledState()`; optional `type` selects the value input type returned by `getInputType`. |
+| `QueryFieldDirective` (`*queryField`) | `$implicit: Rule`, `fields: Field[]`, `onChange(fieldValue, rule)`, `getFields(entityName)`, `getDisabledState()`, `dragDropEnabled`, `dragHandleClass`, `dragHandleAriaLabel`. |
+| `QueryOperatorDirective` (`*queryOperator`) | `$implicit: Rule`, `operators: string[]`, `labels: Record<string, string>`, `getLabel(operator)`, `onChange()`, `getDisabledState()`. |
 | `QueryEntityDirective` (`*queryEntity`) | `$implicit: Rule`, `entities: Entity[]`, `onChange(entityValue, rule)`, `getDisabledState()`. |
-| `QueryButtonGroupDirective` (`*queryButtonGroup`) | `$implicit: RuleSet`, `addRule()`, optional `addRuleSet()` and `removeRuleSet()`, labels and `getDisabledState()`. |
+| `QueryButtonGroupDirective` (`*queryButtonGroup`) | `$implicit: RuleSet`, `addRule()`, optional `addRuleSet()` and `removeRuleSet()`, `labels`, `getLabel(key)`, `getDisabledState()`. The ruleset actions are optional depending on the component configuration and nesting level. |
 | `QueryRemoveButtonDirective` (`*queryRemoveButton`) | `$implicit: Rule`, `removeRule(rule)`, `getDisabledState()`. |
-| `QuerySwitchGroupDirective` (`*querySwitchGroup`) | `$implicit: RuleSet`, `onChange(condition)`, AND/OR labels and `getDisabledState()`. |
+| `QuerySwitchGroupDirective` (`*querySwitchGroup`) | `$implicit: RuleSet`, `onChange(condition)`, `labels: { and, or }`, `getLabel(key)`, `getDisabledState()`. |
 | `QueryEmptyWarningDirective` (`*queryEmptyWarning`) | `$implicit: RuleSet`, `message`, `getDisabledState()`. |
 | `QueryArrowIconDirective` (`*queryArrowIcon`) | `$implicit: RuleSet`, `getDisabledState()`. |
+
+For custom interactive controls, bind their disabled state to `getDisabledState()` and provide an accessible name or label. Keep action buttons at `type="button"` so they do not submit an enclosing application form.
 
 ### Public interfaces and types
 
 | Export | Description |
 |---|---|
 | `QueryBuilderConfig` | Field/entity definitions, empty-ruleset behavior, and customization callbacks. |
-| `RuleSet` | Recursive group with `condition`, `rules`, and optional `collapsed`/`isChild` state. |
+| `RuleSet` | Recursive group with `condition` (`'and'` or `'or'`), `rules`, and optional `collapsed`/`isChild` state. |
 | `Rule` | Leaf query item with `field`, optional `operator`, `value`, and `entity`. |
 | `Field` | Field label/type, values/options/operators, defaults, entity, nullability, and validator. |
 | `FieldMap` | Map from field keys to `Field` definitions. |
@@ -474,10 +471,12 @@ Each directive accepts a template and exposes the listed context values. `$impli
 | `QueryValue` | `unknown`, the type used for rule values. |
 | `QueryValueFactory` / `QueryDefaultValue` | Value factory and value-or-factory types for field/entity defaults. |
 | `QueryBuilderTranslations` | UI labels, accessible labels, empty-ruleset message, and operator captions. |
-| `QueryBuilderClassNames` | CSS class-name override keys for the component. |
+| `QueryBuilderClassNames` | CSS class-name override keys listed in the styling reference below. |
 | `QueryBuilderButtonLabels` / `QueryBuilderSwitchLabels` | Button and AND/OR label shapes for template contexts. |
 | `InputContext`, `FieldContext`, `OperatorContext`, `EntityContext` | Context types for value and selector templates. |
 | `ButtonGroupContext`, `RemoveButtonContext`, `SwitchGroupContext` | Context types for action and condition templates. |
 | `EmptyWarningContext`, `ArrowIconContext` | Context types for empty-warning and collapse-icon templates. |
 | `LocalRuleMeta` | Local metadata describing a ruleset and its invalid state. |
 | `RuleValidationResult` | Result type accepted by a field validator. |
+
+`QueryBuilderClassNames` supports these keys: `arrowIconButton`, `arrowIcon`, `removeIcon`, `addIcon`, `button`, `buttonGroup`, `removeButton`, `removeButtonSize`, `switchRow`, `switchGroup`, `switchLabel`, `switchRadio`, `switchControl`, `rightAlign`, `transition`, `collapsed`, `treeContainer`, `tree`, `row`, `connector`, `rule`, `ruleSet`, `invalidRuleSet`, `emptyWarning`, `fieldControl`, `fieldControlSize`, `entityControl`, `entityControlSize`, `operatorControl`, `operatorControlSize`, `inputControl`, `inputControlSize`, `dragHandle`, `draggableRule`, and `dropTargetSpacer`. The earlier [Styling](#styling) example shows how to override a subset of them.

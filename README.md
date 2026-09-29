@@ -1,438 +1,89 @@
 # ngx-query-builder
 
-A modernized Angular query builder component — Angular 21, standalone, signals, OnPush.
+Angular 21 library workspace for `@argela-uxui/ngx-query-builder`, a standalone query-builder component with Angular forms integration. This repository contains the library, a demo application, and Jest and Playwright tests. It is a fork of [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-QueryBuilder).
 
-Forked from [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-QueryBuilder) and fully updated to current Angular best practices.
+**Looking to use the library in an application?** See the [package usage documentation](projects/ngx-query-builder/README.md) for installation, examples, configuration, custom templates, and the public API. This README covers developing, building, and releasing the project.
 
-[![Angular](https://img.shields.io/badge/Angular-19-red)](https://angular.io)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+## Workspace layout
 
-## Features
-
-- ✅ **Standalone component** — no NgModule required (NgModule export provided for backward compat)
-- ✅ **Signal inputs** — reactive, type-safe `input()` API
-- ✅ **Signal queries** — `viewChild`, `contentChild`, `contentChildren`
-- ✅ **OnPush change detection** — optimal performance
-- ✅ **`inject()` DI** — constructor-free dependency injection
-- ✅ **New template control flow** — `@if`, `@for`, `@switch`, `@let`
-- ✅ **ControlValueAccessor** — works with Angular reactive forms and template-driven forms
-- ✅ **Fully customizable** — replace any template (fields, operators, inputs, buttons, etc.)
-- ✅ **Recursive rule sets** — nested AND/OR grouping
-- ✅ **Radio group isolation** — each component instance generates unique IDs for AND/OR radios, safe for nested rulesets
-- ✅ **Jest** — fast unit tests
-
-## Installation
-
-```bash
-npm install @argela-uxui/ngx-query-builder
-```
-
-> **Peer dependencies:** `@angular/core >=21`, `@angular/forms >=21`, `@angular/cdk >=21`, `rxjs >=7`
-
-## Public npm publication
-
-The package is published publicly as `@argela-uxui/ngx-query-builder`.
-
-```bash
-npm login --registry=https://registry.npmjs.org/
-npm whoami --registry=https://registry.npmjs.org/
-npm run build
-cd dist/ngx-query-builder
-npm publish
-```
-
-The library package config targets the public npm registry and sets scoped package access to public. Increment the version in `projects/ngx-query-builder/package.json` before each subsequent release.
-
-## Internal / Private Distribution
-
-If you want to use this library inside your company without publishing to the public npm registry, choose one of the approaches below.
-
----
-
-### Option 1 — npm pack (tarball) · _simplest, no infrastructure required_
-
-Build the library, pack it into a `.tgz` file, and distribute it however you like (file share, Git LFS, email, etc.).
-
-```bash
-# In this repository
-npm run build
-cd dist/ngx-query-builder
-npm pack
-# Writes a scoped-package tarball to publish/
-```
-
-`npm` writes the tarball to the configured `pack-destination` (`publish/` in this repo), not the current folder.
-
-In the consuming project:
-
-```bash
-npm install /path/to/publish/argela-uxui-ngx-query-builder-X.Y.Z.tgz
-```
-
-Or reference it directly in `package.json`:
-
-```json
-{
-  "dependencies": {
-    "@argela-uxui/ngx-query-builder": "file:./libs/argela-uxui-ngx-query-builder-21.0.0.tgz"
-  }
-}
-```
-
----
-
-### Option 2 — Git dependency · _no infrastructure, version-controlled_
-
-Commit the built `dist/ngx-query-builder/` output to a dedicated release branch or tag in your internal Git repository (GitHub Enterprise, GitLab, Bitbucket, etc.).
-
-```bash
-# Build and commit dist/ to a release branch
-npm run build
-git checkout -b release/1.0.0
-git add -f dist/ngx-query-builder
-git commit -m "Release 1.0.0 — built dist"
-git tag v1.0.0
-git push origin release/1.0.0 --tags
-```
-
-In the consuming project:
-
-```bash
-# Install from a specific tag
-npm install git+https://git.company.com/team/ngx-query-builder.git#v1.0.0
-
-# Or from a branch
-npm install git+https://git.company.com/team/ngx-query-builder.git#release/1.0.0
-```
-
-> **Note:** The `dist/` directory is gitignored on `develop`/`main`. The release branch deliberately commits it so npm can resolve the package without a build step in the consuming project.
-
----
-
-### Option 3 — GitHub Packages · _team-scale, stays on GitHub_
-
-GitHub Packages is a private npm registry built into GitHub. Packages can be scoped to your organisation and are accessible to any team member with the right permissions.
-
-**1. Authenticate** — create a Personal Access Token (PAT) with `write:packages` scope, then add it to `~/.npmrc`:
-
-```ini
-//npm.pkg.github.com/:_authToken=YOUR_GITHUB_PAT
-```
-
-**2. Set the package scope** — update `projects/ngx-query-builder/package.json`:
-
-```json
-{
-  "name": "@your-org/ngx-query-builder"
-}
-```
-
-**3. Build and publish:**
-
-```bash
-npm run build
-cd dist/ngx-query-builder
-npm publish --registry https://npm.pkg.github.com
-```
-
-**4. Install in the consuming project** — add to `.npmrc`:
-
-```ini
-@your-org:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=YOUR_GITHUB_PAT
-```
-
-Then install as usual:
-
-```bash
-npm install @your-org/ngx-query-builder
-```
-
----
-
-### Option 4 — Private npm registry (Verdaccio / Nexus / Artifactory) · _enterprise scale_
-
-Any standard private npm registry works. [Verdaccio](https://verdaccio.org/) is free and easy to self-host.
-
-```bash
-# Start Verdaccio locally (or point at your company registry)
-npx verdaccio
-
-# Publish (builds first)
-npm run build
-cd dist/ngx-query-builder
-npm publish --registry http://your-registry.company.com
-```
-
-In the consuming project, set the registry in `.npmrc`:
-
-```ini
-@your-scope:registry=http://your-registry.company.com
-```
-
----
-
-### Option 5 — npm link · _local development only_
-
-Use `npm link` when you are developing both this library and a consuming app at the same time on the same machine. Changes to the library are reflected immediately without republishing.
-
-```bash
-# In this repository — build in watch mode and register the link
-npm run build:watch &
-cd dist/ngx-query-builder
-npm link
-
-# In the consuming project — connect to the linked package
-npm link @argela-uxui/ngx-query-builder
-```
-
-To unlink when done:
-
-```bash
-# In the consuming project
-npm unlink @argela-uxui/ngx-query-builder
-
-# In this repository
-cd dist/ngx-query-builder
-npm unlink
-```
-
-> **Note:** `npm link` is not suitable for CI or production use. Use one of the options above for shared distribution.
-
----
-
-## Quick Start
-
-### Standalone (Angular 17+)
-
-```ts
-import { QueryBuilderComponent, QueryBuilderConfig } from '@argela-uxui/ngx-query-builder';
-
-@Component({
-  standalone: true,
-  imports: [QueryBuilderComponent, ReactiveFormsModule],
-  template: `<query-builder [formControl]="queryCtrl" [config]="config"></query-builder>`
-})
-export class AppComponent {
-  queryCtrl = new FormControl({ condition: 'and', rules: [] });
-
-  config: QueryBuilderConfig = {
-    fields: {
-      age:      { name: 'Age',      type: 'number' },
-      gender:   { name: 'Gender',   type: 'category', options: [
-                    { name: 'Male',   value: 'm' },
-                    { name: 'Female', value: 'f' },
-                  ]},
-      birthday: { name: 'Birthday', type: 'date' },
-      name:     { name: 'Name',     type: 'string' },
-    }
-  };
-}
-```
-
-### NgModule (backward compatible)
-
-```ts
-import { QueryBuilderModule } from '@argela-uxui/ngx-query-builder';
-
-@NgModule({
-  imports: [QueryBuilderModule, ReactiveFormsModule],
-})
-export class AppModule {}
-```
-
-## Inputs
-
-| Input | Type | Default | Description |
-|---|---|---|---|
-| `[formControl]` | `FormControl<RuleSet>` | — | Reactive forms binding |
-| `[(ngModel)]` | `RuleSet` | — | Template-driven binding |
-| `[config]` | `QueryBuilderConfig` | `{ fields: {} }` | Field/operator configuration |
-| `[data]` | `RuleSet` | `{ condition:'and', rules:[] }` | Query value (use with CVA or direct binding) |
-| `[disabled]` | `boolean` | `false` | Disable the entire query builder |
-| `[allowRuleset]` | `boolean` | `true` | Show "Add Ruleset" button |
-| `[allowCollapse]` | `boolean` | `false` | Enable collapse/expand of rule sets |
-| `[persistValueOnFieldChange]` | `boolean` | `false` | Keep value when field changes to same type |
-| `[dragDropRules]` | `boolean` | `false` | Opt-in pointer drag-drop to reorder/move rules across rulesets (rulesets themselves are not draggable) |
-| `[classNames]` | `QueryBuilderClassNames` | — | CSS class overrides for all elements |
-| `[operatorMap]` | `{ [type: string]: string[] }` | — | Override operators per field type |
-| `[translations]` | `QueryBuilderTranslations` | — | Localize built-in labels, ARIA text, and operator captions |
-| `[emptyMessage]` | `string` | `'A ruleset cannot be empty…'` | Legacy empty warning message when `translations` is not set |
-
-## Configuration
-
-### `QueryBuilderConfig`
-
-```ts
-interface QueryBuilderConfig {
-  fields: {
-    [fieldKey: string]: {
-      name: string;           // Display label
-      type: string;           // 'string' | 'number' | 'date' | 'time' | 'boolean' | 'category' | 'multiselect'
-      value?: string;         // Key used in the rule (defaults to fieldKey)
-      options?: Option[];     // For category/multiselect
-      operators?: string[];   // Override operators for this field
-      defaultValue?: any;     // Default value when field is selected
-      defaultOperator?: any;  // Default operator when field is selected
-      entity?: string;        // Associate field with an entity
-      nullable?: boolean;
-      validator?: (rule: Rule, parent: RuleSet) => any | null;
-    }
-  };
-  entities?: {
-    [entityKey: string]: { name: string; value?: string; defaultField?: any }
-  };
-  allowEmptyRulesets?: boolean;
-  getOperators?: (fieldName: string, field: Field) => string[];
-  getInputType?: (field: string, operator: string) => string;
-  getOptions?: (field: string) => Option[];
-  addRule?: (parent: RuleSet) => void;
-  addRuleSet?: (parent: RuleSet) => void;
-  removeRule?: (rule: Rule, parent: RuleSet) => void;
-  removeRuleSet?: (ruleset: RuleSet, parent: RuleSet) => void;
-  coerceValueForOperator?: (operator: string, value: any, rule: Rule) => any;
-  calculateFieldChangeValue?: (currentField: Field, nextField: Field, currentValue: any) => any;
-}
-
-interface QueryBuilderTranslations {
-  addRule: string;
-  addRuleset: string;
-  removeRule: string;
-  removeRuleset: string;
-  and: string;
-  or: string;
-  collapseRuleset: string;
-  expandRuleset: string;
-  emptyRuleset: string;
-  operatorLabels: Record<string, string>;
-}
-```
-
-### Default Operator Map
-
-| Type | Default Operators |
+| Path | Purpose |
 |---|---|
-| `string` | `=`, `!=`, `contains`, `like` |
-| `number` | `=`, `!=`, `>`, `>=`, `<`, `<=` |
-| `date` | `=`, `!=`, `>`, `>=`, `<`, `<=` |
-| `time` | `=`, `!=`, `>`, `>=`, `<`, `<=` |
-| `category` | `=`, `!=`, `in`, `not in` |
-| `multiselect` | `in`, `not in` |
-| `boolean` | `=` |
+| `projects/ngx-query-builder/src/lib/` | Standalone component, directives, types, and unit tests. |
+| `projects/ngx-query-builder/src/public-api.ts` | Public exports for the npm package. |
+| `projects/ngx-query-builder/README.md` | Consumer-facing documentation, included in the built package. |
+| `demo/` | Angular application exercising the library; see the [demo README](demo/README.md). |
+| `e2e/` | Playwright browser tests for the demo. |
+| `dist/ngx-query-builder/` | Generated, publishable library package (gitignored). |
 
-## Custom Templates
+The Angular CLI project is named `ngx-query-builder`, but the package built from it is named `@argela-uxui/ngx-query-builder`. The workspace root package is private and must not be published.
 
-Replace any part of the UI using structural directives as content children.
+## Development installation
 
-### Custom Input
-
-```html
-<query-builder [formControl]="queryCtrl" [config]="config">
-  <!-- Custom input for fields of type 'textarea' -->
-  <ng-container *queryInput="let rule; type: 'textarea'">
-    <textarea [(ngModel)]="rule.value"></textarea>
-  </ng-container>
-</query-builder>
-```
-
-### Custom Field Selector
-
-```html
-<query-builder [formControl]="queryCtrl" [config]="config">
-  <ng-container *queryField="let rule; let fields=fields; let onChange=onChange">
-    <mat-select [(ngModel)]="rule.field" (ngModelChange)="onChange($event, rule)">
-      <mat-option *ngFor="let f of fields" [value]="f.value">{{f.name}}</mat-option>
-    </mat-select>
-  </ng-container>
-</query-builder>
-```
-
-### Custom Button Group
-
-```html
-<query-builder [formControl]="queryCtrl" [config]="config">
-  <ng-container *queryButtonGroup="let ruleset; let addRule=addRule; let addRuleSet=addRuleSet; let removeRuleSet=removeRuleSet">
-    <button (click)="addRule()">+ Rule</button>
-    <button *ngIf="addRuleSet" (click)="addRuleSet()">+ Ruleset</button>
-    <button *ngIf="removeRuleSet" (click)="removeRuleSet()">- Ruleset</button>
-  </ng-container>
-</query-builder>
-```
-
-### Available Directives
-
-| Directive | Context variables |
-|---|---|
-| `*queryInput` | `rule`, `field`, `options`, `onChange`, `getDisabledState` |
-| `*queryField` | `rule`, `fields`, `onChange`, `getFields`, `getDisabledState`, `dragDropEnabled`, `dragHandleClass`, `dragHandleAriaLabel` |
-| `*queryOperator` | `rule`, `operators`, `labels`, `getLabel(operator)`, `onChange`, `getDisabledState` |
-| `*queryEntity` | `rule`, `entities`, `onChange`, `getDisabledState` |
-| `*queryButtonGroup` | `addRule`, `addRuleSet?`, `removeRuleSet?`, `labels`, `getLabel(key)`, `getDisabledState` |
-| `*queryRemoveButton` | `rule`, `removeRule`, `getDisabledState` |
-| `*querySwitchGroup` | `onChange`, `labels`, `getLabel(key)`, `getDisabledState` |
-| `*queryEmptyWarning` | `message`, `getDisabledState` |
-| `*queryArrowIcon` | `getDisabledState` |
-
-## Styling
-
-> Drag-drop interactions are pointer-based in this release. Keyboard drag interactions are currently out of scope.
-
-Apply CSS class overrides via `[classNames]` input:
-
-```ts
-classNames: QueryBuilderClassNames = {
-  // Bootstrap 4 example
-  row:                'row p-2 m-1',
-  rule:               'border',
-  ruleSet:            'border',
-  invalidRuleSet:     'alert alert-danger',
-  emptyWarning:       'text-danger mx-auto',
-  button:             'btn',
-  buttonGroup:        'btn-group',
-  rightAlign:         'order-12 ml-auto',
-  switchRow:          'd-flex px-2',
-  switchGroup:        'd-flex align-items-center',
-  switchRadio:        'custom-control-input',
-  switchLabel:        'custom-control-label',
-  switchControl:      'custom-control custom-radio custom-control-inline',
-  fieldControl:       'form-control',
-  fieldControlSize:   'col-auto pr-0',
-  operatorControl:    'form-control',
-  operatorControlSize:'col-auto pr-0',
-  inputControl:       'form-control',
-  inputControlSize:   'col-auto',
-};
-```
-
-## Development
+Use Node.js `^20.19.0`, `^22.12.0`, or `>=24.0.0` (as required by the installed Angular CLI), plus npm. From the repository root:
 
 ```bash
-# Install dependencies
-npm install
-
-# Build the library
-npm run build
-
-# Run tests (Jest)
-npm test
-
-# Run tests with coverage report
-npx jest --coverage
-
-# Build the demo app
-npx ng build demo
-
-# Serve the demo app
-npx ng serve demo
+npm ci
 ```
 
-## Migration from `angular2-query-builder`
+`npm ci` installs the versions recorded in `package-lock.json`. For end-to-end tests, install Playwright's Chromium browser once:
 
-1. Replace `angular2-query-builder` with `@argela-uxui/ngx-query-builder` in `package.json`
-2. Update imports: `from 'angular2-query-builder'` → `from '@argela-uxui/ngx-query-builder'`
-3. Keep `QueryBuilderModule` import (or use `QueryBuilderComponent` directly as a standalone component)
+```bash
+npx playwright install chromium
+```
+
+No global Angular CLI installation is needed; `npm run` and `npx` use the project's local tools. To use the released package in another application rather than develop it here, follow the [package installation instructions](projects/ngx-query-builder/README.md#installation).
+
+## Build and run the demo
+
+```bash
+npm run build
+npm start
+```
+
+`npm run build` builds the library in Angular's **production/partial compilation mode** into `dist/ngx-query-builder/`. Publish only this output, never the workspace root. `npm start` serves the demo at `http://localhost:4200`; it uses the library source through the workspace TypeScript path mapping. See [demo/README.md](demo/README.md) for more about the application.
+
+For iterative library development, `npm run build:watch` runs the Angular CLI build in watch mode. This uses the default library configuration, not the production configuration; run `npm run build` before packaging or publishing. To build the demo application separately, run `npx ng build demo`.
+
+## Checks
+
+| Command | Purpose |
+|---|---|
+| `npm run lint` | Lint the library and demo. |
+| `npm test` | Run the library's Jest unit tests. |
+| `npm run test:watch` | Run Jest in watch mode. |
+| `npx jest --coverage` | Generate the unit-test coverage report in `coverage/`. |
+| `npm run e2e` | Run Playwright tests in Chromium; starts the demo on port 4200 automatically. |
+| `npm run e2e:ui` | Open Playwright's interactive test UI. |
+| `npm run e2e:report` | Open the generated Playwright HTML report. |
+| `npm run ci` | Run lint, unit tests, end-to-end tests, and the production library build. |
+| `npm run clean` | Remove generated `dist/` and `coverage/` output. |
+
+## Publishing to npm
+
+The publishable package is configured in `projects/ngx-query-builder/package.json` with public access and the `https://registry.npmjs.org/` registry. `.npmrc` directs the `@argela-uxui` scope to that registry; do not put credentials in the repository. Publishing requires an npm account with permission to publish under `@argela-uxui`. npm may require two-factor authentication or other account verification.
+
+1. Update the version in `projects/ngx-query-builder/package.json` for a new release. Update the [changelog](CHANGELOG.md) as appropriate. npm will not accept a second publish of an existing package version.
+2. Authenticate and verify the publishing identity:
+
+   ```bash
+   npm login --registry=https://registry.npmjs.org/
+   npm whoami --registry=https://registry.npmjs.org/
+   ```
+
+3. From the repository root, run `npm run ci` (and install Playwright Chromium first if necessary). Build and inspect the package from **inside** its output directory:
+
+   ```bash
+   npm run build
+   cd dist/ngx-query-builder
+   npm publish --dry-run
+   cd ../..
+   ```
+
+   Confirm the dry-run package name, version, registry, public access, and included files. The `npm run build` production configuration is required: a default/full-compilation build contains a guard that rejects publication.
+4. From the repository root, publish with `npm run publish`. That script rebuilds with the production configuration and runs `npm publish` from `dist/ngx-query-builder/`. Verify the released package and version on npm after publishing.
+
+Do not run `npm publish` from the root; its `private: true` setting prevents publishing the workspace instead of the library. To create a local archive without publishing, run `npm run build` followed by `npm pack ./dist/ngx-query-builder --pack-destination publish` from the repository root. The tarball is written to the gitignored `publish/` directory; packing does not require npm authentication.
 
 ## License
 
-MIT © [Argela Inc.](https://argela.com.tr)
+MIT - see [LICENSE](LICENSE).

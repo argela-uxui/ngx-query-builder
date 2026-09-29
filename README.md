@@ -25,10 +25,24 @@ Forked from [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-Qu
 ## Installation
 
 ```bash
-npm install ngx-query-builder
+npm install @argela-uxui/ngx-query-builder
 ```
 
 > **Peer dependencies:** `@angular/core >=21`, `@angular/forms >=21`, `@angular/cdk >=21`, `rxjs >=7`
+
+## Public npm publication
+
+The package is published publicly as `@argela-uxui/ngx-query-builder`.
+
+```bash
+npm login --registry=https://registry.npmjs.org/
+npm whoami --registry=https://registry.npmjs.org/
+npm run build
+cd dist/ngx-query-builder
+npm publish
+```
+
+The library package config targets the public npm registry and sets scoped package access to public. Increment the version in `projects/ngx-query-builder/package.json` before each subsequent release.
 
 ## Internal / Private Distribution
 
@@ -42,10 +56,10 @@ Build the library, pack it into a `.tgz` file, and distribute it however you lik
 
 ```bash
 # In this repository
-ng build ngx-query-builder
+npm run build
 cd dist/ngx-query-builder
 npm pack
-# Writes to: publish/ngx-query-builder-X.Y.Z.tgz
+# Writes a scoped-package tarball to publish/
 ```
 
 `npm` writes the tarball to the configured `pack-destination` (`publish/` in this repo), not the current folder.
@@ -53,7 +67,7 @@ npm pack
 In the consuming project:
 
 ```bash
-npm install /path/to/publish/ngx-query-builder-X.Y.Z.tgz
+npm install /path/to/publish/argela-uxui-ngx-query-builder-X.Y.Z.tgz
 ```
 
 Or reference it directly in `package.json`:
@@ -61,7 +75,7 @@ Or reference it directly in `package.json`:
 ```json
 {
   "dependencies": {
-    "ngx-query-builder": "file:./libs/ngx-query-builder-1.0.0.tgz"
+    "@argela-uxui/ngx-query-builder": "file:./libs/argela-uxui-ngx-query-builder-21.0.0.tgz"
   }
 }
 ```
@@ -74,7 +88,7 @@ Commit the built `dist/ngx-query-builder/` output to a dedicated release branch 
 
 ```bash
 # Build and commit dist/ to a release branch
-ng build ngx-query-builder
+npm run build
 git checkout -b release/1.0.0
 git add -f dist/ngx-query-builder
 git commit -m "Release 1.0.0 — built dist"
@@ -117,7 +131,7 @@ GitHub Packages is a private npm registry built into GitHub. Packages can be sco
 **3. Build and publish:**
 
 ```bash
-ng build ngx-query-builder
+npm run build
 cd dist/ngx-query-builder
 npm publish --registry https://npm.pkg.github.com
 ```
@@ -146,7 +160,7 @@ Any standard private npm registry works. [Verdaccio](https://verdaccio.org/) is 
 npx verdaccio
 
 # Publish (builds first)
-ng build ngx-query-builder
+npm run build
 cd dist/ngx-query-builder
 npm publish --registry http://your-registry.company.com
 ```
@@ -170,14 +184,14 @@ cd dist/ngx-query-builder
 npm link
 
 # In the consuming project — connect to the linked package
-npm link ngx-query-builder
+npm link @argela-uxui/ngx-query-builder
 ```
 
 To unlink when done:
 
 ```bash
 # In the consuming project
-npm unlink ngx-query-builder
+npm unlink @argela-uxui/ngx-query-builder
 
 # In this repository
 cd dist/ngx-query-builder
@@ -193,7 +207,7 @@ npm unlink
 ### Standalone (Angular 17+)
 
 ```ts
-import { QueryBuilderComponent, QueryBuilderConfig } from 'ngx-query-builder';
+import { QueryBuilderComponent, QueryBuilderConfig } from '@argela-uxui/ngx-query-builder';
 
 @Component({
   standalone: true,
@@ -220,7 +234,7 @@ export class AppComponent {
 ### NgModule (backward compatible)
 
 ```ts
-import { QueryBuilderModule } from 'ngx-query-builder';
+import { QueryBuilderModule } from '@argela-uxui/ngx-query-builder';
 
 @NgModule({
   imports: [QueryBuilderModule, ReactiveFormsModule],
@@ -415,8 +429,8 @@ npx ng serve demo
 
 ## Migration from `angular2-query-builder`
 
-1. Replace `angular2-query-builder` with `ngx-query-builder` in `package.json`
-2. Update imports: `from 'angular2-query-builder'` → `from 'ngx-query-builder'`
+1. Replace `angular2-query-builder` with `@argela-uxui/ngx-query-builder` in `package.json`
+2. Update imports: `from 'angular2-query-builder'` → `from '@argela-uxui/ngx-query-builder'`
 3. Keep `QueryBuilderModule` import (or use `QueryBuilderComponent` directly as a standalone component)
 
 ## License

@@ -3,7 +3,7 @@
   "version": "21.0.0",
   "description": "A modernized Angular query builder component — Angular 21, standalone, signals",
   "license": "MIT",
-  "private": false,
+  "private": true,
   "keywords": [
     "angular",
     "angular21",
@@ -27,12 +27,13 @@
   },
   "homepage": "https://github.com/argela-uxui/ngx-query-builder#readme",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "ng": "ng",
     "start": "ng serve demo",
-    "build": "ng build ngx-query-builder",
+    "build": "ng build ngx-query-builder --configuration production",
+    "publish": "npm run build && cd dist/ngx-query-builder && npm publish",
     "build:watch": "ng build ngx-query-builder --watch",
     "test": "jest",
     "test:watch": "jest --watch",

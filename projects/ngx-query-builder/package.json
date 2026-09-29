@@ -1,6 +1,10 @@
 {
-  "name": "ngx-query-builder",
+  "name": "@argela-uxui/ngx-query-builder",
   "version": "21.0.0",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "peerDependencies": {
     "@angular/cdk": ">=21.0.0",
     "@angular/common": ">=21.0.0",

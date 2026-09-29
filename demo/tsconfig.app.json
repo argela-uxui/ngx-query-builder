@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../out-tsc/app",
+    "resolveJsonModule": true,
+    "types": []
+  },
+  "include": [
+    "src/**/*.d.ts",
+    "src/main.ts"
+  ]
+}

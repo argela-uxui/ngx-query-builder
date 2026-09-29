@@ -1,0 +1,91 @@
+{
+  "name": "ngx-query-builder",
+  "version": "21.0.1",
+  "description": "A modernized Angular query builder component — Angular 21, standalone, signals",
+  "license": "MIT",
+  "private": true,
+  "keywords": [
+    "angular",
+    "angular21",
+    "query",
+    "builder",
+    "querybuilder",
+    "visual",
+    "standalone",
+    "signals"
+  ],
+  "author": {
+    "name": "Argela Inc.",
+    "url": "https://argela.com.tr"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/argela-uxui/ngx-query-builder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/argela-uxui/ngx-query-builder/issues"
+  },
+  "homepage": "https://github.com/argela-uxui/ngx-query-builder#readme",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve demo",
+    "build": "ng build ngx-query-builder --configuration production",
+    "publish": "npm run build && cd dist/ngx-query-builder && npm publish",
+    "build:watch": "ng build ngx-query-builder --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "npm run lint:lib && npm run lint:demo",
+    "lint:lib": "ng lint ngx-query-builder",
+    "lint:demo": "ng lint demo",
+    "clean": "rimraf dist coverage",
+    "ci": "npm run lint && npm run test && npm run e2e && npm run build",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:report": "playwright show-report e2e/playwright-report"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "21.2.7",
+    "@angular-eslint/builder": "21.3.1",
+    "@angular-eslint/eslint-plugin": "21.3.1",
+    "@angular-eslint/eslint-plugin-template": "21.3.1",
+    "@angular-eslint/schematics": "21.3.1",
+    "@angular-eslint/template-parser": "21.3.1",
+    "@angular/cdk": "21.2.6",
+    "@angular/cli": "21.2.6",
+    "@angular/common": "21.2.7",
+    "@angular/compiler": "21.2.7",
+    "@angular/compiler-cli": "21.2.7",
+    "@angular/core": "21.2.7",
+    "@angular/forms": "21.2.7",
+    "@angular/language-service": "21.2.7",
+    "@angular/platform-browser": "21.2.7",
+    "@angular/platform-browser-dynamic": "21.2.7",
+    "@angular/router": "21.2.7",
+    "@playwright/test": "1.59.1",
+    "@types/jest": "30.0.0",
+    "@types/node": "22.19.17",
+    "@typescript-eslint/eslint-plugin": "8.58.1",
+    "@typescript-eslint/parser": "8.58.1",
+    "angular-eslint": "21.3.1",
+    "eslint": "9.39.4",
+    "jest": "30.3.0",
+    "jest-environment-jsdom": "30.3.0",
+    "jest-preset-angular": "16.1.2",
+    "ng-packagr": "21.2.2",
+    "rimraf": "6.1.3",
+    "rxjs": "7.8.2",
+    "sass": "1.99.0",
+    "ts-jest": "29.4.9",
+    "ts-node": "10.9.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.58.1",
+    "zone.js": "0.15.1"
+  },
+  "dependencies": {
+    "@angular/animations": "21.2.7",
+    "tslib": "2.8.1"
+  }
+}

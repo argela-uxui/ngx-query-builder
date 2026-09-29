@@ -1,0 +1,594 @@
+/* ==========================================================================
+   ngx-query-builder demo — design system
+   Plain SCSS + CSS custom properties. Themes are switched through the
+   [data-theme] attribute on <html> (see ThemeService).
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  --bg: #f6f7fb;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --surface-3: #eef2f7;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-soft: #eef2ff;
+  --primary-contrast: #ffffff;
+  --success: #15803d;
+  --success-soft: #dcfce7;
+  --danger: #b91c1c;
+  --danger-soft: #fee2e2;
+  --warning: #a16207;
+  --warning-soft: #fef9c3;
+  --info: #0369a1;
+  --info-soft: #e0f2fe;
+
+  --code-bg: #0f172a;
+  --code-text: #e2e8f0;
+  --code-bar: #1e293b;
+
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 6%);
+  --shadow: 0 1px 3px rgb(15 23 42 / 8%), 0 4px 16px rgb(15 23 42 / 4%);
+  --focus-ring: 0 0 0 3px rgb(79 70 229 / 35%);
+
+  --topbar-height: 60px;
+  --sidebar-width: 260px;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0b1020;
+  --surface: #111827;
+  --surface-2: #151e30;
+  --surface-3: #1e293b;
+  --border: #243044;
+  --border-strong: #334155;
+  --text: #e5e7eb;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+
+  --primary: #818cf8;
+  --primary-hover: #a5b4fc;
+  --primary-soft: rgb(129 140 248 / 14%);
+  --primary-contrast: #0b1020;
+  --success: #4ade80;
+  --success-soft: rgb(74 222 128 / 14%);
+  --danger: #f87171;
+  --danger-soft: rgb(248 113 113 / 14%);
+  --warning: #facc15;
+  --warning-soft: rgb(250 204 21 / 12%);
+  --info: #38bdf8;
+  --info-soft: rgb(56 189 248 / 12%);
+
+  --code-bg: #070b16;
+  --code-text: #e2e8f0;
+  --code-bar: #111827;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow: 0 1px 3px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 25%);
+  --focus-ring: 0 0 0 3px rgb(129 140 248 / 45%);
+}
+
+/* ---------- Reset & base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+code,
+kbd,
+pre {
+  font-family: var(--font-mono);
+}
+
+:not(pre) > code {
+  font-size: 0.9em;
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  background: var(--surface-3);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+::selection {
+  background: var(--primary-soft);
+}
+
+/* ---------- Layout utilities ---------- */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stack-sm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.row--between {
+  justify-content: space-between;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 20px;
+  align-items: start;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.small {
+  font-size: 12px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-3);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  &--primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--primary-contrast);
+
+    &:hover:not(:disabled) {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+  }
+
+  &--danger {
+    color: var(--danger);
+
+    &:hover:not(:disabled) {
+      background: var(--danger-soft);
+    }
+  }
+
+  &--ghost {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  &--sm {
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  &--block {
+    width: 100%;
+  }
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-3);
+    color: var(--text);
+  }
+}
+
+/* ---------- Form controls ---------- */
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.form-hint {
+  font-size: 12px;
+  color: var(--text-subtle);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+
+  &:focus-visible {
+    border-color: var(--primary);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+.textarea {
+  resize: vertical;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-3);
+
+  button {
+    height: 28px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+
+    &[aria-pressed='true'] {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
+    }
+  }
+}
+
+/* ---------- Badges, chips, callouts ---------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--surface-3);
+  color: var(--text-muted);
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.8;
+  }
+
+  &.valid {
+    background: var(--success-soft);
+    color: var(--success);
+  }
+
+  &.invalid {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+
+  &.active {
+    background: var(--warning-soft);
+    color: var(--warning);
+  }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+
+  strong {
+    font-size: 14px;
+    color: var(--text);
+  }
+}
+
+.callout {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--info);
+  border-radius: var(--radius-sm);
+  background: var(--info-soft);
+  color: var(--text);
+  font-size: 13px;
+
+  &--warning {
+    border-left-color: var(--warning);
+    background: var(--warning-soft);
+  }
+
+  &--danger {
+    border-left-color: var(--danger);
+    background: var(--danger-soft);
+  }
+}
+
+.panel {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.panel-title {
+  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+
+  th,
+  td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+}
+
+.event-log {
+  max-height: 220px;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+
+  li {
+    display: flex;
+    gap: 8px;
+    padding: 6px 8px;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  time {
+    color: var(--text-subtle);
+  }
+}
+
+/* ---------- Query builder theming ----------
+   Maps the library's --qb-* custom properties to the demo design tokens so the
+   component follows the light/dark theme. The `.app-shell` prefix gives these
+   rules enough specificity to override the component's :host defaults. */
+
+.app-shell query-builder {
+  --qb-font-family: var(--font-sans);
+  --qb-font-size: 13px;
+  --qb-border-radius: var(--radius-sm);
+  --qb-border-color: var(--border-strong);
+  --qb-text-color: var(--text);
+  --qb-bg-color: var(--surface);
+  --qb-hover-bg: var(--surface-3);
+  --qb-switch-bg: var(--surface-3);
+  --qb-switch-active-border: var(--primary);
+  --qb-switch-active-color: var(--primary);
+  --qb-remove-color: var(--danger);
+  --qb-invalid-border: var(--danger);
+  --qb-invalid-bg: var(--danger-soft);
+  --qb-warning-color: var(--danger);
+  --qb-connector-color: var(--border-strong);
+
+  color: var(--text);
+
+  .q-rule,
+  .q-ruleset {
+    border-color: var(--border);
+    border-radius: var(--radius-sm);
+  }
+
+  .q-ruleset {
+    background: var(--surface-2);
+  }
+
+  .q-button,
+  .q-switch-label {
+    border-color: var(--border-strong);
+    color: var(--text);
+  }
+
+  .q-button {
+    border-radius: var(--radius-sm);
+  }
+
+  .q-switch-radio:checked + .q-switch-label {
+    background: var(--primary-soft);
+    font-weight: 600;
+  }
+
+  .q-remove-icon::before {
+    content: '✕';
+    font-weight: 700;
+  }
+
+  .q-add-icon::before {
+    content: '+';
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .text-input {
+    padding: 6px 8px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+  }
+
+  .text-area {
+    width: 300px;
+    height: 72px;
+    resize: vertical;
+  }
+}

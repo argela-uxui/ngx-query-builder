@@ -1,0 +1,231 @@
+.styling-controls {
+  align-items: flex-end;
+}
+
+.styling-demo .segmented button,
+.styling-controls .segmented button {
+  text-transform: capitalize;
+}
+
+// ---------- Colour themes (CSS custom properties) ----------
+// `.app-shell` raises specificity above the demo-wide mapping in styles.scss.
+
+.app-shell .styling-demo--ocean query-builder {
+  --qb-border-color: #7dd3fc;
+  --qb-switch-active-border: #0284c7;
+  --qb-switch-active-color: #0369a1;
+  --qb-switch-bg: #e0f2fe;
+  --qb-connector-color: #38bdf8;
+  --qb-border-radius: 8px;
+}
+
+.app-shell .styling-demo--forest query-builder {
+  --qb-border-color: #86efac;
+  --qb-switch-active-border: #16a34a;
+  --qb-switch-active-color: #15803d;
+  --qb-switch-bg: #dcfce7;
+  --qb-connector-color: #4ade80;
+  --qb-border-radius: 2px;
+}
+
+.app-shell .styling-demo--sunset query-builder {
+  --qb-border-color: #fdba74;
+  --qb-switch-active-border: #ea580c;
+  --qb-switch-active-color: #c2410c;
+  --qb-switch-bg: #ffedd5;
+  --qb-connector-color: #fb923c;
+  --qb-border-radius: 16px;
+}
+
+.app-shell .styling-demo:is(.styling-demo--ocean, .styling-demo--forest, .styling-demo--sunset) query-builder {
+  .q-rule,
+  .q-ruleset,
+  .q-field-control,
+  .q-operator-control,
+  .q-input-control,
+  .q-button,
+  .q-switch-label {
+    border-color: var(--qb-border-color);
+    border-radius: var(--qb-border-radius);
+  }
+
+  .q-switch-radio:checked + .q-switch-label {
+    background: var(--qb-switch-bg);
+    color: var(--qb-switch-active-color);
+    border-color: var(--qb-switch-active-border);
+  }
+}
+
+// ---------- classNames preset: "cards" ----------
+
+.styling-demo {
+  .sd-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 30px;
+    margin-left: 6px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--primary);
+    color: var(--primary-contrast);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:disabled {
+      display: none;
+    }
+  }
+
+  .sd-btn--remove {
+    width: 30px;
+    padding: 0;
+    justify-content: center;
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+
+  .sd-icon--add::before {
+    content: '+';
+  }
+
+  .sd-icon--remove::before {
+    content: '✕';
+  }
+
+  .sd-icon {
+    font-style: normal;
+  }
+
+  .sd-switch {
+    display: inline-flex;
+    order: 1;
+    gap: 4px;
+  }
+
+  .sd-switch__label {
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: var(--surface-3);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .q-switch-radio:checked + .sd-switch__label {
+    background: var(--primary);
+    color: var(--primary-contrast);
+  }
+
+  .sd-row {
+    margin-top: 10px;
+    padding: 12px;
+  }
+
+  .sd-rule {
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  .sd-ruleset {
+    border: 2px dashed var(--border-strong);
+    border-radius: 14px;
+    background: var(--surface-2);
+  }
+
+  .sd-control {
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--text);
+    font: inherit;
+  }
+
+  input[type='checkbox'].sd-control {
+    height: 18px;
+  }
+
+  .sd-control--operator {
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  .sd-empty {
+    margin: 8px 0 0;
+    color: var(--warning);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  // ---------- classNames preset: "minimal" ----------
+
+  .sd-link {
+    margin-left: 10px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--primary);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:disabled {
+      display: none;
+    }
+  }
+
+  .sd-link--remove {
+    color: var(--danger);
+  }
+
+  .sd-underline {
+    padding: 2px 8px;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .q-switch-radio:checked + .sd-underline {
+    border-bottom-color: var(--primary);
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  .sd-flat {
+    border: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sd-flat-set {
+    border-left: 3px solid var(--primary);
+    padding-left: 12px;
+  }
+
+  .sd-bare {
+    height: 30px;
+    margin-right: 6px;
+    padding: 0 4px;
+    border: 0;
+    border-bottom: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+  }
+
+  .sd-bare--operator {
+    color: var(--primary);
+    font-weight: 600;
+  }
+}

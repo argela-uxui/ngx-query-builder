@@ -1,0 +1,107 @@
+<app-page-header
+  eyebrow="Interactive playground"
+  title="ngx-query-builder Demo"
+  description="Build a query, flip component inputs and config options on the right, and watch the form value, validity and generated queries update live."
+  [apis]="['<query-builder>', 'ControlValueAccessor', 'Validator', '*queryInput']" />
+
+<div class="playground">
+  <div class="playground__main">
+    <app-demo-card heading="Query builder" description="Bound to a reactive FormControl — the root and every nested ruleset.">
+      <div cardActions class="row">
+        <span class="stat" data-testid="stat-rules"><strong>{{ stats().rules }}</strong> rules</span>
+        <span class="stat" data-testid="stat-rulesets"><strong>{{ stats().rulesets }}</strong> rulesets</span>
+        <span class="stat" data-testid="stat-depth"><strong>{{ stats().depth }}</strong> depth</span>
+      </div>
+
+      <div data-testid="query-builder">
+        <query-builder [formControl]="queryCtrl" [config]="currentConfig()" [allowRuleset]="allowRuleset()"
+          [allowCollapse]="allowCollapse()" [persistValueOnFieldChange]="persistValueOnFieldChange()"
+          [dragDropRules]="dragDropRules()" [emptyMessage]="emptyMessage()"
+          [translations]="translations()">
+          <ng-container *queryInput="let rule; type: 'textarea'; let onChange=onChange; let getDisabledState=getDisabledState">
+            <textarea class="text-input text-area" [(ngModel)]="rule.value" (ngModelChange)="onChange()" [disabled]="getDisabledState()"
+              placeholder="Custom Textarea" data-testid="custom-textarea" aria-label="Notes"></textarea>
+          </ng-container>
+        </query-builder>
+      </div>
+    </app-demo-card>
+
+    <app-demo-card heading="Output" description="Live form value and conversions generated from it." [tabs]="outputTabs()">
+      <div class="json-output">
+        <div class="json-output__header"><span class="panel-title">Current RuleSet</span><span class="chip">live</span></div>
+        <pre class="json-output__pre" data-testid="query-output">{{ queryCtrl.value | json }}</pre>
+      </div>
+      <div class="status-row">
+        <span class="badge" [class.valid]="queryCtrl.valid" [class.invalid]="!queryCtrl.valid" data-testid="badge-valid">{{ queryCtrl.valid ? 'Valid' : 'Invalid' }}</span>
+        <span class="badge" [class.active]="queryCtrl.touched" data-testid="badge-touched">{{ queryCtrl.touched ? 'Touched' : 'Untouched' }}</span>
+        <span class="badge" [class.active]="queryCtrl.dirty" data-testid="badge-dirty">{{ queryCtrl.dirty ? 'Dirty' : 'Pristine' }}</span>
+        <span class="badge" [class.active]="queryCtrl.disabled" data-testid="badge-status">{{ queryCtrl.status }}</span>
+      </div>
+      @if (queryCtrl.errors) {
+        <div class="callout callout--danger errors" data-testid="form-errors">
+          <div>
+            <strong>Validation errors</strong>
+            <pre>{{ errorsJson() }}</pre>
+          </div>
+        </div>
+      }
+    </app-demo-card>
+  </div>
+
+  <aside class="playground__panel" aria-label="Properties">
+    <section class="panel controls">
+      <h2 class="panel-title">Component inputs</h2>
+      <div class="stack-sm">
+        <app-toggle label="Allow Ruleset" hint="[allowRuleset]" testId="toggle-allow-ruleset"
+          [checked]="allowRuleset()" (checkedChange)="allowRuleset.set($event)" />
+        <app-toggle label="Allow Collapse" hint="[allowCollapse]" testId="toggle-allow-collapse"
+          [checked]="allowCollapse()" (checkedChange)="allowCollapse.set($event)" />
+        <app-toggle label="Persist Value on Field Change" hint="[persistValueOnFieldChange]" testId="toggle-persist-value"
+          [checked]="persistValueOnFieldChange()" (checkedChange)="persistValueOnFieldChange.set($event)" />
+        <app-toggle label="Drag-Drop Rules" hint="[dragDropRules]" testId="toggle-drag-drop-rules"
+          [checked]="dragDropRules()" (checkedChange)="dragDropRules.set($event)" />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="language-select">Language <code>[translations]</code></label>
+        <select id="language-select" class="select" data-testid="language-select" [ngModel]="language()"
+          (ngModelChange)="changeLanguage($event)">
+          <option value="en">English</option>
+          <option value="tr">Turkce</option>
+          <option value="none">None (built-in defaults)</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="empty-message-input">Empty message <code>[emptyMessage]</code></label>
+        <input id="empty-message-input" class="input" data-testid="empty-message-input" [ngModel]="emptyMessage()"
+          (ngModelChange)="emptyMessage.set($event)" [disabled]="language() !== 'none'" />
+        <span class="form-hint">Used only when no translations are provided.</span>
+      </div>
+    </section>
+
+    <section class="panel controls">
+      <h2 class="panel-title">Config</h2>
+      <div class="stack-sm">
+        <app-toggle label="Entity Mode" hint="config.entities" testId="toggle-entity-mode"
+          [checked]="entityMode()" (checkedChange)="entityMode.set($event)" />
+        <app-toggle label="Allow Empty Rulesets" hint="config.allowEmptyRulesets" testId="toggle-allow-empty-rulesets"
+          [checked]="allowEmptyRulesets()" (checkedChange)="setAllowEmptyRulesets($event)" />
+      </div>
+    </section>
+
+    <section class="panel controls">
+      <h2 class="panel-title">Form control</h2>
+      <app-toggle label="Disabled" hint="formControl.disable()" testId="toggle-disabled"
+        [checked]="disabled()" (checkedChange)="setDisabled($event)" />
+      <div class="row">
+        <button type="button" class="btn btn--sm" data-testid="reset-query" (click)="resetQuery()">
+          <app-icon name="refresh" [size]="14" /> Reset
+        </button>
+        <button type="button" class="btn btn--sm btn--danger" data-testid="clear-query" (click)="clearQuery()">
+          <app-icon name="trash" [size]="14" /> Clear all
+        </button>
+      </div>
+    </section>
+  </aside>
+</div>

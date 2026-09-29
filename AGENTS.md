@@ -8,7 +8,7 @@ Angular 21 library (`ngx-query-builder`) — a standalone, signal-based query bu
 
 - **Library source:** `projects/ngx-query-builder/src/lib/` — single component (`QueryBuilderComponent`) + 9 template directives (e.g. `QueryInputDirective`, `QueryFieldDirective`).
 - **Public API:** `projects/ngx-query-builder/src/public-api.ts` — re-exports everything. `QueryBuilderModule` exists only for NgModule backward-compat; the component is standalone.
-- **Demo app:** `demo/src/app/app.component.ts` — standalone component importing `QueryBuilderModule`, wired with `FormControl`. Used as the target for e2e tests.
+- **Demo app:** `demo/src/app/` — routed standalone application with an accessible sidebar, theme service, a live playground at `/`, and 13 lazy-loaded feature examples. Shared demo components and sample query formatters are in `demo/src/app/shared/`. Used as the target for e2e tests.
 - **Recursive rendering:** `QueryBuilderComponent` renders nested `<query-builder>` for child rulesets, passing parent templates and callbacks via `parentXxxTemplate` signal inputs. Context objects are cached per `Rule` instance in `Map` caches and invalidated on field/rule changes.
 - **Radio group isolation:** Each component instance auto-generates a unique `componentId` from a `private static nextComponentId` counter (`qb-0`, `qb-1`, …). From this, `switchGroupId` (`qb-N-switch`), `andOptionId` (`qb-N-and`), and `orOptionId` (`qb-N-or`) are derived and used as `name`, `id`, and `for` attributes on the AND/OR radio buttons and labels. This ensures nested `<query-builder>` instances don't interfere with each other's radio selection.
 - **Data model:** `RuleSet` (recursive tree of `condition` + `rules: (Rule | RuleSet)[]`) defined in `query-builder.interfaces.ts`. The component mutates this tree in-place and notifies via CVA callbacks.
@@ -37,7 +37,7 @@ Angular 21 library (`ngx-query-builder`) — a standalone, signal-based query bu
 ## Testing Patterns
 
 - **Unit tests** (Jest): `projects/ngx-query-builder/src/**/*.spec.ts`. Use `TestBed.createComponent(QueryBuilderComponent)` directly; set signal inputs via `fixture.componentRef.setInput('config', ...)`. Shared `createComponent()` helper and `baseConfig` fixture at the top of the spec file.
-- **E2E tests** (Playwright): `e2e/*.spec.ts`. All specs use a shared **Page Object** (`e2e/demo.page.ts` → `DemoPage` class) with typed locator helpers. Demo elements use `data-testid` attributes; query-builder internals use CSS class selectors (`.q-field-control`, `.q-operator-control`, `.q-remove-button`).
+- **E2E tests** (Playwright): `e2e/*.spec.ts`. All specs use a shared **Page Object** (`e2e/demo.page.ts` → `DemoPage` class) with typed locator helpers. Demo elements use `data-testid` attributes; query-builder internals use CSS class selectors (`.q-field-control`, `.q-operator-control`, `.q-remove-button`). `examples.spec.ts` covers the example routes.
 - **E2E output assertions:** capture output text before action with `demo.getOutputText()`, then `demo.waitForOutputChange(prevText)` after mutation — avoids flaky timing issues.
 
 ## Key Files
@@ -49,7 +49,10 @@ Angular 21 library (`ngx-query-builder`) — a standalone, signal-based query bu
 | Template (HTML) | `projects/ngx-query-builder/src/lib/query-builder/query-builder.component.html` |
 | Unit tests | `projects/ngx-query-builder/src/lib/query-builder/query-builder.component.spec.ts` |
 | E2E Page Object | `e2e/demo.page.ts` |
-| Demo app | `demo/src/app/app.component.ts` |
+| Demo shell | `demo/src/app/app.component.ts` |
+| Demo routes/navigation | `demo/src/app/app.routes.ts`, `demo/src/app/navigation.ts` |
+| Playground | `demo/src/app/playground/playground.component.ts` |
+| Demo shared components | `demo/src/app/shared/` |
+| Demo examples | `demo/src/app/examples/` |
 | Library package.json | `projects/ngx-query-builder/package.json` |
 | TSConfig paths | `tsconfig.json` (`"ngx-query-builder"` → `public-api.ts`) |
-

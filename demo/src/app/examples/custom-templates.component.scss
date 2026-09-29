@@ -1,0 +1,149 @@
+// Styles for elements rendered through custom templates. The templates are
+// declared in this component, so emulated encapsulation applies to them.
+
+.directives {
+  margin: 0;
+
+  dt {
+    margin-top: 10px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  dd {
+    margin: 2px 0 0;
+  }
+}
+
+.c-switch {
+  display: inline-flex;
+  order: 1;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface-3);
+
+  button {
+    height: 28px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &[aria-pressed='true'] {
+      background: var(--primary);
+      color: var(--primary-contrast);
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+}
+
+.c-actions {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.c-arrow {
+  display: inline-block;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--primary);
+}
+
+.c-select,
+.c-input {
+  height: 34px;
+  margin-right: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+
+  &:focus-visible {
+    border-color: var(--primary);
+  }
+}
+
+.c-select--entity {
+  background: var(--primary-soft);
+  border-color: transparent;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.c-select--operator {
+  background: var(--surface-3);
+  border-color: transparent;
+}
+
+.c-input--number {
+  width: 110px;
+}
+
+.c-chips {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  button {
+    height: 30px;
+    padding: 0 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+
+    &[aria-checked='true'] {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 600;
+    }
+  }
+}
+
+.c-bool {
+  min-width: 64px;
+  height: 32px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface-3);
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  &--on {
+    border-color: var(--success);
+    background: var(--success-soft);
+    color: var(--success);
+  }
+}
+
+.c-remove {
+  width: 32px;
+  height: 32px;
+
+  &:hover:not(:disabled) {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+}
+
+.c-empty {
+  margin: 8px 0 0;
+}

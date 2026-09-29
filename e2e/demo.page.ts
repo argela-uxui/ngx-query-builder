@@ -18,6 +18,27 @@ export class DemoPage {
     await expect(this.page.locator('select.q-field-control')).toHaveCount(10);
   }
 
+  /** Navigate directly to an example route and wait for its builder to render. */
+  async gotoExample(slug: string): Promise<void> {
+    await this.page.goto(`/examples/${slug}`);
+    await expect(this.exampleBuilder().locator('query-builder').first()).toBeVisible();
+  }
+
+  /** Sidebar link for the specified example slug. */
+  sidebarLink(slug: string): Locator {
+    return this.page.locator(`[data-testid="nav-${slug}"]`);
+  }
+
+  /** Theme toggle in the application top bar. */
+  themeToggle(): Locator {
+    return this.page.locator('[data-testid="theme-toggle"]');
+  }
+
+  /** Main live builder wrapper on an example route. */
+  exampleBuilder(): Locator {
+    return this.page.locator('[data-testid="example-builder"]');
+  }
+
   /** Click "Add Rule" and wait for the new rule row to appear in the DOM. */
   async addRule(): Promise<void> {
     const before = await this.fieldSelects().count();

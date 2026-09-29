@@ -34,7 +34,7 @@ projects/ngx-query-builder/src/
 - **Radio group isolation:** Each component instance auto-generates a unique `componentId` from a `private static nextComponentId` counter (`qb-0`, `qb-1`, …). From this, `switchGroupId` (`qb-N-switch`), `andOptionId` (`qb-N-and`), and `orOptionId` (`qb-N-or`) are derived and used as `name`, `id`, and `for` attributes on the AND/OR radio buttons and labels. This ensures nested `<query-builder>` instances don't interfere with each other's radio selection.
 - **Data model:** `RuleSet` is a recursive tree of `condition` + `rules: (Rule | RuleSet)[]`. The component mutates this tree in-place and notifies via CVA callbacks.
 - **Context caching:** Template context objects are cached per `Rule` instance in `Map` caches and invalidated on field/rule changes.
-- **Demo app:** `demo/src/app/app.component.ts` — standalone component importing `QueryBuilderModule`, used as the E2E test target.
+- **Demo app:** `demo/src/app/` — routed standalone app with an accessible sidebar, light/dark ThemeService, Playground route `/`, and 13 lazy-loaded feature example routes. Shared cards, controls, sample configs, and demo-only query converters live in `demo/src/app/shared/`.
 
 ## Commands
 
@@ -87,6 +87,7 @@ projects/ngx-query-builder/src/
 ### E2E Tests (Playwright)
 - **Location:** `e2e/*.spec.ts`
 - **Page Object:** `e2e/demo.page.ts` → `DemoPage` class with typed locator helpers.
+- **Example route coverage:** `e2e/examples.spec.ts` smoke-tests all examples and adds targeted feature checks.
 - **Selectors:** Demo elements use `data-testid` attributes; query-builder internals use CSS class selectors (`.q-field-control`, `.q-operator-control`, `.q-remove-button`).
 - **Output assertions:** Capture output text before action with `demo.getOutputText()`, then `demo.waitForOutputChange(prevText)` after mutation — avoids flaky timing issues.
 - **Structure:** Each spec file focuses on one feature area (rules, conditions, controls, field-operator, input-types, output, page-load, validation).
@@ -101,7 +102,11 @@ projects/ngx-query-builder/src/
 | Unit tests | `projects/ngx-query-builder/src/lib/query-builder/query-builder.component.spec.ts` |
 | Public API | `projects/ngx-query-builder/src/public-api.ts` |
 | NgModule (compat) | `projects/ngx-query-builder/src/lib/ngx-query-builder.module.ts` |
-| Demo app | `demo/src/app/app.component.ts` |
+| Demo shell | `demo/src/app/app.component.ts` |
+| Demo routes/navigation | `demo/src/app/app.routes.ts`, `demo/src/app/navigation.ts` |
+| Playground | `demo/src/app/playground/playground.component.ts` |
+| Demo shared components | `demo/src/app/shared/` |
+| Demo examples | `demo/src/app/examples/` |
 | E2E Page Object | `e2e/demo.page.ts` |
 | Jest config | `jest.config.ts` |
 | Playwright config | `playwright.config.ts` |
@@ -364,4 +369,3 @@ npm run build     # Library builds cleanly
 - Commands table matches `package.json` scripts.
 - Interface documentation matches `query-builder.interfaces.ts`.
 - No broken internal links or references to removed features.
-

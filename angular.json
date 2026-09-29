@@ -64,7 +64,7 @@
                 "output": ""
               }
             ],
-            "styles": ["demo/src/styles.css"],
+            "styles": ["demo/src/styles.scss"],
             "scripts": []
           },
           "configurations": {

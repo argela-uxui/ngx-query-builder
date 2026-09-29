@@ -1,68 +1,71 @@
-# ngx-query-builder — Demo App
+# ngx-query-builder Demo
 
-A standalone Angular 19 application showcasing the `ngx-query-builder` library. The demo provides a live, interactive query builder with JSON output displayed in real time.
+An Angular 21 application for exploring the `ngx-query-builder` component. It uses a responsive application shell, light/dark themes, a live playground, and 13 focused examples. The component is backed by reactive forms throughout the examples, with a few template-driven examples to show both forms APIs.
 
-## Features Demonstrated
+## Run locally
 
-- **ReactiveFormsModule** integration — query bound to a `FormControl`
-- **Entity mode** — fields filtered by selected entity
-- **Allow collapse** — rulesets can be collapsed/expanded with animation
-- **Persist value on field change** — values are preserved when switching between compatible field types
-- **Disabled state** — toggling the entire query builder on/off
-- **Custom textarea input** — overriding the default text input with a `<textarea>` via `*queryInput` template
-- **All input types** — string, number, date, time, category, multiselect, boolean
-- **Nullable fields** — operators `is null` / `is not null` hide the value input
-- **Live JSON output** — rendered below the query builder as pretty-printed JSON
-
-## Development Server
+From the repository root:
 
 ```bash
-# From the workspace root:
+npm ci
 npm start
-# or
-npx ng serve demo
 ```
 
-Navigate to `http://localhost:4200/`. The app auto-reloads on file changes.
+Open `http://localhost:4200/`. The library is loaded from the workspace source through the TypeScript path mapping. Choose the theme with the top-right button; the selection is saved locally.
 
-## Build
+Build the demo independently with:
 
 ```bash
 npx ng build demo
 ```
 
-Build artifacts are written to `dist/demo/`.
+Build output is written to `demo/dist/demo/` and is ignored by git.
 
-## End-to-End Tests (Playwright)
+## Playground (`/`)
 
-The demo app is covered by a Playwright e2e test suite in `e2e/`.
+The main playground keeps the existing 10-rule sample query and stable `data-testid` selectors used by the E2E suite. The builder is paired with live controls for:
+
+- `allowRuleset`, `allowCollapse`, `persistValueOnFieldChange`, `dragDropRules`, `emptyMessage`, and translations
+- Entity mode and `config.allowEmptyRulesets`
+- FormControl disabled state, reset, clear, validity, touched/dirty status, and rule/ruleset counts
+- Live RuleSet JSON, SQL, MongoDB, readable text, and a template snippet
+
+## Examples
+
+| Route | Demonstrates |
+|---|---|
+| `/examples/basic` | `ngModel` and reactive `FormControl` |
+| `/examples/field-types` | Built-in types, defaults, nullable fields, custom textarea and rating inputs |
+| `/examples/entities` | Entity-filtered fields and `Entity.defaultField` |
+| `/examples/operators` | Built-in and field operators, `operatorMap`, `getOperators`, operator labels |
+| `/examples/validation` | `Field.validator`, `allowEmptyRulesets`, inline and form-level errors |
+| `/examples/callbacks` | `getInputType`, `getOptions`, CRUD callbacks, coercion and field-change callbacks |
+| `/examples/custom-templates` | All nine structural template directives |
+| `/examples/styling` | `classNames` presets and `--qb-*` CSS custom properties |
+| `/examples/localization` | English, Turkish and German translations; `emptyMessage` |
+| `/examples/nested` | Recursive groups, `allowCollapse`, `allowRuleset`, and initial collapse state |
+| `/examples/drag-drop` | Reordering and moving rules between nested groups |
+| `/examples/disabled` | Reactive/template-driven disabled state, preset queries and JSON import |
+| `/examples/query-conversion` | Demo-only SQL, MongoDB and readable-text conversions; share query state in the URL |
+
+Each route is lazy-loaded and includes a live builder with configuration, template, or output code tabs as appropriate.
+
+## E2E tests
+
+Playwright tests live in the repository-level `e2e/` folder:
 
 ```bash
-# Run all e2e tests (starts dev server automatically)
 npm run e2e
-
-# Open Playwright interactive UI
 npm run e2e:ui
-
-# View the last HTML test report
 npm run e2e:report
 ```
 
-Test files:
+The Playwright web server starts `ng serve demo` automatically. Install Chromium once with `npx playwright install chromium` if it is not already present.
 
-| File | Coverage |
-|------|----------|
-| `e2e/page-load.spec.ts` | Page renders, title, output, badges |
-| `e2e/condition.spec.ts` | AND/OR condition toggle (root + nested) |
-| `e2e/rules.spec.ts` | Add/remove rules & rulesets, allowRuleset toggle |
-| `e2e/input-types.spec.ts` | All 8 input types + nullable operator |
-| `e2e/field-operator.spec.ts` | Field changes operators; operator shows/hides input |
-| `e2e/controls.spec.ts` | Entity mode, disabled, collapse, persist value |
-| `e2e/validation.spec.ts` | Valid/invalid/touched badges, empty ruleset warning |
-| `e2e/output.spec.ts` | Live JSON output updates correctly |
+## Adding an example
 
-## Notes
+1. Create a standalone component in `demo/src/app/examples/`, using the `app-` selector prefix, OnPush change detection, and the shared `DemoCardComponent` / `PageHeaderComponent`.
+2. Add a lazy `DemoNavItem` in `demo/src/app/navigation.ts`; `app.routes.ts` creates a route for each navigation item.
+3. Add a route smoke test to `e2e/examples.spec.ts` if it introduces an independently addressable example.
 
-- The demo has **no unit tests** — it exists solely to showcase the library
-- Playwright uses Chromium headless; run `npx playwright install chromium` if browsers aren't installed
-- The `webServer` config in `playwright.config.ts` auto-starts `ng serve demo` before tests run
+Shared example configs, translations, JSON tracking, and query formatters are in `demo/src/app/shared/`.

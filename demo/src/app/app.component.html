@@ -1,0 +1,54 @@
+<div class="app-shell" [class.app-shell--nav-open]="navOpen()">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="topbar">
+    <button type="button" class="icon-btn topbar__menu" (click)="toggleNav()"
+      [attr.aria-expanded]="navOpen()" aria-controls="app-sidebar" aria-label="Toggle navigation">
+      <app-icon name="menu" [size]="20" />
+    </button>
+
+    <a routerLink="/" class="brand" (click)="closeNav()">
+      <span class="brand__logo" aria-hidden="true"><app-icon name="sliders" [size]="18" /></span>
+      <span class="brand__name">ngx-query-builder</span>
+      <span class="brand__version" data-testid="library-version">v{{ version }}</span>
+    </a>
+
+    <span class="topbar__spacer"></span>
+
+    <a class="topbar__link" [href]="repoUrl" target="_blank" rel="noopener noreferrer">
+      <app-icon name="github" [size]="18" />
+      <span class="topbar__link-text">GitHub</span>
+    </a>
+    <button type="button" class="icon-btn" data-testid="theme-toggle" (click)="theme.toggle()"
+      [attr.aria-label]="theme.theme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
+      [attr.aria-pressed]="theme.theme() === 'dark'">
+      <app-icon [name]="theme.theme() === 'dark' ? 'sun' : 'moon'" [size]="18" />
+    </button>
+  </header>
+
+  <nav id="app-sidebar" class="sidebar" aria-label="Demo navigation" data-testid="sidebar">
+    @for (group of navGroups; track group.label) {
+      <div class="sidebar__group">
+        <p class="sidebar__group-label">{{ group.label }}</p>
+        <ul class="sidebar__list">
+          @for (item of group.items; track item.slug) {
+            <li>
+              <a class="sidebar__link" [routerLink]="'/' + item.path" routerLinkActive="is-active"
+                [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page"
+                [attr.data-testid]="'nav-' + item.slug" (click)="closeNav()">
+                <app-icon [name]="item.icon" />
+                <span>{{ item.label }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </nav>
+
+  <button type="button" class="scrim" aria-label="Close navigation" tabindex="-1" (click)="closeNav()"></button>
+
+  <main id="main-content" class="content" tabindex="-1">
+    <router-outlet />
+  </main>
+</div>

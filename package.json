@@ -1,5 +1,5 @@
 {
-  "name": "@Yildiray-Meric_argelatk/ngx-query-builder",
+  "name": "ngx-query-builder",
   "version": "21.0.0",
   "description": "A modernized Angular query builder component — Angular 21, standalone, signals",
   "license": "MIT",
@@ -20,12 +20,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Yildiray-Meric_argelatk/ngx-query-builder.git"
+    "url": "git+https://github.com/argela-uxui/ngx-query-builder.git"
   },
   "bugs": {
-    "url": "https://github.com/Yildiray-Meric_argelatk/ngx-query-builder/issues"
+    "url": "https://github.com/argela-uxui/ngx-query-builder/issues"
   },
-  "homepage": "https://github.com/Yildiray-Meric_argelatk/ngx-query-builder#readme",
+  "homepage": "https://github.com/argela-uxui/ngx-query-builder#readme",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },

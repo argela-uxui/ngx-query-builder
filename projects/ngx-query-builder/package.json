@@ -1,5 +1,5 @@
 {
-  "name": "@Yildiray-Meric_argelatk/ngx-query-builder",
+  "name": "ngx-query-builder",
   "version": "21.0.0",
   "peerDependencies": {
     "@angular/cdk": ">=21.0.0",

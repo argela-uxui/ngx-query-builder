@@ -35,12 +35,11 @@ jobs:
         run: npm ci
 
       - name: Build demo
-        run: npx ng build demo --configuration production --base-href /ngx-query-builder/
+        run: npx ng build demo --configuration production --base-href /qbdemo/
 
       - name: Prepare GitHub Pages files
         run: |
           cp demo/dist/demo/browser/index.html demo/dist/demo/browser/404.html
-          touch demo/dist/demo/browser/.nojekyll
 
       - name: Deploy to argela-uxui.github.io
         uses: JamesIves/github-pages-deploy-action@v4

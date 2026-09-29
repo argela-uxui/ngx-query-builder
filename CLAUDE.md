@@ -107,6 +107,7 @@ projects/ngx-query-builder/src/
 | Playground | `demo/src/app/playground/playground.component.ts` |
 | Demo shared components | `demo/src/app/shared/` |
 | Demo examples | `demo/src/app/examples/` |
+| Operational documentation | `docs/README.md`, `docs/npm-publishing.md`, `docs/demo-deployment.md` |
 | E2E Page Object | `e2e/demo.page.ts` |
 | Jest config | `jest.config.ts` |
 | Playwright config | `playwright.config.ts` |

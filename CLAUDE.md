@@ -2,9 +2,9 @@
 
 ## Project Overview
 
-`ngx-query-builder` is an Angular 21 library providing a standalone, signal-based query builder component with `ControlValueAccessor` support. Forked from `angular2-query-builder`, it has been modernized to use `input()`, `contentChild()`, `contentChildren()`, `inject()`, OnPush change detection, and `@if`/`@for`/`@switch`/`@let` template control flow.
+`ngx-query-builder` is an Angular 22 library providing a standalone, signal-based query builder component with `ControlValueAccessor` support. Forked from `angular2-query-builder`, it has been modernized to use `input()`, `contentChild()`, `contentChildren()`, `inject()`, OnPush change detection, and `@if`/`@for`/`@switch`/`@let` template control flow.
 
-**Tech stack:** Angular 21 · TypeScript 5.9 · Jest 30 · Playwright 1.59 · ng-packagr · ESLint (flat config)
+**Tech stack:** Angular 22 · TypeScript 6.0 · Jest 30 · Playwright 1.59 · ng-packagr · ESLint (flat config)
 
 ## Architecture
 

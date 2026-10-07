@@ -1,6 +1,6 @@
 # ngx-query-builder
 
-Angular 21 library workspace for `@argela-uxui/ngx-query-builder`, a standalone query-builder component with Angular forms integration. This repository contains the library, a demo application, and Jest and Playwright tests. It is a fork of [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-QueryBuilder).
+Angular 22 library workspace for `@argela-uxui/ngx-query-builder`, a standalone query-builder component with Angular forms integration. This repository contains the library, a demo application, and Jest and Playwright tests. It is a fork of [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-QueryBuilder).
 
 **Looking to use the library in an application?** See the [package usage documentation](projects/ngx-query-builder/README.md) for installation, examples, configuration, custom templates, and the public API. This README covers developing, building, and releasing the project.
 
@@ -20,7 +20,7 @@ The Angular CLI project is named `ngx-query-builder`, but the package built from
 
 ## Development installation
 
-Use Node.js `^20.19.0`, `^22.12.0`, or `>=24.0.0` (as required by the installed Angular CLI), plus npm. From the repository root:
+Use Node.js `^22.22.3`, `^24.15.0`, or `>=26.0.0` (as required by Angular 22), plus npm. From the repository root:
 
 ```bash
 npm ci

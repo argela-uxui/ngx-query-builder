@@ -1,8 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
-    "ignoreDeprecations": "5.0",
     "outDir": "./out-tsc/app",
     "strict": true,
     "noImplicitOverride": true,
@@ -19,7 +17,7 @@
     "typeRoots": ["node_modules/@types"],
     "skipLibCheck": true,
     "paths": {
-      "ngx-query-builder": ["projects/ngx-query-builder/src/public-api.ts"]
+      "ngx-query-builder": ["./projects/ngx-query-builder/src/public-api.ts"]
     }
   },
   "angularCompilerOptions": {

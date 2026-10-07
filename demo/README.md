@@ -1,6 +1,6 @@
 # ngx-query-builder Demo
 
-An Angular 21 application for exploring the `ngx-query-builder` component. It uses a responsive application shell, light/dark themes, a live playground, and 13 focused examples. The component is backed by reactive forms throughout the examples, with a few template-driven examples to show both forms APIs.
+An Angular 22 application for exploring the `ngx-query-builder` component. It uses a responsive application shell, light/dark themes, a live playground, and 13 focused examples. The component is backed by reactive forms throughout the examples, with a few template-driven examples to show both forms APIs.
 
 ## Run locally
 

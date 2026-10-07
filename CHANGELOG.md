@@ -11,6 +11,7 @@ All notable changes to this project are documented in this file.
 - Dedicated TypeScript configuration files to improve IDE support in JetBrains/WebStorm.
 
 ### Changed
+- Upgraded the workspace and library metadata to Angular 22.
 - Refined event handling and lint configuration in line with Angular 21 conventions.
 - Updated TypeScript and deprecation-related compiler settings.
 - Refactored query builder and query value typings for stricter type safety.

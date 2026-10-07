@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Angular 21 library (`ngx-query-builder`) — a standalone, signal-based query builder component with `ControlValueAccessor` support. Forked from `angular2-query-builder`, modernized to use `input()`, `contentChild()`, `contentChildren()`, `inject()`, OnPush, and `@if`/`@for` control flow.
+Angular 22 library (`ngx-query-builder`) — a standalone, signal-based query builder component with `ControlValueAccessor` support. Forked from `angular2-query-builder`, modernized to use `input()`, `contentChild()`, `contentChildren()`, `inject()`, OnPush, and `@if`/`@for` control flow.
 
 ## Architecture
 

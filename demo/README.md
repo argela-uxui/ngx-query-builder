@@ -42,6 +42,7 @@ The main playground keeps the existing 10-rule sample query and stable `data-tes
 | `/examples/callbacks` | `getInputType`, `getOptions`, CRUD callbacks, coercion and field-change callbacks |
 | `/examples/custom-templates` | All nine structural template directives |
 | `/examples/styling` | `classNames` presets and `--qb-*` CSS custom properties |
+| `/examples/theme-builder` | Live editor for all `--qb-*` variables and `QueryBuilderClassNames`, editable code and saved themes |
 | `/examples/localization` | English, Turkish and German translations; `emptyMessage` |
 | `/examples/nested` | Recursive groups, `allowCollapse`, `allowRuleset`, and initial collapse state |
 | `/examples/drag-drop` | Reordering and moving rules between nested groups |

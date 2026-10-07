@@ -66,7 +66,7 @@ Below is the step-by-step walkthrough of what the deployment job executes:
 - name: Setup Node.js
   uses: actions/setup-node@v4
   with:
-    node-version: 22
+    node-version: 24.15.0
     cache: npm
 
 - name: Install dependencies

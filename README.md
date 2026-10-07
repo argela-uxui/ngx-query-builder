@@ -1,6 +1,6 @@
 # ngx-query-builder
 
-Angular 21 library workspace for `@argela-uxui/ngx-query-builder`, a standalone query-builder component with Angular forms integration. This repository contains the library, a demo application, and Jest and Playwright tests. It is a fork of [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-QueryBuilder).
+Angular 22 library workspace for `@argela-uxui/ngx-query-builder`, a standalone query-builder component with Angular forms integration. This repository contains the library, a demo application, and Jest and Playwright tests. It is a fork of [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-QueryBuilder).
 
 **Looking to use the library in an application?** See the [package usage documentation](projects/ngx-query-builder/README.md) for installation, examples, configuration, custom templates, and the public API. This README covers developing, building, and releasing the project.
 
@@ -20,7 +20,7 @@ The Angular CLI project is named `ngx-query-builder`, but the package built from
 
 ## Development installation
 
-Use Node.js `^20.19.0`, `^22.12.0`, or `>=24.0.0` (as required by the installed Angular CLI), plus npm. From the repository root:
+Use Node.js `^22.22.3`, `^24.15.0`, or `>=26.0.0` (as required by Angular 22), plus npm. From the repository root:
 
 ```bash
 npm ci
@@ -41,7 +41,7 @@ npm run build
 npm start
 ```
 
-`npm run build` builds the library in Angular's **production/partial compilation mode** into `dist/ngx-query-builder/`. Publish only this output, never the workspace root. `npm start` serves the demo at `http://localhost:4200`; it uses the library source through the workspace TypeScript path mapping. The demo has a live playground and 13 lazy-loaded examples for inputs, config callbacks, custom templates, localization, validation, styling, drag-and-drop, and query conversion; see [demo/README.md](demo/README.md).
+`npm run build` builds the library in Angular's **production/partial compilation mode** into `dist/ngx-query-builder/`. Publish only this output, never the workspace root. `npm start` serves the demo at `http://localhost:4200`; it uses the library source through the workspace TypeScript path mapping. The demo has a live playground and 15 lazy-loaded examples, including Theme Builder for custom appearance and Localization Builder for custom language profiles; see [demo/README.md](demo/README.md).
 
 For iterative library development, `npm run build:watch` runs the Angular CLI build in watch mode. This uses the default library configuration, not the production configuration; run `npm run build` before packaging or publishing. To build the demo application separately, run `npx ng build demo`.
 

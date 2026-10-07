@@ -67,8 +67,17 @@ export const NAV_GROUPS: DemoNavGroup[] = [
         loadComponent: () => import('./examples/styling.component').then((m) => m.StylingExampleComponent),
       },
       {
+        path: 'examples/theme-builder', slug: 'theme-builder', label: 'Theme builder', icon: 'sliders',
+        loadComponent: () => import('./examples/theme-builder.component').then((m) => m.ThemeBuilderExampleComponent),
+      },
+      {
         path: 'examples/localization', slug: 'localization', label: 'Localization', icon: 'globe',
         loadComponent: () => import('./examples/localization.component').then((m) => m.LocalizationExampleComponent),
+      },
+      {
+        path: 'examples/localization-builder', slug: 'localization-builder', label: 'Localization Builder', icon: 'globe',
+        loadComponent: () => import('./examples/localization-builder.component')
+          .then((m) => m.LocalizationBuilderExampleComponent),
       },
     ],
   },

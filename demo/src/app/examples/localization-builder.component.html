@@ -1,0 +1,167 @@
+<app-page-header eyebrow="Customization" title="Localization Builder"
+  description="Create a custom language by editing every QueryBuilderTranslations label, previewing it live, and copying a ready-to-use TypeScript language file."
+  [apis]="['QueryBuilderTranslations', 'operatorLabels', 'Live preview', 'Saved localizations']">
+  <section pageHeaderActions class="panel saved-localizations" aria-labelledby="saved-localization-heading">
+    <div class="saved-localization-heading">
+      <div>
+        <h2 class="panel-title" id="saved-localization-heading">Save &amp; reuse</h2>
+        <p class="muted small">Load a sample or save a custom language.</p>
+      </div>
+      <button type="button" class="btn btn--sm" data-testid="reset-localization" (click)="resetLocalization()">
+        Reset to English
+      </button>
+    </div>
+    <div class="saved-localization-create">
+      <label class="form-field">
+        <span class="form-label">Language name</span>
+        <input class="input" type="text" maxlength="80" name="localizationName" placeholder="e.g. Français"
+          data-testid="localization-name" [ngModel]="localizationName()"
+          (ngModelChange)="localizationName.set($event)" />
+      </label>
+      <button type="button" class="btn btn--primary save-button" data-testid="save-localization"
+        (click)="saveLocalization()">Save language</button>
+    </div>
+    <div class="saved-localization-divider" aria-hidden="true"></div>
+    <div class="saved-localization-load">
+      <label class="form-field">
+        <span class="form-label">Languages</span>
+        <select class="select" aria-label="Languages" data-testid="localization-profile-select"
+          [ngModel]="selectedLocalizationId()" (ngModelChange)="selectedLocalizationId.set($event)">
+          <option value="">Choose a language</option>
+          <optgroup label="Sample languages">
+            @for (language of sampleLanguages; track language.id) {
+              <option [value]="language.id">{{ language.name }}</option>
+            }
+          </optgroup>
+          @if (savedLocalizations().length > 0) {
+            <optgroup label="Your saved languages">
+              @for (profile of savedLocalizations(); track profile.id) {
+                <option [value]="profile.id">{{ profile.name }}</option>
+              }
+            </optgroup>
+          }
+        </select>
+      </label>
+      <div class="row saved-actions">
+        <button type="button" class="btn btn--sm btn--primary" data-testid="load-localization"
+          (click)="loadLocalization()">Load</button>
+        <button type="button" class="btn btn--sm btn--danger" data-testid="delete-localization"
+          [disabled]="!canDeleteSelected()" (click)="deleteLocalization()">Delete</button>
+      </div>
+    </div>
+    @if (message()) {
+      <p class="form-hint localization-message" role="status" data-testid="localization-message">{{ message() }}</p>
+    }
+  </section>
+</app-page-header>
+
+<section class="localization-layout" aria-label="Query-builder localization editor">
+  <div class="localization-preview">
+    <div class="panel">
+      <div class="panel-heading">
+        <div>
+          <h2 class="panel-title">Live preview</h2>
+          <p class="muted small">The sample includes nested rules, entities, and a range of field controls.</p>
+        </div>
+      </div>
+      <div class="preview-builder" data-testid="example-builder">
+        <query-builder [formControl]="queryCtrl" [config]="config" [translations]="translations()"
+          [allowCollapse]="true" [dragDropRules]="true" />
+      </div>
+    </div>
+  </div>
+
+  <aside class="localization-controls" aria-label="Localization settings">
+    <div class="editor-tabs" role="tablist" aria-label="Localization settings" data-testid="localization-editor-tabs">
+      @for (tab of editorTabs; track tab.id) {
+        <button type="button" role="tab" class="editor-tab"
+          [id]="'localization-tab-' + tab.id"
+          [attr.aria-selected]="activeEditorTab() === tab.id"
+          [attr.aria-controls]="'localization-panel-' + tab.id"
+          [attr.tabindex]="activeEditorTab() === tab.id ? 0 : -1"
+          [attr.data-editor-tab]="tab.id"
+          [attr.data-testid]="'localization-tab-' + tab.id"
+          (click)="selectEditorTab(tab.id)"
+          (keydown)="onEditorTabKeydown($event)">
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+
+    @if (activeEditorTab() === 'labels') {
+      <section class="panel token-group" role="tabpanel" id="localization-panel-labels"
+        aria-labelledby="localization-tab-labels">
+        <h2 class="panel-title">Builder labels</h2>
+        @for (field of stringFields; track field.key) {
+          <div class="form-field token-field">
+            <label class="form-label" [for]="'translation-' + field.key">
+              {{ field.label }} <code>{{ field.key }}</code>
+            </label>
+            @if (field.key === 'emptyRuleset') {
+              <textarea class="textarea" [id]="'translation-' + field.key" rows="3" [name]="field.key"
+                [attr.data-testid]="'translation-' + field.key"
+                [ngModel]="translations()[field.key]" (ngModelChange)="updateString(field.key, $event)"></textarea>
+            } @else {
+              <input class="input" [id]="'translation-' + field.key" type="text" [name]="field.key"
+                [attr.data-testid]="'translation-' + field.key"
+                [ngModel]="translations()[field.key]" (ngModelChange)="updateString(field.key, $event)" />
+            }
+          </div>
+        }
+      </section>
+    }
+
+    @if (activeEditorTab() === 'operators') {
+      <section class="panel token-group" role="tabpanel" id="localization-panel-operators"
+        aria-labelledby="localization-tab-operators">
+        <div class="panel-heading">
+          <div>
+            <h2 class="panel-title">Operator labels</h2>
+            <p class="muted small">Customize built-in and project-specific operator names.</p>
+          </div>
+        </div>
+        <div class="operator-list">
+          @for (operator of operatorLabels(); track operator.key) {
+            <label class="form-field token-field operator-field">
+              <span class="form-label"><code>{{ operator.key }}</code>
+                @if (operator.custom) {
+                  <span class="custom-operator-badge">Custom</span>
+                }
+              </span>
+              <input class="input" type="text" [name]="'operator-' + operator.key"
+                [attr.data-testid]="'operator-label-' + operator.key"
+                [ngModel]="operator.value" (ngModelChange)="updateOperator(operator.key, $event)" />
+            </label>
+          }
+        </div>
+        <div class="add-operator">
+          <label class="form-field">
+            <span class="form-label">Add a custom operator key</span>
+            <input class="input" type="text" name="customOperatorKey" data-testid="custom-operator-key"
+              [ngModel]="customOperatorKey()" (ngModelChange)="customOperatorKey.set($event)"
+              (keydown.enter)="addOperatorLabel(); $event.preventDefault()" />
+          </label>
+          <button type="button" class="btn btn--sm" data-testid="add-operator-label"
+            (click)="addOperatorLabel()">Add label</button>
+        </div>
+      </section>
+    }
+
+    @if (activeEditorTab() === 'code') {
+      <section class="panel code-panel" role="tabpanel" id="localization-panel-code"
+        aria-labelledby="localization-tab-code">
+        <div class="panel-heading">
+          <div>
+            <h2 class="panel-title">Language file</h2>
+            <p class="muted small">Copy this TypeScript module into your application.</p>
+          </div>
+          <button type="button" class="btn btn--sm btn--primary" data-testid="copy-localization-file"
+            (click)="copyLanguageFile()">Copy file</button>
+        </div>
+        <label class="sr-only" for="localization-code">Generated TypeScript QueryBuilderTranslations language file</label>
+        <textarea id="localization-code" class="textarea code-editor" rows="18" readonly spellcheck="false"
+          data-testid="localization-code" [ngModel]="translationCode()"></textarea>
+      </section>
+    }
+  </aside>
+</section>

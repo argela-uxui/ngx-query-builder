@@ -29,6 +29,47 @@ test.describe('Rule Drag-Drop', () => {
     await expect(demo.draggableRuleRows().first()).toBeVisible();
   });
 
+  test('keeps the drag handle aligned to the top of a custom textarea rule', async () => {
+    await demo.toggleDragDropRules().check();
+
+    const textarea = demo.customTextarea().first();
+    const rowOffset = await textarea.evaluate((element) => {
+      const handle = element.closest('li')?.querySelector('button.q-drag-handle');
+      const row = element.closest('li');
+      return handle && row
+        ? handle.getBoundingClientRect().top - row.getBoundingClientRect().top
+        : null;
+    });
+
+    expect(rowOffset).not.toBeNull();
+    expect(rowOffset).toBeCloseTo(7, 0);
+  });
+
+  test('positions the ruleset drag handle on the AND/OR controls row', async ({ page }) => {
+    await demo.toggleDragDropRules().check();
+
+    const rulesetRow = page.locator('li.q-ruleset').first();
+    const handle = rulesetRow.locator('.q-switch-row > button.q-drag-handle');
+    const switchGroup = rulesetRow.locator('.q-switch-row > .q-switch-group');
+    const [handleBox, switchGroupBox] = await Promise.all([handle.boundingBox(), switchGroup.boundingBox()]);
+
+    expect(handleBox).not.toBeNull();
+    expect(switchGroupBox).not.toBeNull();
+    expect(Math.abs((handleBox?.y ?? 0) - (switchGroupBox?.y ?? 0))).toBeLessThanOrEqual(1);
+  });
+
+  test('drags a ruleset using the handle inside its AND/OR row', async ({ page }) => {
+    await demo.toggleDragDropRules().check();
+
+    const previousOutput = await demo.getOutputText();
+    await page.locator('li.q-ruleset .q-switch-row > button.q-drag-handle').first()
+      .dragTo(page.locator('.q-tree > li.q-rule').first());
+    await demo.waitForOutputChange(previousOutput);
+
+    const rules = (await demo.getOutputJson())['rules'] as Array<Record<string, unknown>>;
+    expect(Array.isArray(rules[rules.length - 1]?.['rules'])).toBe(false);
+  });
+
   test('drags rules from root into 2nd and 3rd-level rulesets', async () => {
     test.fail(true, 'Known issue: cross-ruleset drag into depth >=2 does not always register in headless runs.');
 
@@ -67,10 +108,3 @@ test.describe('Rule Drag-Drop', () => {
     expect(thirdLevelAfterCount).toBe(thirdLevelBeforeCount + 1);
   });
 });
-
-
-
-
-
-
-

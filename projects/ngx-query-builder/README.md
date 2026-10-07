@@ -2,12 +2,12 @@
 
 ## General Overview
 
-`@argela-uxui/ngx-query-builder` is a configurable Angular 21 query-builder component for composing, validating, and editing nested filter expressions. It exposes a standalone component, integrates with Angular forms through `ControlValueAccessor` and `Validator`, and lets applications replace individual controls with custom templates.
+`@argela-uxui/ngx-query-builder` is a configurable Angular 22 query-builder component for composing, validating, and editing nested filter expressions. It exposes a standalone component, integrates with Angular forms through `ControlValueAccessor` and `Validator`, and lets applications replace individual controls with custom templates.
 
 Forked from [zebzhao/Angular-QueryBuilder](https://github.com/zebzhao/Angular-QueryBuilder) and fully updated to current Angular best practices.
 
-[![Angular](https://img.shields.io/badge/Angular-21-red)](https://angular.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org)
+[![Angular](https://img.shields.io/badge/Angular-22-red)](https://angular.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue)](https://www.typescriptlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 ## Online Demo
@@ -34,10 +34,10 @@ Visit : https://argela-uxui.github.io/qbdemo/
 
 | Package | Version |
 |---|---:|
-| `@angular/cdk` | `>=21.0.0` |
-| `@angular/common` | `>=21.0.0` |
-| `@angular/core` | `>=21.0.0` |
-| `@angular/forms` | `>=21.0.0` |
+| `@angular/cdk` | `>=22.0.0` |
+| `@angular/common` | `>=22.0.0` |
+| `@angular/core` | `>=22.0.0` |
+| `@angular/forms` | `>=22.0.0` |
 | `rxjs` | `>=7.0.0` |
 
 ## Installation
@@ -46,13 +46,13 @@ Visit : https://argela-uxui.github.io/qbdemo/
 npm install @argela-uxui/ngx-query-builder
 ```
 
-The published package targets Angular 21 or later. Install the Angular CDK, Common, Core, and Forms packages, plus RxJS, as peer dependencies if they are not already part of your application.
+The published package targets Angular 22 or later. Install the Angular CDK, Common, Core, and Forms packages, plus RxJS, as peer dependencies if they are not already part of your application.
 
 ---
 
 ## Quick Start
 
-### Standalone (Angular 21+)
+### Standalone (Angular 22+)
 
 ```ts
 import { Component } from '@angular/core';

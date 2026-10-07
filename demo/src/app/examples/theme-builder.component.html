@@ -1,0 +1,191 @@
+<app-page-header eyebrow="Customization" title="Theme builder"
+  description="Tune every query-builder CSS variable and classNames hook, preview the result against a representative query, and copy or save your custom theme."
+  [apis]="['--qb-* custom properties', 'QueryBuilderClassNames', 'Live preview', 'Saved themes']">
+  <section pageHeaderActions class="panel saved-themes" aria-labelledby="saved-theme-heading">
+    <div class="saved-theme-heading">
+      <div>
+        <h2 class="panel-title" id="saved-theme-heading">Save &amp; reuse</h2>
+        <p class="muted small">Load an example or save a theme.</p>
+      </div>
+      <button type="button" class="btn btn--sm" data-testid="reset-theme" (click)="resetTheme()">
+        Reset theme
+      </button>
+    </div>
+    <div class="saved-theme-create">
+      <label class="form-field">
+        <span class="form-label">Theme name</span>
+        <input class="input" type="text" maxlength="80" placeholder="e.g. Brand blue"
+          data-testid="theme-name" [ngModel]="themeName()" (ngModelChange)="themeName.set($event)" />
+      </label>
+      <button type="button" class="btn btn--primary save-button" data-testid="save-theme"
+        [disabled]="!!cssError() || !!classNamesError()" (click)="saveTheme()">Save theme</button>
+    </div>
+    <div class="saved-theme-divider" aria-hidden="true"></div>
+    <div class="saved-theme-load">
+      <label class="form-field">
+        <span class="form-label">Saved themes</span>
+        <select class="select" aria-label="Saved themes" data-testid="saved-theme-select"
+          [ngModel]="selectedThemeId()" (ngModelChange)="selectedThemeId.set($event)">
+          <option value="">Choose a theme</option>
+          <optgroup label="Styling examples">
+            @for (theme of sampleThemes; track theme.id) {
+              <option [value]="theme.id">{{ theme.name }}</option>
+            }
+          </optgroup>
+          @if (savedThemes().length > 0) {
+            <optgroup label="Your saved themes">
+              @for (theme of savedThemes(); track theme.id) {
+                <option [value]="theme.id">{{ theme.name }}</option>
+              }
+            </optgroup>
+          }
+        </select>
+      </label>
+      <div class="row saved-actions">
+        <button type="button" class="btn btn--sm btn--primary" data-testid="load-theme" (click)="loadTheme()">Load</button>
+        <button type="button" class="btn btn--sm btn--danger" data-testid="delete-theme"
+          [disabled]="!canDeleteSelectedTheme()" (click)="deleteTheme()">
+          Delete
+        </button>
+      </div>
+    </div>
+    @if (message()) {
+      <p class="form-hint theme-message" role="status" data-testid="theme-message">{{ message() }}</p>
+    }
+  </section>
+</app-page-header>
+
+<section class="theme-layout" aria-label="Query-builder theme editor">
+  <div class="theme-preview">
+    <div class="panel">
+      <div class="panel-heading">
+        <div>
+          <h2 class="panel-title">Live preview</h2>
+          <p class="muted small">The sample includes nested rules, entities, and varied field controls.</p>
+        </div>
+      </div>
+      <div class="preview-builder styling-demo" data-testid="example-builder"
+        [attr.data-theme-ready]="!cssError() && !classNamesError()">
+        <query-builder
+          [formControl]="queryCtrl"
+          [config]="config"
+          [classNames]="classNames()"
+          [style]="cssStyle()" />
+      </div>
+    </div>
+  </div>
+
+  <aside class="theme-controls" aria-label="Theme customization">
+    <div class="editor-tabs" role="tablist" aria-label="Theme settings" data-testid="theme-editor-tabs">
+      @for (tab of editorTabs; track tab.id) {
+        <button type="button" role="tab" class="editor-tab"
+          [id]="'theme-tab-' + tab.id"
+          [attr.aria-selected]="activeEditorTab() === tab.id"
+          [attr.aria-controls]="'theme-panel-' + tab.id"
+          [attr.tabindex]="activeEditorTab() === tab.id ? 0 : -1"
+          [attr.data-editor-tab]="tab.id"
+          [attr.data-testid]="'theme-tab-' + tab.id"
+          (click)="selectEditorTab(tab.id)"
+          (keydown)="onEditorTabKeydown($event)">
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+
+    @for (group of tokenGroups; track group.label) {
+      @if (activeEditorTab() === 'typography' && group.label === 'Typography and sizing'
+        || activeEditorTab() === 'surfaces' && group.label === 'Surfaces and borders'
+        || activeEditorTab() === 'accents' && group.label === 'Accents and validation'
+        || activeEditorTab() === 'motion' && group.label === 'Motion') {
+        <section class="panel token-group" role="tabpanel"
+          [id]="'theme-panel-' + activeEditorTab()" [attr.aria-labelledby]="'theme-tab-' + activeEditorTab()">
+          <h2 class="panel-title">{{ group.label }}</h2>
+          @for (token of group.tokens; track token.key) {
+            <div class="form-field token-field">
+              <label class="form-label" [for]="'token-' + token.key">{{ token.key }}</label>
+              @if (token.kind === 'color') {
+                <span class="color-control">
+                  <input type="color" [attr.aria-label]="token.key + ' color picker'"
+                    [value]="colorPickerValue(tokenValue(token.key))"
+                    (input)="onTokenInput($event, token.key)" />
+                  <input class="input" type="text" [id]="'token-' + token.key"
+                    [attr.aria-label]="token.key + ' CSS value'"
+                    [ngModel]="tokenValue(token.key)" (ngModelChange)="updateToken(token.key, $event)" />
+                </span>
+              } @else if (token.kind === 'range') {
+                <span class="range-control">
+                  <input type="range" [id]="'token-' + token.key" [attr.aria-label]="token.key"
+                    [min]="token.min" [max]="token.max" [value]="rangeValue(token.key)"
+                    (input)="onTokenInput($event, token.key)" />
+                  <output>{{ tokenValue(token.key) }}</output>
+                </span>
+              } @else {
+                <input class="input" type="text" [id]="'token-' + token.key" [attr.aria-label]="token.key"
+                  [ngModel]="tokenValue(token.key)" (ngModelChange)="updateToken(token.key, $event)" />
+              }
+              <span class="form-hint">{{ token.description }}</span>
+            </div>
+          }
+        </section>
+      }
+    }
+
+    @if (activeEditorTab() === 'classNames') {
+      <section class="panel token-group" role="tabpanel" id="theme-panel-classNames"
+        aria-labelledby="theme-tab-classNames">
+        <h2 class="panel-title">QueryBuilderClassNames</h2>
+        <p class="form-hint classnames-hint">Set a class for any query-builder element. Add matching CSS in your app when you use custom classes.</p>
+        @for (key of classNameKeys; track key) {
+          <label class="form-field token-field">
+            <span class="form-label">{{ key }}</span>
+            <input class="input" type="text" [id]="'class-name-' + key" [attr.aria-label]="key + ' class name'"
+              [ngModel]="classNameValues()[key]" (ngModelChange)="updateClassName(key, $event)" />
+          </label>
+        }
+      </section>
+    }
+
+    @if (activeEditorTab() === 'cssCode') {
+      <section class="panel code-panel" role="tabpanel" id="theme-panel-cssCode"
+        aria-labelledby="theme-tab-cssCode">
+        <div class="panel-heading">
+          <div>
+            <h2 class="panel-title">CSS custom properties</h2>
+            <p class="muted small">Edit declarations directly; valid changes update the controls and preview.</p>
+          </div>
+          <button type="button" class="btn btn--sm" data-testid="copy-theme-css"
+            (click)="copyCode(cssCode(), 'CSS')">Copy CSS</button>
+        </div>
+        <label class="sr-only" for="theme-css-code">CSS custom property declarations</label>
+        <textarea id="theme-css-code" class="textarea code-editor" rows="12" spellcheck="false"
+          data-testid="theme-css-code" [ngModel]="cssCode()" (ngModelChange)="updateCssCode($event)"></textarea>
+        @if (cssError()) {
+          <p class="callout callout--danger editor-error" role="alert" data-testid="theme-css-error">{{ cssError() }}</p>
+        }
+      </section>
+    }
+
+    @if (activeEditorTab() === 'classNamesCode') {
+      <section class="panel code-panel" role="tabpanel" id="theme-panel-classNamesCode"
+        aria-labelledby="theme-tab-classNamesCode">
+        <div class="panel-heading">
+          <div>
+            <h2 class="panel-title">classNames overrides</h2>
+            <p class="muted small">Edit a JSON object. Empty or omitted keys keep the built-in class names.</p>
+          </div>
+          <button type="button" class="btn btn--sm" data-testid="copy-theme-classnames"
+            (click)="copyCode(classNamesCode(), 'classNames JSON')">Copy JSON</button>
+        </div>
+        <label class="sr-only" for="theme-classnames-code">QueryBuilderClassNames JSON overrides</label>
+        <textarea id="theme-classnames-code" class="textarea code-editor" rows="12" spellcheck="false"
+          data-testid="theme-classnames-code" [ngModel]="classNamesCode()"
+          (ngModelChange)="updateClassNamesCode($event)"></textarea>
+        @if (classNamesError()) {
+          <p class="callout callout--danger editor-error" role="alert" data-testid="theme-classnames-error">
+            {{ classNamesError() }}
+          </p>
+        }
+      </section>
+    }
+  </aside>
+</section>

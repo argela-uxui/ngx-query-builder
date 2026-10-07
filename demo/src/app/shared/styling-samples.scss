@@ -37,7 +37,7 @@
   --qb-border-radius: 16px;
 }
 
-.app-shell .styling-demo:is(.styling-demo--ocean, .styling-demo--forest, .styling-demo--sunset) query-builder {
+.app-shell .styling-demo query-builder {
   .q-rule,
   .q-ruleset,
   .q-field-control,
@@ -71,7 +71,8 @@
     background: var(--primary);
     color: var(--primary-contrast);
     font: inherit;
-    font-size: 12.5px;
+    font-family: var(--qb-font-family, inherit);
+    font-size: var(--qb-font-size, inherit);
     font-weight: 600;
     cursor: pointer;
 
@@ -85,7 +86,7 @@
     padding: 0;
     justify-content: center;
     background: var(--danger-soft);
-    color: var(--danger);
+    color: var(--qb-remove-color, var(--danger));
   }
 
   .sd-icon--add::before {
@@ -111,7 +112,8 @@
     border-radius: 999px;
     background: var(--surface-3);
     color: var(--text-muted);
-    font-size: 12px;
+    font-family: var(--qb-font-family, inherit);
+    font-size: var(--qb-font-size, inherit);
     font-weight: 700;
     cursor: pointer;
   }
@@ -139,13 +141,15 @@
   }
 
   .sd-control {
-    height: 32px;
-    padding: 0 10px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface-2);
-    color: var(--text);
+    height: var(--qb-control-height, 32px);
+    padding: var(--qb-control-padding, 5px 8px);
+    border: 1px solid var(--qb-border-color, #ccc);
+    border-radius: var(--qb-border-radius, 4px);
+    background: var(--qb-bg-color, #fff);
+    color: var(--qb-text-color, #555);
     font: inherit;
+    font-family: var(--qb-font-family, inherit);
+    font-size: var(--qb-font-size, inherit);
   }
 
   input[type='checkbox'].sd-control {
@@ -153,8 +157,8 @@
   }
 
   .sd-control--operator {
-    background: var(--primary-soft);
-    color: var(--primary);
+    background: var(--qb-switch-bg, var(--primary-soft));
+    color: var(--qb-switch-active-color, var(--primary));
     font-weight: 600;
   }
 
@@ -174,6 +178,8 @@
     background: transparent;
     color: var(--primary);
     font: inherit;
+    font-family: var(--qb-font-family, inherit);
+    font-size: var(--qb-font-size, inherit);
     font-weight: 600;
     cursor: pointer;
 
@@ -187,7 +193,7 @@
   }
 
   .sd-link--remove {
-    color: var(--danger);
+    color: var(--qb-remove-color, var(--danger));
   }
 
   .sd-underline {
@@ -214,18 +220,21 @@
   }
 
   .sd-bare {
-    height: 30px;
+    height: var(--qb-control-height, 32px);
     margin-right: 6px;
-    padding: 0 4px;
+    padding: var(--qb-control-padding, 5px 8px);
     border: 0;
-    border-bottom: 1px solid var(--border-strong);
+    border-bottom: 1px solid var(--qb-border-color, var(--border-strong));
+    border-radius: var(--qb-border-radius, 4px);
     background: transparent;
-    color: var(--text);
+    color: var(--qb-text-color, var(--text));
     font: inherit;
+    font-family: var(--qb-font-family, inherit);
+    font-size: var(--qb-font-size, inherit);
   }
 
   .sd-bare--operator {
-    color: var(--primary);
+    color: var(--qb-switch-active-color, var(--primary));
     font-weight: 600;
   }
 }

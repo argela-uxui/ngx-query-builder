@@ -129,6 +129,7 @@
   .q-drag-handle {
     margin-right: 6px;
     min-height: var(--_qb-control-height);
+    vertical-align: top;
     border: 1px solid var(--_qb-border-color);
     border-radius: var(--_qb-border-radius);
     background-color: var(--_qb-bg-color);

@@ -28,10 +28,10 @@ function createDragQuery(): RuleSet {
   imports: [ReactiveFormsModule, QueryBuilderComponent, PageHeaderComponent, DemoCardComponent, IconComponent, ToggleComponent],
   template: `
     <app-page-header eyebrow="Interaction" title="Drag & drop"
-      description="Enable dragDropRules to reorder rules with the :: handle and move them between rulesets at any depth. Built on @angular/cdk/drag-drop — the model is updated in place and the form control is notified."
+      description="Enable dragDropRules to reorder rules and rulesets with the :: handle, including moves between rulesets at any depth. Built on @angular/cdk/drag-drop — the model is updated in place and the form control is notified."
       [apis]="['[dragDropRules]', '@angular/cdk/drag-drop', 'classNames.dragHandle', 'classNames.draggableRule']" />
 
-    <app-demo-card heading="Reorder & regroup" description="Grab the :: handle next to a field and drop it into another group." [tabs]="tabs()">
+    <app-demo-card heading="Reorder & regroup" description="Grab the :: handle next to a rule or ruleset and drop it into another group." [tabs]="tabs()">
       <div cardActions class="row">
         <app-toggle label="Drag & drop" testId="toggle-dd" [checked]="enabled()" (checkedChange)="enabled.set($event)" />
         <button type="button" class="btn btn--sm" (click)="reset()"><app-icon name="refresh" [size]="14" /> Reset</button>

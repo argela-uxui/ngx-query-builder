@@ -66,7 +66,7 @@ import {
 } from '@angular/cdk/drag-drop';
 
 interface DragRuleData {
-  rule: Rule;
+  rule: Rule | RuleSet;
   parent: RuleSet;
   owner: QueryBuilderComponent;
 }
@@ -676,7 +676,7 @@ export class QueryBuilderComponent implements OnChanges, OnDestroy, ControlValue
     this.handleDataChange();
   }
 
-  getDragRuleData(rule: Rule, parent: RuleSet): DragRuleData {
+  getDragRuleData(rule: Rule | RuleSet, parent: RuleSet): DragRuleData {
     return {
       rule,
       parent,
@@ -699,7 +699,11 @@ export class QueryBuilderComponent implements OnChanges, OnDestroy, ControlValue
     if (!this.dragDropRules() || this.disabled) {
       return false;
     }
-    return drag.data?.rule != null && drop.data?.ruleset != null;
+    const draggedRule = drag.data?.rule;
+    const targetRuleset = drop.data?.ruleset;
+    return draggedRule != null &&
+      targetRuleset != null &&
+      (!this.isRuleSet(draggedRule) || !this.containsRuleset(draggedRule, targetRuleset));
   };
 
   dropRule(event: CdkDragDrop<DropListData, DropListData, DragRuleData>): void {
@@ -715,26 +719,13 @@ export class QueryBuilderComponent implements OnChanges, OnDestroy, ControlValue
 
     const sourceRuleset = sourceListData.ruleset;
     const targetRuleset = targetListData.ruleset;
-    const sourceRuleAbsoluteIndices = this.getRuleAbsoluteIndices(sourceRuleset);
-    const sourceAbsoluteIndex = sourceRuleAbsoluteIndices[event.previousIndex];
-    if (sourceAbsoluteIndex === undefined) {
+    const movedRule = sourceRuleset.rules[event.previousIndex];
+    if (!movedRule || (this.isRuleSet(movedRule) && this.containsRuleset(movedRule, targetRuleset))) {
       return;
     }
 
-    const [movedRule] = sourceRuleset.rules.splice(sourceAbsoluteIndex, 1);
-    if (!movedRule) {
-      return;
-    }
-
-    const targetRuleAbsoluteIndices = this.getRuleAbsoluteIndices(targetRuleset);
-    const targetAbsoluteIndex = event.currentIndex >= targetRuleAbsoluteIndices.length
-      ? targetRuleset.rules.length
-      : targetRuleAbsoluteIndices[event.currentIndex];
-    if (targetAbsoluteIndex === undefined) {
-      return;
-    }
-
-    targetRuleset.rules.splice(targetAbsoluteIndex, 0, movedRule as Rule);
+    sourceRuleset.rules.splice(event.previousIndex, 1);
+    targetRuleset.rules.splice(Math.min(event.currentIndex, targetRuleset.rules.length), 0, movedRule);
 
     sourceListData.owner.resetContextCaches();
     targetListData.owner.resetContextCaches();
@@ -847,7 +838,7 @@ export class QueryBuilderComponent implements OnChanges, OnDestroy, ControlValue
   getQueryItemClassName(local: LocalRuleMeta): string {
     let cls = this.getClassNames('row', 'connector', 'transition');
     cls += ' ' + this.getClassNames(local.ruleset ? 'ruleSet' : 'rule');
-    if (this.dragDropRules() && !local.ruleset) {
+    if (this.dragDropRules()) {
       cls += ' ' + this.getClassNames('draggableRule');
     }
     if (local.invalid) {
@@ -1035,17 +1026,13 @@ export class QueryBuilderComponent implements OnChanges, OnDestroy, ControlValue
     }
   }
 
-  private getRuleAbsoluteIndices(ruleset: RuleSet): number[] {
-    return ruleset.rules.reduce<number[]>((indices, item, index) => {
-      if (!this.isRuleSet(item)) {
-        indices.push(index);
-      }
-      return indices;
-    }, []);
-  }
-
   private isRuleSet(item: Rule | RuleSet): item is RuleSet {
     return (item as RuleSet).rules !== undefined;
+  }
+
+  private containsRuleset(ruleset: RuleSet, candidate: RuleSet): boolean {
+    return ruleset === candidate ||
+      ruleset.rules.some((item) => this.isRuleSet(item) && this.containsRuleset(item, candidate));
   }
 
   private resetContextCaches(): void {

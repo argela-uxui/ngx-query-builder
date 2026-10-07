@@ -1,6 +1,6 @@
 {
   "name": "ngx-query-builder",
-  "version": "21.0.2",
+  "version": "21.0.3",
   "description": "A modernized Angular query builder component — Angular 21, standalone, signals",
   "license": "MIT",
   "private": true,

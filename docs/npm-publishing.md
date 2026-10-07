@@ -143,12 +143,12 @@ You can package the library into a `.tgz` archive for offline testing or manual 
 npm pack ./dist/ngx-query-builder --pack-destination publish
 ```
 
-This generates an archive such as `publish/argela-uxui-ngx-query-builder-21.0.2.tgz`.
+This generates an archive such as `publish/argela-uxui-ngx-query-builder-21.0.3.tgz`.
 
 To test this tarball in an external Angular project without publishing:
 ```bash
 # In your target application
-npm install /path/to/ngx-query-builder/publish/argela-uxui-ngx-query-builder-21.0.2.tgz
+npm install /path/to/ngx-query-builder/publish/argela-uxui-ngx-query-builder-21.0.3.tgz
 ```
 
 ---

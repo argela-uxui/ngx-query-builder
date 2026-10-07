@@ -1,6 +1,6 @@
 # ngx-query-builder Demo
 
-An Angular 22 application for exploring the `ngx-query-builder` component. It uses a responsive application shell, light/dark themes, a live playground, and 13 focused examples. The component is backed by reactive forms throughout the examples, with a few template-driven examples to show both forms APIs.
+An Angular 22 application for exploring the `ngx-query-builder` component. It uses a responsive application shell, light/dark themes, a live playground, and 15 focused examples. The component is backed by reactive forms throughout the examples, with a few template-driven examples to show both forms APIs.
 
 ## Run locally
 
@@ -42,8 +42,9 @@ The main playground keeps the existing 10-rule sample query and stable `data-tes
 | `/examples/callbacks` | `getInputType`, `getOptions`, CRUD callbacks, coercion and field-change callbacks |
 | `/examples/custom-templates` | All nine structural template directives |
 | `/examples/styling` | `classNames` presets and `--qb-*` CSS custom properties |
-| `/examples/theme-builder` | Live editor for all `--qb-*` variables and `QueryBuilderClassNames`, editable code and saved themes |
+| `/examples/theme-builder` | Live editor for theme variables and `QueryBuilderClassNames`, with presets, saved themes, and exportable CSS/class-name code |
 | `/examples/localization` | English, Turkish and German translations; `emptyMessage` |
+| `/examples/localization-builder` | Live editor for labels and operator translations, saved language profiles, and exportable TypeScript translations |
 | `/examples/nested` | Recursive groups, `allowCollapse`, `allowRuleset`, and initial collapse state |
 | `/examples/drag-drop` | Reordering and moving rules between nested groups |
 | `/examples/disabled` | Reactive/template-driven disabled state, preset queries and JSON import |

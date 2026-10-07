@@ -3,6 +3,17 @@
     <i [ngClass]="getClassNames('arrowIcon')"></i>
   </ng-template>
 
+  @if (dragDropRules() && parentValue()) {
+    <button
+      type="button"
+      cdkDragHandle
+      [ngClass]="getClassNames('dragHandle')"
+      aria-label="Drag ruleset"
+      [disabled]="disabled">
+      <span aria-hidden="true">::</span>
+    </button>
+  }
+
   @if (allowCollapse()) {
     <button
       type="button"
@@ -125,6 +136,17 @@
               </div>
             }
 
+            @if (dragDropRules()) {
+              <button
+                type="button"
+                cdkDragHandle
+                [ngClass]="getClassNames('dragHandle')"
+                [attr.aria-label]="getFieldContext(asRule).dragHandleAriaLabel"
+                [disabled]="disabled">
+                <span aria-hidden="true">::</span>
+              </button>
+            }
+
             @if (entities && entities.length > 0) {
               <div class="q-inline-block-display">
                 @let entityTpl = getEntityTemplate();
@@ -148,16 +170,6 @@
               <ng-container [ngTemplateOutlet]="fieldTpl" [ngTemplateOutletContext]="getFieldContext(asRule)"></ng-container>
             } @else {
               <div [ngClass]="getClassNames('fieldControlSize')">
-                @if (dragDropRules()) {
-                  <button
-                    type="button"
-                    cdkDragHandle
-                    [ngClass]="getClassNames('dragHandle')"
-                    [attr.aria-label]="getFieldContext(asRule).dragHandleAriaLabel"
-                    [disabled]="disabled">
-                    <span aria-hidden="true">::</span>
-                  </button>
-                }
                 <select [ngClass]="getClassNames('fieldControl')" [(ngModel)]="asRule.field" (ngModelChange)="changeField($event, asRule)"
                   [disabled]="disabled">
                   @for (field of getFields(asRule.entity); track field.value) {
@@ -230,7 +242,12 @@
         }
 
         @if (local.ruleset) {
-          <li [ngClass]="getQueryItemClassName(local)">
+          <li
+            [ngClass]="getQueryItemClassName(local)"
+            cdkDrag
+            [cdkDragData]="getDragRuleData($any(rule), data)"
+            [cdkDragDisabled]="disabled || !dragDropRules()"
+            cdkDragPreviewContainer="parent">
             <query-builder
               [data]="$any(rule)"
               [disabled]="disabled"

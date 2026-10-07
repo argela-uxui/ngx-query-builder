@@ -827,6 +827,26 @@ describe('QueryBuilderComponent', () => {
       expect(context.dragHandleAriaLabel).toBe('Drag rule');
     });
 
+    it('renders a drag handle for nested rulesets', () => {
+      const { fixture } = createComponent(baseConfig, {
+        condition: 'and',
+        rules: [
+          { field: 'name', operator: '=', value: 'Alice' },
+          { condition: 'or', rules: [] },
+        ],
+      });
+      fixture.componentRef.setInput('dragDropRules', true);
+      fixture.detectChanges();
+
+      const el: HTMLElement = fixture.nativeElement;
+      const rulesetRow = el.querySelector('li.q-ruleset');
+      const dragHandle = rulesetRow?.querySelector('.q-switch-row > button[aria-label="Drag ruleset"]');
+      const switchGroup = rulesetRow?.querySelector('.q-switch-row > .q-switch-group');
+
+      expect(dragHandle).toBeTruthy();
+      expect(dragHandle?.parentElement).toBe(switchGroup?.parentElement);
+    });
+
     it('dropRule reorders rules inside the same ruleset', () => {
       const ruleA: Rule = { field: 'name', operator: '=', value: 'Alice' };
       const ruleB: Rule = { field: 'age', operator: '=', value: 30 };
@@ -845,6 +865,26 @@ describe('QueryBuilderComponent', () => {
 
       expect((ruleset.rules[0] as Rule).field).toBe('age');
       expect((ruleset.rules[1] as Rule).field).toBe('name');
+    });
+
+    it('dropRule reorders rulesets alongside rules', () => {
+      const nestedRuleset: RuleSet = { condition: 'or', rules: [] };
+      const root: RuleSet = {
+        condition: 'and',
+        rules: [{ field: 'name', operator: '=', value: 'Alice' }, nestedRuleset],
+      };
+      const { fixture, component } = createComponent(baseConfig, root);
+      fixture.componentRef.setInput('dragDropRules', true);
+      fixture.detectChanges();
+
+      component.dropRule({
+        previousIndex: 1,
+        currentIndex: 0,
+        previousContainer: { data: component.getDropListData(root) },
+        container: { data: component.getDropListData(root) },
+      } as Parameters<QueryBuilderComponent['dropRule']>[0]);
+
+      expect(root.rules[0]).toBe(nestedRuleset);
     });
 
     it('dropRule moves rule between rulesets and leaves source empty', () => {
@@ -868,6 +908,21 @@ describe('QueryBuilderComponent', () => {
       expect(sourceRuleset.rules).toEqual([]);
       expect((targetRuleset.rules[0] as Rule).field).toBe('age');
       expect((targetRuleset.rules[1] as Rule).field).toBe('name');
+    });
+
+    it('does not allow a ruleset to be dropped into itself or a descendant', () => {
+      const descendant: RuleSet = { condition: 'or', rules: [] };
+      const draggedRuleset: RuleSet = { condition: 'and', rules: [descendant] };
+      const { fixture, component } = createComponent(baseConfig, { condition: 'and', rules: [draggedRuleset] });
+      fixture.componentRef.setInput('dragDropRules', true);
+      fixture.detectChanges();
+
+      const canDrop = component.canEnterDropList(
+        { data: { rule: draggedRuleset } } as Parameters<QueryBuilderComponent['canEnterDropList']>[0],
+        { data: component.getDropListData(descendant) } as Parameters<QueryBuilderComponent['canEnterDropList']>[1],
+      );
+
+      expect(canDrop).toBe(false);
     });
   });
 
@@ -2024,6 +2079,30 @@ describe('QueryBuilderComponent — template rendering', () => {
     const entitySelect = el.querySelector('select.q-entity-control') as HTMLSelectElement;
     expect(entitySelect).toBeTruthy();
     expect(entitySelect.options.length).toBe(2);
+  });
+
+  it('should render the drag handle before the entity selector', () => {
+    const fixture = TestBed.createComponent(QueryBuilderComponent);
+    fixture.componentRef.setInput('config', {
+      fields: {
+        personName: { name: 'Person Name', type: 'string', entity: 'person' },
+      },
+      entities: { person: { name: 'Person' } },
+    });
+    fixture.componentRef.setInput('dragDropRules', true);
+    fixture.componentInstance.data = {
+      condition: 'and',
+      rules: [{ field: 'personName', operator: '=', entity: 'person' }],
+    };
+    fixture.detectChanges();
+
+    const el: HTMLElement = fixture.nativeElement;
+    const dragHandle = el.querySelector('button.q-drag-handle');
+    const entitySelect = el.querySelector('select.q-entity-control');
+
+    expect(dragHandle).toBeTruthy();
+    expect(entitySelect).toBeTruthy();
+    expect(dragHandle!.compareDocumentPosition(entitySelect!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('should render collapse button when allowCollapse is true', () => {

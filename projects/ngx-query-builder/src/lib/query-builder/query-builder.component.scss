@@ -1,29 +1,32 @@
 :host {
   // ─── CSS Custom Properties ──────────────────────────────────────────────────
   // Override these on the host element to theme the query builder.
-  --qb-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --qb-font-size: 14px;
-  --qb-control-height: 32px;
-  --qb-control-padding: 5px 8px;
-  --qb-border-radius: 4px;
-  --qb-border-color: #ccc;
-  --qb-text-color: #555;
-  --qb-bg-color: #fff;
-  --qb-hover-bg: #f0f0f0;
-  --qb-switch-bg: #e4e4e4;
-  --qb-switch-active-border: rgb(97, 158, 215);
-  --qb-switch-active-color: rgb(49, 118, 179);
-  --qb-remove-color: #b3415d;
-  --qb-invalid-border: rgba(179, 65, 93, 0.5);
-  --qb-invalid-bg: rgba(179, 65, 93, 0.1);
-  --qb-warning-color: rgb(141, 37, 46);
-  --qb-connector-color: #ccc;
-  --qb-collapse-transition: linear 0.25s transform;
-  --qb-tree-transition: ease-in 0.25s max-height;
-  --qb-item-transition: all 0.1s ease-in-out;
+  --_qb-font-family: var(--qb-font-family, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  --_qb-font-size: var(--qb-font-size, 14px);
+  --_qb-control-height: var(--qb-control-height, 32px);
+  --_qb-control-padding: var(--qb-control-padding, 5px 8px);
+  --_qb-border-radius: var(--qb-border-radius, 4px);
+  --_qb-border-color: var(--qb-border-color, #ccc);
+  --_qb-text-color: var(--qb-text-color, #555);
+  --_qb-bg-color: var(--qb-bg-color, #fff);
+  --_qb-hover-bg: var(--qb-hover-bg, #f0f0f0);
+  --_qb-switch-bg: var(--qb-switch-bg, #e4e4e4);
+  --_qb-switch-active-border: var(--qb-switch-active-border, rgb(97, 158, 215));
+  --_qb-switch-active-color: var(--qb-switch-active-color, rgb(49, 118, 179));
+  --_qb-remove-color: var(--qb-remove-color, #b3415d);
+  --_qb-invalid-border: var(--qb-invalid-border, rgba(179, 65, 93, 0.5));
+  --_qb-invalid-bg: var(--qb-invalid-bg, rgba(179, 65, 93, 0.1));
+  --_qb-warning-color: var(--qb-warning-color, rgb(141, 37, 46));
+  --_qb-connector-color: var(--qb-connector-color, #ccc);
+  --_qb-collapse-transition: var(--qb-collapse-transition, linear 0.25s transform);
+  --_qb-tree-transition: var(--qb-tree-transition, ease-in 0.25s max-height);
+  --_qb-item-transition: var(--qb-item-transition, all 0.1s ease-in-out);
 
   display: block;
   width: 100%;
+  color: var(--_qb-text-color);
+  font-family: var(--_qb-font-family);
+  font-size: var(--_qb-font-size);
 
   .q-icon {
     font-style: normal;
@@ -59,7 +62,7 @@
     align-items: center;
     margin: 4px 2px 4px 0;
     transform: rotate(90deg);
-    transition: var(--qb-collapse-transition);
+    transition: var(--_qb-collapse-transition);
     cursor: pointer;
     background: transparent;
     border: 0;
@@ -77,7 +80,7 @@
   }
 
   .q-add-icon {
-    color: var(--qb-text-color);
+    color: var(--_qb-text-color);
 
     &::before {
       content: '➕';
@@ -85,14 +88,16 @@
   }
 
   .q-remove-button {
-    color: var(--qb-remove-color);
+    color: var(--_qb-remove-color);
     width: 31px;
+    font-family: var(--_qb-font-family);
+    font-size: var(--_qb-font-size);
   }
 
   .q-switch-group,
   .q-button-group {
     display: inline-flex;
-    font-family: var(--qb-font-family), serif;
+    font-family: var(--_qb-font-family);
   }
 
   .q-right-align {
@@ -104,7 +109,7 @@
   .q-button {
     margin-left: 8px;
     padding: 0 8px;
-    background-color: var(--qb-bg-color);
+    background-color: var(--_qb-bg-color);
 
     &:disabled {
       display: none;
@@ -123,11 +128,11 @@
 
   .q-drag-handle {
     margin-right: 6px;
-    min-height: var(--qb-control-height);
-    border: 1px solid var(--qb-border-color);
-    border-radius: var(--qb-border-radius);
-    background-color: var(--qb-bg-color);
-    color: var(--qb-text-color);
+    min-height: var(--_qb-control-height);
+    border: 1px solid var(--_qb-border-color);
+    border-radius: var(--_qb-border-radius);
+    background-color: var(--_qb-bg-color);
+    color: var(--_qb-text-color);
     cursor: grab;
 
     &:active {
@@ -148,11 +153,13 @@
   .q-field-control,
   .q-entity-control {
     display: inline-block;
-    padding: var(--qb-control-padding);
-    color: var(--qb-text-color);
-    background-color: var(--qb-bg-color);
-    border: 1px solid var(--qb-border-color);
-    border-radius: var(--qb-border-radius);
+    padding: var(--_qb-control-padding);
+    color: var(--_qb-text-color);
+    background-color: var(--_qb-bg-color);
+    border: 1px solid var(--_qb-border-color);
+    border-radius: var(--_qb-border-radius);
+    font-family: var(--_qb-font-family);
+    font-size: var(--_qb-font-size);
     box-sizing: border-box;
     width: auto;
 
@@ -161,7 +168,7 @@
     }
 
     &:focus-visible {
-      outline: 2px solid var(--qb-switch-active-border);
+      outline: 2px solid var(--_qb-switch-active-border);
       outline-offset: 1px;
     }
   }
@@ -170,14 +177,15 @@
   .q-field-control,
   .q-entity-control,
   .q-input-control:not([type='checkbox']) {
-    min-height: var(--qb-control-height);
+    min-height: var(--_qb-control-height);
     appearance: auto;
   }
 
   .q-switch-label,
   .q-button {
     margin-bottom: 0;
-    font-size: var(--qb-font-size);
+    font-family: var(--_qb-font-family);
+    font-size: var(--_qb-font-size);
     line-height: 30px;
     font-weight: normal;
     text-align: center;
@@ -187,17 +195,17 @@
 
     &:hover {
       cursor: pointer;
-      background-color: var(--qb-hover-bg);
+      background-color: var(--_qb-hover-bg);
     }
 
     &:focus-visible {
-      outline: 2px solid var(--qb-switch-active-border);
+      outline: 2px solid var(--_qb-switch-active-border);
       outline-offset: -2px;
     }
   }
 
   .q-switch-label {
-    background-color: var(--qb-switch-bg);
+    background-color: var(--_qb-switch-bg);
     padding: 0 8px;
   }
 
@@ -214,9 +222,9 @@
     border: 0;
 
     &:checked + .q-switch-label {
-      border: 1px solid var(--qb-switch-active-border);
-      background: var(--qb-bg-color);
-      color: var(--qb-switch-active-color);
+      border: 1px solid var(--_qb-switch-active-border);
+      background: var(--_qb-bg-color);
+      color: var(--_qb-switch-active-color);
     }
 
     &:disabled + .q-switch-label {
@@ -232,32 +240,32 @@
   }
 
   .q-invalid-ruleset {
-    border: 1px solid var(--qb-invalid-border) !important;
-    background: var(--qb-invalid-bg) !important;
+    border: 1px solid var(--_qb-invalid-border) !important;
+    background: var(--_qb-invalid-bg) !important;
   }
 
   .q-empty-warning {
-    color: var(--qb-warning-color);
+    color: var(--_qb-warning-color);
     text-align: center;
   }
 
   .q-ruleset {
-    border: 1px solid var(--qb-border-color);
+    border: 1px solid var(--_qb-border-color);
   }
 
   .q-rule {
-    border: 1px solid var(--qb-border-color);
-    background: var(--qb-bg-color);
+    border: 1px solid var(--_qb-border-color);
+    background: var(--_qb-bg-color);
   }
 
   .q-transition {
-    transition: var(--qb-item-transition);
+    transition: var(--_qb-item-transition);
   }
 
   .q-tree-container {
     width: 100%;
     overflow: hidden;
-    transition: var(--qb-tree-transition);
+    transition: var(--_qb-tree-transition);
 
     &.q-collapsed {
       max-height: 0 !important;
@@ -274,16 +282,16 @@
   }
 
   .q-drop-list-enabled.cdk-drop-list-receiving {
-    outline: 1px dashed var(--qb-switch-active-border);
+    outline: 1px dashed var(--_qb-switch-active-border);
     outline-offset: 2px;
   }
 
   .q-drop-target-spacer {
     min-height: 36px;
     margin: 4px 0;
-    border: 1px dashed var(--qb-border-color);
-    border-radius: var(--qb-border-radius);
-    background: var(--qb-hover-bg);
+    border: 1px dashed var(--_qb-border-color);
+    border-radius: var(--_qb-border-radius);
+    background: var(--_qb-hover-bg);
     pointer-events: none;
   }
 
@@ -309,7 +317,7 @@
     &::after {
       content: '';
       left: -12px;
-      border-color: var(--qb-connector-color);
+      border-color: var(--_qb-connector-color);
       border-style: solid;
       width: 9px;
       height: calc(50% + 6px);

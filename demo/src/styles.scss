@@ -4,6 +4,8 @@
    [data-theme] attribute on <html> (see ThemeService).
    ========================================================================== */
 
+@use './app/shared/styling-samples.scss';
+
 :root {
   color-scheme: light;
 
@@ -518,11 +520,9 @@ pre {
 }
 
 /* ---------- Query builder theming ----------
-   Maps the library's --qb-* custom properties to the demo design tokens so the
-   component follows the light/dark theme. The `.app-shell` prefix gives these
-   rules enough specificity to override the component's :host defaults. */
-
-.app-shell query-builder {
+   Set public tokens above query-builder instances so nested builders inherit
+   theme overrides instead of resetting them. */
+.app-shell {
   --qb-font-family: var(--font-sans);
   --qb-font-size: 13px;
   --qb-border-radius: var(--radius-sm);
@@ -538,7 +538,9 @@ pre {
   --qb-invalid-bg: var(--danger-soft);
   --qb-warning-color: var(--danger);
   --qb-connector-color: var(--border-strong);
+}
 
+.app-shell query-builder {
   color: var(--text);
 
   .q-rule,

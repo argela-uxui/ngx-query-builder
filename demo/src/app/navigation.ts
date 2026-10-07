@@ -74,6 +74,11 @@ export const NAV_GROUPS: DemoNavGroup[] = [
         path: 'examples/localization', slug: 'localization', label: 'Localization', icon: 'globe',
         loadComponent: () => import('./examples/localization.component').then((m) => m.LocalizationExampleComponent),
       },
+      {
+        path: 'examples/localization-builder', slug: 'localization-builder', label: 'Localization Builder', icon: 'globe',
+        loadComponent: () => import('./examples/localization-builder.component')
+          .then((m) => m.LocalizationBuilderExampleComponent),
+      },
     ],
   },
   {

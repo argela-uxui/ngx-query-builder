@@ -12,6 +12,7 @@ const EXAMPLES = [
   'styling',
   'theme-builder',
   'localization',
+  'localization-builder',
   'nested',
   'drag-drop',
   'disabled',

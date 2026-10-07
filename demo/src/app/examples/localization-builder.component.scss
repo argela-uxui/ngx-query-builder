@@ -1,0 +1,236 @@
+.localization-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 440px);
+  align-items: start;
+  gap: 20px;
+}
+
+.localization-preview {
+  position: sticky;
+  top: calc(var(--topbar-height) + 16px);
+  min-width: 0;
+  max-height: calc(100dvh - 300px);
+  overflow: auto;
+}
+
+.localization-controls {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
+  max-height: calc(100dvh - 300px);
+  overflow-y: auto;
+}
+
+.localization-controls > * {
+  flex: 0 0 auto;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.panel-heading .panel-title {
+  margin-bottom: 4px;
+}
+
+.preview-builder {
+  padding: 4px 0;
+}
+
+.saved-localizations {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.saved-localization-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.saved-localization-heading .panel-title {
+  margin-bottom: 4px;
+}
+
+.saved-localization-heading .btn {
+  flex: 0 0 auto;
+}
+
+.saved-localization-create,
+.saved-localization-load {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+}
+
+.saved-localization-create .form-field,
+.saved-localization-load .form-field {
+  min-width: 0;
+}
+
+.save-button {
+  min-width: 108px;
+  margin-bottom: 0;
+}
+
+.saved-localization-divider {
+  height: 1px;
+  background: color-mix(in srgb, var(--border-strong) 65%, transparent);
+}
+
+.saved-actions {
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.localization-message {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.token-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.token-group .panel-title {
+  margin-bottom: 0;
+}
+
+.token-field {
+  min-width: 0;
+}
+
+.token-field code {
+  margin-left: 4px;
+  font-weight: 500;
+}
+
+.operator-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.operator-field {
+  min-width: 0;
+}
+
+.custom-operator-badge {
+  margin-left: 6px;
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.add-operator {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.code-editor {
+  min-height: 340px;
+  font-family: var(--font-mono);
+  line-height: 1.55;
+  tab-size: 2;
+}
+
+.editor-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  flex: 0 0 auto;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-3);
+}
+
+.editor-tab {
+  min-width: 0;
+  min-height: 34px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.editor-tab:hover:not([aria-selected='true']) {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.editor-tab[aria-selected='true'] {
+  background: var(--primary);
+  color: var(--primary-contrast);
+  box-shadow: var(--shadow-sm);
+}
+
+.editor-tab:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+@media (max-width: 1050px) {
+  .localization-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .localization-preview {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .localization-controls {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .editor-tabs {
+    top: var(--topbar-height);
+  }
+}
+
+@media (max-width: 620px) {
+  .saved-localization-create,
+  .saved-localization-load,
+  .add-operator {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .saved-actions {
+    flex-wrap: wrap;
+  }
+
+  .save-button {
+    min-height: 36px;
+  }
+
+  .operator-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

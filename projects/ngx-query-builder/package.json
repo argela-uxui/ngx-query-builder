@@ -2,7 +2,7 @@
   "name": "@argela-uxui/ngx-query-builder",
   "description": "A modernized Angular query builder component — Angular 21, standalone, signals",
   "license": "MIT",
-  "version": "21.0.3",
+  "version": "21.0.4",
   "keywords": [
     "angular",
     "angular21",
